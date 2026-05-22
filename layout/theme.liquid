@@ -134,5 +134,7 @@
     {% if settings.quick_add or settings.mobile_quick_add %}
       {% render 'quick-add-modal' %}
     {% endif %}
+
+    {%- render 'ctr-swiper-loader', ctr_swiper_needed: ctr_swiper_needed -%}
   </body>
 </html>

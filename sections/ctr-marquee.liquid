@@ -1,0 +1,308 @@
+{%- comment -%} Scrolling Marquee Section {%- endcomment -%}
+{%- liquid
+  assign speed      = section.settings.speed
+  assign direction  = section.settings.direction
+  assign separator  = section.settings.separator
+  assign custom_css = section.settings.custom_css
+  assign kf_name    = 'ctr-marquee-' | append: section.id
+-%}
+
+{% capture selector %}[data-style-id="{{ section.id }}"]{% endcapture %}
+
+{% capture css %}
+  & {
+    overflow: hidden;
+    {% if section.settings.bg_color != blank and section.settings.bg_color.alpha != 0 %}background-color: {{ section.settings.bg_color }};{% endif %}
+  }
+
+  {% if section.settings.hide_on_mobile %}
+    @media (max-width: 767px) {
+      & { display: none; }
+    }
+  {% endif %}
+
+  & .marquee__track {
+    display: flex;
+    width: max-content;
+    align-items: center;
+    will-change: transform;
+    animation-name: {{ kf_name }};
+    animation-duration: {{ speed }}s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+  }
+
+  & .marquee__item {
+    white-space: nowrap;
+    padding: {{ section.settings.padding_v }}px {{ section.settings.item_gap }}px;
+    font-size: {{ section.settings.font_size }}px;
+    font-weight: {{ section.settings.font_weight }};
+    {% if section.settings.text_color != blank and section.settings.text_color.alpha != 0 %}color: {{ section.settings.text_color }};{% endif %}
+  }
+
+  & .marquee__sep {
+    white-space: nowrap;
+    padding: {{ section.settings.padding_v }}px {{ section.settings.sep_gap }}px;
+    font-size: {{ section.settings.sep_size }}px;
+    line-height: 1;
+    {% if section.settings.sep_color != blank and section.settings.sep_color.alpha != 0 %}
+      color: {{ section.settings.sep_color }};
+    {% elsif section.settings.text_color != blank and section.settings.text_color.alpha != 0 %}
+      color: {{ section.settings.text_color }};
+      opacity: 0.5;
+    {% endif %}
+  }
+{% endcapture %}
+
+<style>
+  {{ css | append: custom_css | replace: '&', selector | strip_newlines }}
+
+  @keyframes {{ kf_name }} {
+    {% if direction == 'left' %}
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    {% else %}
+      from { transform: translateX(-50%); }
+      to   { transform: translateX(0); }
+    {% endif %}
+  }
+</style>
+
+<div
+  data-style-id="{{ section.id }}"
+  {% if section.settings.section_id != blank %}id="{{ section.settings.section_id }}"{% endif %}
+  role="marquee"
+  aria-label="{{ section.settings.aria_label | default: 'Scrolling announcement' }}"
+>
+  <div class="marquee__track">
+
+    {%- comment -%} First copy {%- endcomment -%}
+    {%- for block in section.blocks -%}
+      {%- if block.type == 'text' -%}
+        <span class="marquee__item" {{ block.shopify_attributes }}>{{ block.settings.text }}</span>
+        <span class="marquee__sep" aria-hidden="true">{{ separator }}</span>
+      {%- endif -%}
+    {%- endfor -%}
+
+    {%- comment -%} Second copy — seamless loop {%- endcomment -%}
+    {%- for block in section.blocks -%}
+      {%- if block.type == 'text' -%}
+        <span class="marquee__item" aria-hidden="true">{{ block.settings.text }}</span>
+        <span class="marquee__sep" aria-hidden="true">{{ separator }}</span>
+      {%- endif -%}
+    {%- endfor -%}
+
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Marquee",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Animation"
+    },
+    {
+      "type": "range",
+      "id": "speed",
+      "label": "Scroll duration (seconds)",
+      "info": "Lower = faster. Adjust based on number of items.",
+      "default": 20,
+      "min": 5,
+      "max": 120,
+      "step": 5,
+      "unit": "s"
+    },
+    {
+      "type": "select",
+      "id": "direction",
+      "label": "Scroll direction",
+      "default": "left",
+      "options": [
+        { "value": "left",  "label": "Left (default)" },
+        { "value": "right", "label": "Right" }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": "t:all.empty_char"
+    },
+    {
+      "type": "header",
+      "content": "Separator"
+    },
+    {
+      "type": "text",
+      "id": "separator",
+      "label": "Separator character",
+      "default": "•"
+    },
+    {
+      "type": "range",
+      "id": "sep_gap",
+      "label": "Separator padding (px)",
+      "default": 20,
+      "min": 4,
+      "max": 60,
+      "step": 2,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "sep_size",
+      "label": "Separator size (px)",
+      "default": 10,
+      "min": 6,
+      "max": 24,
+      "step": 1,
+      "unit": "px"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:all.empty_char"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "alpha": true,
+      "id": "bg_color",
+      "label": "Background color",
+      "default": "#1a2032"
+    },
+    {
+      "type": "color",
+      "alpha": true,
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "alpha": true,
+      "id": "sep_color",
+      "label": "Separator color",
+      "info": "Leave transparent to inherit text color at 50% opacity."
+    },
+    {
+      "type": "paragraph",
+      "content": "t:all.empty_char"
+    },
+    {
+      "type": "header",
+      "content": "Typography & Spacing"
+    },
+    {
+      "type": "range",
+      "id": "font_size",
+      "label": "Font size (px)",
+      "default": 14,
+      "min": 10,
+      "max": 28,
+      "step": 1,
+      "unit": "px"
+    },
+    {
+      "type": "select",
+      "id": "font_weight",
+      "label": "Font weight",
+      "default": "400",
+      "options": [
+        { "value": "300", "label": "Light 300" },
+        { "value": "400", "label": "Regular 400" },
+        { "value": "500", "label": "Medium 500" },
+        { "value": "600", "label": "Semi-bold 600" },
+        { "value": "700", "label": "Bold 700" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "padding_v",
+      "label": "Vertical padding (px)",
+      "default": 14,
+      "min": 4,
+      "max": 40,
+      "step": 2,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "item_gap",
+      "label": "Item padding (px)",
+      "default": 16,
+      "min": 4,
+      "max": 60,
+      "step": 2,
+      "unit": "px"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:all.empty_char"
+    },
+    {
+      "type": "header",
+      "content": "Visibility"
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_on_mobile",
+      "label": "Hide on mobile",
+      "default": false
+    },
+    {
+      "type": "paragraph",
+      "content": "t:all.empty_char"
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "text",
+      "id": "aria_label",
+      "label": "Aria label",
+      "default": "Scrolling announcement"
+    },
+    {
+      "type": "textarea",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    },
+    {
+      "type": "text",
+      "id": "section_id",
+      "label": "Section ID"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "text",
+      "name": "Marquee text",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "30 day risk free trial"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "CTR Marquee",
+      "category": "Promotional",
+      "blocks": [
+        { "type": "text", "settings": { "text": "30 day risk free trial" } },
+        { "type": "text", "settings": { "text": "30 day risk free trial" } },
+        { "type": "text", "settings": { "text": "30 day risk free trial" } },
+        { "type": "text", "settings": { "text": "30 day risk free trial" } },
+        { "type": "text", "settings": { "text": "30 day risk free trial" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

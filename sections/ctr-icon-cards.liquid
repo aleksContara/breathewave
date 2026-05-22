@@ -1,0 +1,681 @@
+{%- comment -%} Icon Cards / Benefits Section {%- endcomment -%}
+{%- if section.settings.mobile_layout == 'carousel' -%}{% assign ctr_swiper_needed = true %}{%- endif -%}
+{%- liquid
+  assign mobile_layout   = section.settings.mobile_layout
+  assign desktop_cols    = section.settings.desktop_cols
+  assign show_dots       = section.settings.show_dots
+  assign custom_css      = section.settings.custom_css
+  assign section_id_attr = section.settings.section_id
+  assign use_swiper      = false
+  if mobile_layout == 'carousel'
+    assign use_swiper = true
+  endif
+  assign swiper_id = 'ic-swiper-' | append: section.id
+-%}
+
+{% capture selector %}[data-style-id="{{ section.id }}"]{% endcapture %}
+
+{% capture css %}
+  & {
+    {% if section.settings.bg_color != blank and section.settings.bg_color.alpha != 0 %}background-color: {{ section.settings.bg_color }};{% endif %}
+    padding: {{ section.settings.padding_top }}px {{ section.settings.padding_horizontal }}px {{ section.settings.padding_bottom }}px;
+    box-sizing: border-box;
+  }
+
+  & .ic__inner {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+  }
+
+  & .ic__header {
+    margin-bottom: {{ section.settings.header_gap }}px;
+  }
+
+  & .ic__eyebrow {
+    font-size: {{ section.settings.eyebrow_size }}px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 10px;
+    {% if section.settings.eyebrow_color != blank and section.settings.eyebrow_color.alpha != 0 %}color: {{ section.settings.eyebrow_color }};{% endif %}
+  }
+
+  & .ic__heading {
+    font-size: {{ section.settings.heading_size_mobile }}px;
+    font-weight: 700;
+    line-height: 1.15;
+    margin: 0;
+    {% if section.settings.heading_color != blank and section.settings.heading_color.alpha != 0 %}color: {{ section.settings.heading_color }};{% endif %}
+  }
+  & .ic__heading h1,
+  & .ic__heading h2,
+  & .ic__heading h3,
+  & .ic__heading p {
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+    color: inherit;
+    margin: 0;
+  }
+
+  & .ic__card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: {{ section.settings.card_padding }}px;
+    border-radius: {{ section.settings.card_radius }}px;
+    gap: 12px;
+    height: auto;
+    box-sizing: border-box;
+    {% if section.settings.card_bg != blank and section.settings.card_bg.alpha != 0 %}background-color: {{ section.settings.card_bg }};{% endif %}
+    {% if section.settings.card_border_color != blank and section.settings.card_border_color.alpha != 0 %}
+      border: 1px solid {{ section.settings.card_border_color }};
+    {% endif %}
+  }
+
+  & .ic__card-icon {
+    width: {{ section.settings.icon_size }}px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 4px;
+    mix-blend-mode: multiply; 
+  }
+  & .ic__card-icon img {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+  }
+
+  & .ic__card-title {
+    font-size: {{ section.settings.title_size }}px;
+    font-weight: 700;
+    line-height: 1.25;
+    margin: 0;
+    {% if section.settings.title_color != blank and section.settings.title_color.alpha != 0 %}color: {{ section.settings.title_color }};{% endif %}
+  }
+
+  & .ic__card-body {
+    font-size: {{ section.settings.body_size }}px;
+    line-height: 1.6;
+    margin: 0;
+    {% if section.settings.body_color != blank and section.settings.body_color.alpha != 0 %}color: {{ section.settings.body_color }};{% endif %}
+  }
+  & .ic__card-body p { margin: 0; }
+  & .ic__card-body sup {
+    font-size: 0.65em;
+    vertical-align: super;
+    line-height: 0;
+  }
+
+  & .ic__pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  & .ic__pagination .swiper-pagination-bullet {
+    width: 8px;
+    height: 8px;
+    background-color: {{ section.settings.dot_color | default: '#1a1a1a' }};
+    opacity: 0.25;
+    border-radius: 50%;
+    display: inline-block;
+    margin: 0 4px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  & .ic__pagination .swiper-pagination-bullet-active {
+    opacity: 1;
+  }
+
+  /* Mobile grid fallback (when carousel is off) */
+  & .ic__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  /* Desktop overrides */
+  @media (min-width: 768px) {
+    & .ic__heading {
+      font-size: {{ section.settings.heading_size_desktop }}px;
+    }
+
+    /* Swiper reset → CSS grid on desktop */
+    & .ic__slider.swiper {
+      overflow: visible;
+    }
+    & .ic__slider .swiper-wrapper {
+      display: grid !important;
+      grid-template-columns: repeat({{ desktop_cols }}, 1fr);
+      transform: none !important;
+      transition: none !important;
+      gap: 16px;
+    }
+    & .ic__slider .swiper-slide {
+      width: auto !important;
+      margin-right: 0 !important;
+    }
+    & .ic__pagination {
+      display: none !important;
+    }
+
+    /* Plain grid on desktop */
+    & .ic__grid {
+      grid-template-columns: repeat({{ desktop_cols }}, 1fr);
+      gap: 16px;
+    }
+  }
+{% endcapture %}
+
+
+<style>
+  {{ css | append: custom_css | replace: '&', selector | strip_newlines }}
+</style>
+
+<div
+  data-style-id="{{ section.id }}"
+  {% if section_id_attr != blank %}id="{{ section_id_attr }}"{% endif %}
+>
+  <div class="ic__inner">
+
+    {%- comment -%} Section header {%- endcomment -%}
+    {%- if section.settings.eyebrow != blank or section.settings.heading != blank -%}
+      <div class="ic__header">
+        {%- if section.settings.eyebrow != blank -%}
+          <div class="ic__eyebrow">{{ section.settings.eyebrow }}</div>
+        {%- endif -%}
+        {%- if section.settings.heading != blank -%}
+          <div class="ic__heading">{{ section.settings.heading }}</div>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    {%- comment -%} Cards — Swiper markup (works as grid on desktop via CSS) {%- endcomment -%}
+    {% if use_swiper %}
+
+      <div class="ic__slider swiper" id="{{ swiper_id }}">
+        <div class="swiper-wrapper">
+          {%- for block in section.blocks -%}
+            {%- if block.type == 'card' -%}
+              <div class="ic__card swiper-slide" {{ block.shopify_attributes }}>
+                {%- if block.settings.icon != blank -%}
+                  <div class="ic__card-icon">
+                    <img
+                      src="{{ block.settings.icon | image_url: width: 240 }}"
+                      alt="{{ block.settings.icon.alt | default: block.settings.title }}"
+                      loading="lazy"
+                      width="{{ block.settings.icon.width }}"
+                      height="{{ block.settings.icon.height }}"
+                    >
+                  </div>
+                {%- endif -%}
+                {%- if block.settings.title != blank -%}
+                  <div class="ic__card-title">{{ block.settings.title }}</div>
+                {%- endif -%}
+                {%- if block.settings.body != blank -%}
+                  <div class="ic__card-body">{{ block.settings.body }}</div>
+                {%- endif -%}
+              </div>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+
+        {%- if show_dots -%}
+          <div class="ic__pagination swiper-pagination"></div>
+        {%- endif -%}
+      </div>
+
+    {% else %}
+
+      {%- comment -%} Plain grid (no Swiper) {%- endcomment -%}
+      <div class="ic__grid">
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'card' -%}
+            <div class="ic__card" {{ block.shopify_attributes }}>
+              {%- if block.settings.icon != blank -%}
+                <div class="ic__card-icon">
+                  <img
+                    src="{{ block.settings.icon | image_url: width: 240 }}"
+                    alt="{{ block.settings.icon.alt | default: block.settings.title }}"
+                    loading="lazy"
+                    width="{{ block.settings.icon.width }}"
+                    height="{{ block.settings.icon.height }}"
+                  >
+                </div>
+              {%- endif -%}
+              {%- if block.settings.title != blank -%}
+                <div class="ic__card-title">{{ block.settings.title }}</div>
+              {%- endif -%}
+              {%- if block.settings.body != blank -%}
+                <div class="ic__card-body">{{ block.settings.body }}</div>
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+
+    {% endif %}
+
+  </div>
+</div>
+
+{%- if use_swiper -%}
+  <script>
+    window._ctrSwiperQ = window._ctrSwiperQ || [];
+    window._ctrSwiperQ.push(function () {
+      var el = document.getElementById({{ swiper_id | json }});
+      if (!el) return;
+
+      var mq  = window.matchMedia('(max-width: 767px)');
+      var sw  = null;
+
+      function activate() {
+        if (mq.matches && !sw) {
+          sw = new Swiper(el, {
+            slidesPerView: {{ section.settings.slides_per_view_mobile }},
+            spaceBetween: {{ section.settings.mobile_gap }},
+            grabCursor: true,
+            {% if show_dots %}
+            pagination: { el: el.querySelector('.swiper-pagination'), clickable: true },
+            {% endif %}
+          });
+        } else if (!mq.matches && sw) {
+          sw.destroy(true, true);
+          sw = null;
+        }
+      }
+
+      activate();
+      mq.addEventListener('change', activate);
+    });
+  </script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Icon Cards",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Heading"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow text"
+    },
+    {
+      "type": "richtext",
+      "id": "heading",
+      "label": "Heading",
+      "default": "<p>to live you breathe. to optimize you only nose-breathe.</p>"
+    },
+    {
+      "type": "range",
+      "id": "heading_size_desktop",
+      "label": "Heading size — Desktop (px)",
+      "default": 48,
+      "min": 20,
+      "max": 80,
+      "step": 2,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "heading_size_mobile",
+      "label": "Heading size — Mobile (px)",
+      "default": 28,
+      "min": 16,
+      "max": 52,
+      "step": 2,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "header_gap",
+      "label": "Gap after heading (px)",
+      "default": 40,
+      "min": 8,
+      "max": 80,
+      "step": 4,
+      "unit": "px"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:all.empty_char"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "mobile_layout",
+      "label": "Mobile layout",
+      "default": "carousel",
+      "options": [
+        { "value": "carousel", "label": "Carousel (Swiper)" },
+        { "value": "grid",     "label": "Grid" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "desktop_cols",
+      "label": "Desktop columns",
+      "default": "5",
+      "options": [
+        { "value": "3", "label": "3" },
+        { "value": "4", "label": "4" },
+        { "value": "5", "label": "5" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "slides_per_view_mobile",
+      "label": "Slides visible — Mobile",
+      "default": "1.2",
+      "info": "Use 1.2 to show a peek of the next slide.",
+      "options": [
+        { "value": "1",   "label": "1 — full width" },
+        { "value": "1.2", "label": "1.2 — peek effect" },
+        { "value": "1.5", "label": "1.5" },
+        { "value": "2",   "label": "2" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "mobile_gap",
+      "label": "Gap between slides — Mobile (px)",
+      "default": 12,
+      "min": 4,
+      "max": 32,
+      "step": 2,
+      "unit": "px"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_dots",
+      "label": "Show pagination dots on mobile",
+      "default": true
+    },
+    {
+      "type": "paragraph",
+      "content": "t:all.empty_char"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "label": "Max width (px)",
+      "default": 1200,
+      "min": 800,
+      "max": 1800,
+      "step": 40,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding top (px)",
+      "default": 60,
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding bottom (px)",
+      "default": 60,
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_horizontal",
+      "label": "Padding horizontal (px)",
+      "default": 24,
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:all.empty_char"
+    },
+    {
+      "type": "header",
+      "content": "Card Style"
+    },
+    {
+      "type": "range",
+      "id": "card_padding",
+      "label": "Card padding (px)",
+      "default": 24,
+      "min": 8,
+      "max": 48,
+      "step": 4,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "card_radius",
+      "label": "Card border radius (px)",
+      "default": 16,
+      "min": 0,
+      "max": 32,
+      "step": 2,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "icon_size",
+      "label": "Icon size (px)",
+      "default": 96,
+      "min": 40,
+      "max": 180,
+      "step": 4,
+      "unit": "px"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:all.empty_char"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "alpha": true,
+      "id": "bg_color",
+      "label": "Section background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "alpha": true,
+      "id": "card_bg",
+      "label": "Card background",
+      "default": "#eef2f8"
+    },
+    {
+      "type": "color",
+      "alpha": true,
+      "id": "card_border_color",
+      "label": "Card border color",
+      "info": "Leave transparent to hide border."
+    },
+    {
+      "type": "color",
+      "alpha": true,
+      "id": "heading_color",
+      "label": "Heading color",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "color",
+      "alpha": true,
+      "id": "eyebrow_color",
+      "label": "Eyebrow color",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "color",
+      "alpha": true,
+      "id": "title_color",
+      "label": "Card title color",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "color",
+      "alpha": true,
+      "id": "body_color",
+      "label": "Card body color",
+      "default": "#444444"
+    },
+    {
+      "type": "color",
+      "alpha": true,
+      "id": "dot_color",
+      "label": "Pagination dot color",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:all.empty_char"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "eyebrow_size",
+      "label": "Eyebrow size (px)",
+      "default": 12,
+      "min": 10,
+      "max": 18,
+      "step": 1,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "label": "Card title size (px)",
+      "default": 16,
+      "min": 12,
+      "max": 28,
+      "step": 1,
+      "unit": "px"
+    },
+    { 
+      "type": "range",
+      "id": "body_size",
+      "label": "Card body size (px)",
+      "default": 14,
+      "min": 10,
+      "max": 20,
+      "step": 1,
+      "unit": "px"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:all.empty_char"
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "textarea",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    },
+    {
+      "type": "text",
+      "id": "section_id",
+      "label": "Section ID"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "card",
+      "name": "Card",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "icon",
+          "label": "Icon image"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Benefit Title"
+        },
+        {
+          "type": "richtext",
+          "id": "body",
+          "label": "Body text",
+          "default": "<p>Description of this benefit and how it helps the user in their daily life.</p>"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "CTR Icon Cards",
+      "category": "Content",
+      "blocks": [
+        {
+          "type": "card",
+          "settings": {
+            "title": "Boosted Oxygen",
+            "body": "<p>Properly dilated nasal passages increase airflow by 15–30%, improving oxygen saturation and cellular energy production.</p>"
+          }
+        },
+        {
+          "type": "card",
+          "settings": {
+            "title": "Nitric Oxide Production",
+            "body": "<p>The nasal cavity produces nitric oxide, a molecule that dilates blood vessels, regulates blood pressure, and enhances circulation.</p>"
+          }
+        },
+        {
+          "type": "card",
+          "settings": {
+            "title": "Respiratory Efficiency",
+            "body": "<p>Nasal breathing filters, warms, and humidifies air, creating optimal conditions for comfortable breathing.</p>"
+          }
+        },
+        {
+          "type": "card",
+          "settings": {
+            "title": "Improved Sleep Quality",
+            "body": "<p>Open nasal airways reduce snoring, nighttime awakenings, and improve overall sleep architecture.</p>"
+          }
+        },
+        {
+          "type": "card",
+          "settings": {
+            "title": "Athletic Performance",
+            "body": "<p>Enhanced oxygen uptake through optimal nasal breathing improves endurance and recovery during physical activity.</p>"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

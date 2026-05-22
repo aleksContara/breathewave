@@ -1,0 +1,670 @@
+{%- comment -%} Reviews Carousel Section {%- endcomment -%}
+{% assign ctr_swiper_needed = true %}
+{%- liquid
+  assign star_count     = section.settings.star_count
+  assign autoplay_on    = section.settings.autoplay
+  assign autoplay_speed = section.settings.autoplay_speed
+  assign show_dots      = section.settings.show_dots
+  assign custom_css     = section.settings.custom_css
+  assign swiper_id      = 'rv-swiper-' | append: section.id
+-%}
+
+{% capture selector %}[data-style-id="{{ section.id }}"]{% endcapture %}
+
+{% capture css %}
+  & {
+    {% if section.settings.bg_color != blank and section.settings.bg_color.alpha != 0 %}
+      background-color: {{ section.settings.bg_color }};
+    {% endif %}
+    padding: {{ section.settings.padding_v }}px {{ section.settings.padding_h }}px;
+    box-sizing: border-box;
+  }
+
+  & .rv__inner {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+  }
+
+  & .rv__columns {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+
+  & .rv__left {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    flex-shrink: 0;
+  }
+
+  & .rv__stars {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+  & .rv__stars svg {
+    display: block;
+    width: {{ section.settings.star_size }}px;
+    height: {{ section.settings.star_size }}px;
+    flex-shrink: 0;
+    {% if section.settings.star_color != blank and section.settings.star_color.alpha != 0 %}
+      color: {{ section.settings.star_color }};
+    {% endif %}
+  }
+
+  & .rv__heading {
+    font-size: {{ section.settings.heading_size_mobile }}px;
+    font-weight: 700;
+    line-height: 1.1;
+    margin: 0;
+    {% if section.settings.heading_color != blank and section.settings.heading_color.alpha != 0 %}
+      color: {{ section.settings.heading_color }};
+    {% endif %}
+  }
+  & .rv__heading h1,
+  & .rv__heading h2,
+  & .rv__heading h3,
+  & .rv__heading p {
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+    color: inherit;
+    margin: 0;
+  }
+
+  & .rv__cta-wrap {
+    display: flex;
+  }
+  & .rv__cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 32px;
+    border-radius: 100px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: opacity 0.2s;
+    font-size: {{ section.settings.cta_size }}px;
+    white-space: nowrap;
+  }
+  & .rv__cta:hover { opacity: 0.85; }
+
+  & .rv__right {
+    flex: 1;
+    min-width: 0;
+  }
+
+  & .rv__slider {
+    position: relative;
+  }
+  & .rv__slider .swiper-wrapper {
+    align-items: flex-start;
+  }
+
+  & .rv__slide {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    box-sizing: border-box;
+  }
+
+  & .rv__quote-headline {
+    font-size: {{ section.settings.quote_headline_size_mobile }}px;
+    font-weight: 700;
+    line-height: 1.2;
+    margin: 0;
+    {% if section.settings.quote_headline_color != blank and section.settings.quote_headline_color.alpha != 0 %}
+      color: {{ section.settings.quote_headline_color }};
+    {% endif %}
+  }
+
+  & .rv__quote-body {
+    font-size: {{ section.settings.quote_body_size_mobile }}px;
+    line-height: 1.65;
+    margin: 0;
+    {% if section.settings.quote_body_color != blank and section.settings.quote_body_color.alpha != 0 %}
+      color: {{ section.settings.quote_body_color }};
+    {% endif %}
+  }
+  & .rv__quote-body p { margin: 0 0 0.75em; }
+  & .rv__quote-body p:last-child { margin-bottom: 0; }
+
+  & .rv__reviewer {
+    font-size: {{ section.settings.reviewer_size }}px;
+    font-weight: 500;
+    {% if section.settings.reviewer_color != blank and section.settings.reviewer_color.alpha != 0 %}
+      color: {{ section.settings.reviewer_color }};
+    {% endif %}
+  }
+
+  & .rv__pagination {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 24px;
+  }
+  & .rv__pagination .swiper-pagination-bullet {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: {{ section.settings.dot_color | default: '#ffffff' }};
+    opacity: 0.3;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    border: none;
+    padding: 0;
+    display: inline-block;
+  }
+  & .rv__pagination .swiper-pagination-bullet-active {
+    opacity: 1;
+  }
+
+  @media (min-width: 768px) {
+    & .rv__columns {
+      flex-direction: row;
+      align-items: center;
+      gap: {{ section.settings.col_gap }}px;
+    }
+    & .rv__left {
+      flex: 0 0 {{ section.settings.left_col_width }}%;
+      max-width: {{ section.settings.left_col_width }}%;
+    }
+    & .rv__heading {
+      font-size: {{ section.settings.heading_size_desktop }}px;
+    }
+    & .rv__quote-headline {
+      font-size: {{ section.settings.quote_headline_size_desktop }}px;
+    }
+    & .rv__quote-body {
+      font-size: {{ section.settings.quote_body_size_desktop }}px;
+    }
+  }
+{% endcapture %}
+
+<style>
+  {{ css | append: custom_css | replace: '&', selector | strip_newlines }}
+</style>
+
+<div
+  data-style-id="{{ section.id }}"
+  {% if section.settings.section_id != blank %}id="{{ section.settings.section_id }}"{% endif %}
+>
+  <div class="rv__inner">
+    <div class="rv__columns">
+
+      {%- comment -%} LEFT: stars + heading + CTA {%- endcomment -%}
+      <div class="rv__left">
+
+        {%- comment -%} Stars {%- endcomment -%}
+        <div class="rv__stars">
+          {%- for i in (1..star_count) -%}
+            <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+            </svg>
+          {%- endfor -%}
+        </div>
+
+        {%- comment -%} Heading {%- endcomment -%}
+        {%- if section.settings.heading != blank -%}
+          <div class="rv__heading">{{ section.settings.heading }}</div>
+        {%- endif -%}
+
+        {%- comment -%} CTA blocks {%- endcomment -%}
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'cta' -%}
+            <div class="rv__cta-wrap" {{ block.shopify_attributes }}>
+              <a
+                href="{{ block.settings.cta_url }}"
+                class="rv__cta"
+                style="
+                  {% if block.settings.cta_bg != blank and block.settings.cta_bg.alpha != 0 %}background-color: {{ block.settings.cta_bg }};{% endif %}
+                  {% if block.settings.cta_color != blank and block.settings.cta_color.alpha != 0 %}color: {{ block.settings.cta_color }};{% endif %}
+                "
+              >{{ block.settings.cta_label }}</a>
+            </div>
+          {%- endif -%}
+        {%- endfor -%}
+
+      </div>
+
+      {%- comment -%} RIGHT: Swiper testimonials {%- endcomment -%}
+      <div class="rv__right">
+        <div class="rv__slider swiper" id="{{ swiper_id }}">
+          <div class="swiper-wrapper">
+            {%- for block in section.blocks -%}
+              {%- if block.type == 'testimonial' -%}
+                <div class="rv__slide swiper-slide" {{ block.shopify_attributes }}>
+                  {%- if block.settings.quote_headline != blank -%}
+                    <div class="rv__quote-headline">{{ block.settings.quote_headline }}</div>
+                  {%- endif -%}
+                  {%- if block.settings.quote_body != blank -%}
+                    <div class="rv__quote-body">{{ block.settings.quote_body }}</div>
+                  {%- endif -%}
+                  {%- if block.settings.reviewer != blank -%}
+                    <div class="rv__reviewer">{{ block.settings.reviewer }}</div>
+                  {%- endif -%}
+                </div>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+
+          {%- if show_dots -%}
+            <div class="rv__pagination swiper-pagination"></div>
+          {%- endif -%}
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  window._ctrSwiperQ = window._ctrSwiperQ || [];
+  window._ctrSwiperQ.push(function () {
+    var el = document.getElementById({{ swiper_id | json }});
+    if (!el || el._sw) return;
+    el._sw = new Swiper(el, {
+      slidesPerView: 1,
+      spaceBetween: 32,
+      grabCursor: true,
+      {% if autoplay_on %}
+      autoplay: { delay: {{ autoplay_speed | times: 1000 }}, disableOnInteraction: false },
+      {% endif %}
+      {% if show_dots %}
+      pagination: { el: el.querySelector('.swiper-pagination'), clickable: true },
+      {% endif %}
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Reviews Carousel",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Stars"
+    },
+    {
+      "type": "range",
+      "id": "star_count",
+      "label": "Number of stars",
+      "default": 5,
+      "min": 1,
+      "max": 5,
+      "step": 1
+    },
+    {
+      "type": "range",
+      "id": "star_size",
+      "label": "Star size (px)",
+      "default": 28,
+      "min": 14,
+      "max": 48,
+      "step": 2,
+      "unit": "px"
+    },
+    {
+      "type": "color",
+      "alpha": true,
+      "id": "star_color",
+      "label": "Star color",
+      "default": "#3de8c8"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:all.empty_char"
+    },
+    {
+      "type": "header",
+      "content": "Section Heading"
+    },
+    {
+      "type": "richtext",
+      "id": "heading",
+      "label": "Heading",
+      "default": "<p>real reviews</p>"
+    },
+    {
+      "type": "range",
+      "id": "heading_size_desktop",
+      "label": "Heading size — Desktop (px)",
+      "default": 48,
+      "min": 24,
+      "max": 80,
+      "step": 2,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "heading_size_mobile",
+      "label": "Heading size — Mobile (px)",
+      "default": 36,
+      "min": 20,
+      "max": 56,
+      "step": 2,
+      "unit": "px"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:all.empty_char"
+    },
+    {
+      "type": "header",
+      "content": "Carousel"
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Autoplay",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "autoplay_speed",
+      "label": "Autoplay delay (seconds)",
+      "default": 5,
+      "min": 2,
+      "max": 15,
+      "step": 1,
+      "unit": "s"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_dots",
+      "label": "Show pagination dots",
+      "default": true
+    },
+    {
+      "type": "paragraph",
+      "content": "t:all.empty_char"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "left_col_width",
+      "label": "Left column width — Desktop (%)",
+      "default": 28,
+      "min": 15,
+      "max": 50,
+      "step": 1,
+      "unit": "%"
+    },
+    {
+      "type": "range",
+      "id": "col_gap",
+      "label": "Column gap — Desktop (px)",
+      "default": 80,
+      "min": 20,
+      "max": 160,
+      "step": 4,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "label": "Max width (px)",
+      "default": 1200,
+      "min": 800,
+      "max": 1800,
+      "step": 40,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_v",
+      "label": "Padding vertical (px)",
+      "default": 80,
+      "min": 20,
+      "max": 140,
+      "step": 4,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_h",
+      "label": "Padding horizontal (px)",
+      "default": 24,
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:all.empty_char"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "alpha": true,
+      "id": "bg_color",
+      "label": "Section background",
+      "default": "#16192a"
+    },
+    {
+      "type": "color",
+      "alpha": true,
+      "id": "heading_color",
+      "label": "Heading color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "alpha": true,
+      "id": "quote_headline_color",
+      "label": "Quote headline color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "alpha": true,
+      "id": "quote_body_color",
+      "label": "Quote body color",
+      "default": "#ccccdd"
+    },
+    {
+      "type": "color",
+      "alpha": true,
+      "id": "reviewer_color",
+      "label": "Reviewer name color",
+      "default": "#888899"
+    },
+    {
+      "type": "color",
+      "alpha": true,
+      "id": "dot_color",
+      "label": "Pagination dot color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:all.empty_char"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "quote_headline_size_desktop",
+      "label": "Quote headline — Desktop (px)",
+      "default": 32,
+      "min": 18,
+      "max": 56,
+      "step": 2,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "quote_headline_size_mobile",
+      "label": "Quote headline — Mobile (px)",
+      "default": 24,
+      "min": 16,
+      "max": 40,
+      "step": 2,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "quote_body_size_desktop",
+      "label": "Quote body — Desktop (px)",
+      "default": 18,
+      "min": 12,
+      "max": 28,
+      "step": 1,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "quote_body_size_mobile",
+      "label": "Quote body — Mobile (px)",
+      "default": 15,
+      "min": 12,
+      "max": 22,
+      "step": 1,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "reviewer_size",
+      "label": "Reviewer name size (px)",
+      "default": 14,
+      "min": 10,
+      "max": 20,
+      "step": 1,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "cta_size",
+      "label": "CTA button size (px)",
+      "default": 16,
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:all.empty_char"
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "textarea",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    },
+    {
+      "type": "text",
+      "id": "section_id",
+      "label": "Section ID"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "testimonial",
+      "name": "Testimonial",
+      "settings": [
+        {
+          "type": "text",
+          "id": "quote_headline",
+          "label": "Quote headline",
+          "default": "game changer!"
+        },
+        {
+          "type": "richtext",
+          "id": "quote_body",
+          "label": "Quote body",
+          "default": "<p>\"I never realized I could actually BREATHE better, because I'd never had obvious breathing problems. But once I tried the nasal dilator, I felt an incredible new openness I'd never experienced before. I love it—so simple and such a boost to my health.\" - Victoria A.</p>"
+        },
+        {
+          "type": "text",
+          "id": "reviewer",
+          "label": "Reviewer name / attribution",
+          "info": "Optional. Leave empty if reviewer is included in the quote body."
+        }
+      ]
+    },
+    {
+      "type": "cta",
+      "name": "CTA Button",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "cta_label",
+          "label": "Button label",
+          "default": "Buy now"
+        },
+        {
+          "type": "url",
+          "id": "cta_url",
+          "label": "Button URL"
+        },
+        {
+          "type": "color",
+          "alpha": true,
+          "id": "cta_bg",
+          "label": "Button background",
+          "default": "#3de8c8"
+        },
+        {
+          "type": "color",
+          "alpha": true,
+          "id": "cta_color",
+          "label": "Button text color",
+          "default": "#000000"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "CTR Reviews Carousel",
+      "category": "Social proof",
+      "blocks": [
+        {
+          "type": "cta",
+          "settings": {
+            "cta_label": "Buy now",
+            "cta_bg": "#3de8c8",
+            "cta_color": "#000000"
+          }
+        },
+        {
+          "type": "testimonial",
+          "settings": {
+            "quote_headline": "game changer!",
+            "quote_body": "<p>\"I never realized I could actually BREATHE better, because I'd never had obvious breathing problems. But once I tried the nasal dilator, I felt an incredible new openness I'd never experienced before. I love it—so simple and such a boost to my health. I only wish I'd understood its importance so.\" - Victoria A.</p>"
+          }
+        },
+        {
+          "type": "testimonial",
+          "settings": {
+            "quote_headline": "best sleep of my life",
+            "quote_body": "<p>\"I've been using this for 3 weeks and my sleep tracker shows a 40% improvement in deep sleep. My partner says the snoring is almost gone. Absolutely worth it.\" - James R.</p>"
+          }
+        },
+        {
+          "type": "testimonial",
+          "settings": {
+            "quote_headline": "I breathe so much better",
+            "quote_body": "<p>\"As someone who runs marathons, nasal breathing was always a struggle. Since using Breathewave my endurance has noticeably improved. Simple but incredibly effective.\" - Sarah M.</p>"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

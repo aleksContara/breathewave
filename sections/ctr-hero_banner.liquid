@@ -1,0 +1,1609 @@
+{%- comment -%} Hero Banner Slider Section {%- endcomment -%}
+{%- liquid
+  assign section_type = "hero_banner"
+  assign logo_image = section.settings.logo_image
+  assign logo_width = section.settings.logo_width
+  assign logo_left_desktop = section.settings.logo_left_desktop
+  assign logo_top_desktop = section.settings.logo_top_desktop
+  assign logo_left_mobile = section.settings.logo_left_mobile
+  assign logo_top_mobile = section.settings.logo_top_mobile
+  assign trust_line_text = section.settings.trust_line_text
+  assign trust_line_color = section.settings.trust_line_color
+  assign trust_line_size = section.settings.trust_line_size
+  assign auto_rotate = section.settings.auto_rotate
+  assign pause_on_hover = section.settings.pause_on_hover
+  assign min_height_desktop = section.settings.min_height_desktop
+  assign min_height_mobile = section.settings.min_height_mobile
+  assign custom_css = section.settings.custom_css
+  assign section_id = section.settings.section_id
+-%}
+
+{% capture selector %}[data-style-id="{{ section.id }}"]{% endcapture %}
+
+{% capture css %}
+  {% if section.settings.hide_header %}
+    .header-sections-container { display: none !important; }
+  {% endif %}
+
+  .hero-banner__clinicians {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    gap: 24px;
+  }
+
+  & {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  & .hero-banner__logo {
+    position: absolute;
+    z-index: 20;
+    display: block;
+    width: {{ logo_width }}px;
+    left: {{ logo_left_mobile }}%;
+    top: {{ logo_top_mobile }}%;
+  }
+  & .hero-banner__logo img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  & .hero-banner__slides {
+    position: relative;
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    scroll-snap-type: x mandatory;
+  }
+  & .hero-banner__slides::-webkit-scrollbar {
+    display: none;
+  }
+
+  & .hero-banner__slide {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: {{ min_height_mobile }}px;
+    scroll-snap-align: start;
+  }
+
+  & .hero-banner__bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+  }
+  & .hero-banner__bg--desktop {
+    display: none;
+  }
+  & .hero-banner__bg--mobile {
+    display: block;
+  }
+
+  & .hero-banner__content {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex-grow: 1;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 32px 24px;
+  }
+
+  & .hero-banner__content-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+  }
+
+  & .hero-banner__headline {
+    font-weight: 700;
+    line-height: 1.1;
+    margin: 0;
+  }
+  & .hero-banner__headline p,
+  & .hero-banner__headline h1 {
+    display: inline;
+    margin: 0;
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+    color: inherit;
+  }
+  & .hero-banner__headline-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+    margin-left: 0.35em;
+    padding: 4px 12px;
+    border-radius: 999px;
+    background: #536dff;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    white-space: nowrap;
+    transform: rotate(6deg) translateY(-0.12em);
+    transform-origin: center;
+  }
+
+  & .hero-banner__subtitle {
+    font-weight: 700;
+    font-size: 18px;
+    line-height: 1.4;
+    margin: 0;
+  }
+  & .hero-banner__subtitle p { margin: 0; }
+
+  & .hero-banner__description {
+    line-height: 1.6;
+  }
+  & .hero-banner__description p {
+    margin: 0;
+  }
+
+  & .hero-banner__rating {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  & .hero-banner__rating svg {
+    flex-shrink: 0;
+  }
+  & .hero-banner__rating--mobile {
+    display: none;
+  }
+  @media (max-width: 767px) {
+    & .hero-banner__rating--desktop {
+      display: none;
+    }
+    & .hero-banner__rating--mobile {
+      display: flex;
+    }
+  }
+
+  & .hero-banner__cta-wrap {
+    margin-top: 8px;
+  }
+  & .hero-banner__cta {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 32px;
+    font-weight: 400;
+    border-radius: 24px;
+    text-decoration: none;
+    transition: opacity 0.2s;
+    max-width: 100%;
+    width: max-content;
+    text-align: center;
+  }
+  & .hero-banner__cta:hover {
+    opacity: 0.9;
+  }
+  & .hero-banner__cta-badge {
+    position: absolute; 
+    top: -12px;
+    right: -22px;
+    padding: 2px 8px;
+    font-size: 12px;
+    font-weight: 700;
+    border-radius: 100px;
+    white-space: nowrap;
+    transform: rotate(25deg);
+  }
+
+  & .hero-banner__badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px 16px;
+    margin-top: 4px;
+
+    @media (max-width: 767px) {
+      gap: 4px;
+    }
+  }
+
+  & .hero-banner__badges.m-custom  .hero-banner__badge-item svg {
+    display: none;
+  }
+
+  & .hero-banner__badge-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  & .hero-banner__badge-item svg {
+    flex-shrink: 0;
+  }
+
+  & .hero-banner__pagination {
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 20;
+    display: flex;
+    gap: 8px;
+  }
+  & .hero-banner__dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: rgba(255,255,255,0.5);
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  & .hero-banner__dot--active {
+    background-color: #ffffff;
+  }
+
+  & .hero-banner__trust-line {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 20;
+    text-align: center;
+    padding: 12px 16px;
+    {% if trust_line_color != blank and trust_line_color.alpha != 0 %}color: {{ trust_line_color }};{% endif %}
+    {% if trust_line_size != blank %}font-size: {{ trust_line_size }}px;{% endif %}
+  }
+
+  & .hero-banner__clinicians {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 16px 24px;
+    background-color: {{ section.settings.clinicians_bg | default: '#f5f5f5' }};
+    cursor: pointer;
+    transition: opacity 150ms ease;
+  }
+  & .hero-banner__clinicians:hover {
+    opacity: 0.85;
+  }
+  & .hero-banner__clinicians:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
+
+  & .hero-banner__clinicians-img1 {
+    flex-basis: 100%;
+    display: flex;
+    justify-content: center;
+    max-width: 200px;
+  }
+  & .hero-banner__clinicians-img1 img {
+    display: block;
+    height: auto;
+  }
+
+  & .hero-banner__clinicians-bottom {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  & .hero-banner__clinicians-img2 {
+    flex-shrink: 0;
+  }
+  & .hero-banner__clinicians-img2 img {
+    display: block;
+    height: auto;
+  }
+
+  & .hero-banner__clinicians-text {
+    font-size: 14px;
+    line-height: 1.4;
+    color: {{ section.settings.clinicians_text_color | default: '#1a1a1a' }};
+  }
+  & .hero-banner__clinicians-text strong {
+    font-weight: 700;
+  }
+
+  @media (min-width: 768px) {
+    .hero-banner__clinicians {
+      flex-direction: row;
+      gap: 8px; 
+      padding: 16px 16px 0;
+    }
+
+
+    & .hero-banner__logo {
+      left: {{ logo_left_desktop }}%;
+      top: {{ logo_top_desktop }}%;
+    }
+    & .hero-banner__slide {
+      min-height: {{ min_height_desktop }}px;
+    }
+    & .hero-banner__bg--desktop {
+      display: block;
+    }
+    & .hero-banner__bg--mobile {
+      display: none;
+    }
+    & .hero-banner__content {
+      padding: 48px 48px;
+    }
+    & .hero-banner__clinicians {
+      flex-wrap: nowrap;
+      gap: 16px;
+      padding: 16px 24px;
+    }
+    & .hero-banner__clinicians-img1 {
+      flex-basis: auto;
+    }
+    & .hero-banner__clinicians-bottom {
+      gap: 20px;
+    }
+  }
+{% endcapture %}
+
+{% capture section_content %}
+  <style>
+    {{ css | append: custom_css | replace: '&', selector | strip_newlines }}
+  </style>
+
+  {%- comment -%} Per-slide styles {%- endcomment -%}
+  {%- for block in section.blocks -%}
+    {%- liquid
+      assign slide_bg_color = block.settings.background_color
+      assign bg_position_desktop = block.settings.bg_position_desktop
+      assign bg_position_mobile = block.settings.bg_position_mobile
+      assign content_h_desktop = block.settings.content_horizontal_desktop
+      assign content_v_desktop = block.settings.content_vertical_desktop
+      assign content_h_mobile = block.settings.content_horizontal_mobile
+      assign content_v_mobile = block.settings.content_vertical_mobile
+      assign text_align_desktop = block.settings.text_align_desktop
+      assign text_align_mobile = block.settings.text_align_mobile
+      assign content_width_desktop = block.settings.content_width_desktop
+      assign content_width_mobile = block.settings.content_width_mobile
+      assign rating_color = block.settings.rating_color
+      assign rating_size = block.settings.rating_size
+      assign headline_color = block.settings.headline_color
+      assign headline_size_desktop = block.settings.headline_size_desktop
+      assign headline_size_mobile = block.settings.headline_size_mobile
+      assign description_color = block.settings.description_color
+      assign description_size_desktop = block.settings.description_size_desktop
+      assign description_size_mobile = block.settings.description_size_mobile
+      assign cta_bg_color = block.settings.cta_bg_color
+      assign cta_text_color = block.settings.cta_text_color
+      assign cta_size_desktop = block.settings.cta_size_desktop
+      assign cta_size_mobile = block.settings.cta_size_mobile
+      assign cta_full_width = block.settings.cta_full_width
+      assign badges_color = block.settings.badges_color
+      assign badges_size = block.settings.badges_size
+      assign custom_badge_styles = block.settings.custom_badge_styles
+      assign badge_background = block.settings.badge_background
+      assign badge_text_color = block.settings.badge_text_color
+      assign badge_border_radius = block.settings.badge_border_radius
+      assign badge_padding_vertical = block.settings.badge_padding_vertical
+      assign badge_padding_horizontal = block.settings.badge_padding_horizontal
+      assign slide_custom_css = block.settings.custom_css
+    -%}
+
+    {%- comment -%} Map align values to CSS {%- endcomment -%}
+    {%- liquid
+      case content_h_mobile
+        when 'left'
+          assign h_mobile_css = 'flex-start'
+        when 'center'
+          assign h_mobile_css = 'center'
+        when 'right'
+          assign h_mobile_css = 'flex-end'
+      endcase
+
+      case content_v_mobile
+        when 'top'
+          assign v_mobile_css = 'flex-start'
+        when 'center'
+          assign v_mobile_css = 'center'
+        when 'bottom'
+          assign v_mobile_css = 'flex-end'
+      endcase
+
+      case content_h_desktop
+        when 'left'
+          assign h_desktop_css = 'flex-start'
+        when 'center'
+          assign h_desktop_css = 'center'
+        when 'right'
+          assign h_desktop_css = 'flex-end'
+      endcase
+
+      case content_v_desktop
+        when 'top'
+          assign v_desktop_css = 'flex-start'
+        when 'center'
+          assign v_desktop_css = 'center'
+        when 'bottom'
+          assign v_desktop_css = 'flex-end'
+      endcase
+    -%}
+
+    {% capture slide_selector %}[data-style-id="{{ section.id }}--{{ block.id }}"]{% endcapture %}
+
+    {%- comment -%} Map text-align to flex justify for mobile {%- endcomment -%}
+    {%- liquid
+      case text_align_mobile
+        when 'left'
+          assign flex_align_mobile = 'flex-start'
+        when 'center'
+          assign flex_align_mobile = 'center'
+        when 'right'
+          assign flex_align_mobile = 'flex-end'
+      endcase
+
+      case text_align_desktop
+        when 'left'
+          assign flex_align_desktop = 'flex-start'
+        when 'center'
+          assign flex_align_desktop = 'center'
+        when 'right'
+          assign flex_align_desktop = 'flex-end'
+      endcase
+    -%}
+
+    {% capture slide_css %}
+      & {
+        {% if slide_bg_color != blank %}background-color: {{ slide_bg_color }};{% endif %}
+      }
+      & .hero-banner__bg--mobile {
+        object-position: {{ bg_position_mobile }};
+      }
+      & .hero-banner__bg--desktop {
+        object-position: {{ bg_position_desktop }};
+      }
+      & .hero-banner__content {
+        justify-content: {{ h_mobile_css }};
+        align-items: {{ v_mobile_css }};
+      }
+      & .hero-banner__content-inner {
+        max-width: {{ content_width_mobile }}%;
+        text-align: {{ text_align_mobile }};
+      }
+      & .hero-banner__rating {
+        {% if rating_color != blank and rating_color.alpha != 0 %}color: {{ rating_color }};{% endif %}
+        {% if rating_size != blank %}font-size: {{ rating_size }}px;{% endif %}
+        justify-content: {{ flex_align_mobile }};
+      }
+      & .hero-banner__headline {
+        {% if headline_color != blank and headline_color.alpha != 0 %}color: {{ headline_color }};{% endif %}
+        font-size: {{ headline_size_mobile }}px;
+      }
+      & .hero-banner__subtitle {
+        {%- assign subtitle_color = block.settings.subtitle_color -%}
+        {% if subtitle_color != blank and subtitle_color.alpha != 0 %}color: {{ subtitle_color }};{% endif %}
+        {%- assign subtitle_size_val = block.settings.subtitle_size -%}
+        {% if subtitle_size_val != blank %}font-size: {{ subtitle_size_val }}px;{% endif %}
+      }
+      & .hero-banner__description {
+        {% if description_color != blank and description_color.alpha != 0 %}color: {{ description_color }};{% endif %}
+        font-size: {{ description_size_mobile }}px;
+      }
+      & .hero-banner__cta {
+        {% if cta_bg_color != blank and cta_bg_color.alpha != 0 %}background-color: {{ cta_bg_color }};{% endif %}
+        {% if cta_text_color != blank and cta_text_color.alpha != 0 %}color: {{ cta_text_color }};{% endif %}
+        font-size: {{ cta_size_mobile }}px;
+      }
+      {% if cta_full_width %}
+        & .hero-banner__cta-wrap {
+          width: 100%;
+        }
+        & .hero-banner__cta {
+          display: flex;
+          width: 100%;
+        }
+      {% endif %}
+      & .hero-banner__badges {
+        {% if badges_color != blank and badges_color.alpha != 0 %}color: {{ badges_color }};{% endif %}
+        {% if badges_size != blank %}font-size: {{ badges_size }}px;{% endif %}
+        justify-content: {{ flex_align_mobile }};
+      }
+      {% if custom_badge_styles %}
+        & .hero-banner__badges.m-custom .hero-banner__badge-item {
+          {% if badge_background != blank and badge_background.alpha != 0 %}background-color: {{ badge_background }};{% endif %}
+          {% if badge_text_color != blank and badge_text_color.alpha != 0 %}color: {{ badge_text_color }};{% endif %}
+          border-radius: {{ badge_border_radius }}px;
+          padding: {{ badge_padding_vertical }}px {{ badge_padding_horizontal }}px;
+        }
+      {% endif %}
+      @media (min-width: 768px) {
+        & .hero-banner__content {
+          justify-content: {{ h_desktop_css }};
+          align-items: {{ v_desktop_css }};
+        }
+        & .hero-banner__content-inner {
+          max-width: {{ content_width_desktop }}px;
+          text-align: {{ text_align_desktop }};
+        }
+        & .hero-banner__headline {
+          font-size: {{ headline_size_desktop }}px;
+        }
+        & .hero-banner__description {
+          font-size: {{ description_size_desktop }}px;
+        }
+        & .hero-banner__cta {
+          font-size: {{ cta_size_desktop }}px;
+        }
+        & .hero-banner__rating {
+          justify-content: {{ flex_align_desktop }};
+        }
+        & .hero-banner__badges {
+          justify-content: {{ flex_align_desktop }};
+        }
+      }
+    {% endcapture %}
+
+    <style>
+      {{ slide_css | append: slide_custom_css | replace: '&', slide_selector | strip_newlines }}
+    </style>
+  {%- endfor -%}
+
+  <section
+      data-style-id="{{ section.id }}"
+      {% if section_id != blank %}id="{{ section_id }}"{% endif %}
+      {% if section.blocks.size > 1 %}
+        x-data="{ ...utils.initContentSlider($el, $refs.heroScrollContainer, undefined, 'all', +`{{ auto_rotate }}`, false) }"
+        x-defer="intersect"
+        {% if pause_on_hover %}
+          @pointerover="content_slider.state.rotatePause = true"
+          @pointerout="content_slider.state.rotatePause = false"
+        {% endif %}
+      {% endif %}
+  >
+
+    {%- comment -%} Logo overlay (global) {%- endcomment -%}
+    {% if logo_image != blank %}
+      <a href="/" class="hero-banner__logo">
+        <img
+          src="{{ logo_image | image_url: width: 400 }}"
+          alt="{{ logo_image.alt | default: shop.name }}"
+          width="{{ logo_image.width }}"
+          height="{{ logo_image.height }}"
+          loading="eager"
+        >
+      </a>
+    {% endif %}
+
+    {%- comment -%} Slides container {%- endcomment -%}
+    <div
+      class="hero-banner__slides"
+      {% if section.blocks.size > 1 %}
+        x-ref="heroScrollContainer"
+        @scroll="content_slider.handleScroll"
+        @scrollend="content_slider.handleInfiniteScroll"
+        @resize.window="content_slider.handleResize"
+        x-init="$nextTick(() => content_slider.handleResize())"
+      {% endif %}
+    >
+
+      {%- for block in section.blocks -%}
+        {%- liquid
+          assign slide_bg_image_desktop = block.settings.bg_image_desktop
+          assign slide_bg_image_mobile = block.settings.bg_image_mobile
+          assign rating_text = block.settings.rating_text
+          assign headline = block.settings.headline
+          assign description = block.settings.description
+          assign cta_label = block.settings.cta_label
+          assign cta_url = block.settings.cta_url
+          assign cta_badge_text = block.settings.cta_badge_text
+          assign cta_badge_color = block.settings.cta_badge_color
+          assign cta_badge_bg = block.settings.cta_badge_bg
+          assign badge_1 = block.settings.badge_1
+          assign badge_2 = block.settings.badge_2
+          assign badge_3 = block.settings.badge_3
+          assign badge_4 = block.settings.badge_4
+        -%}
+
+        <div
+          data-style-id="{{ section.id }}--{{ block.id }}"
+          {{ block.shopify_attributes }}
+          class="hero-banner__slide"
+        >
+          {%- comment -%} Background image — Mobile {%- endcomment -%}
+          {% if slide_bg_image_mobile != blank %}
+            <img
+              src="{{ slide_bg_image_mobile | image_url: width: 1200 }}"
+              alt=""
+              loading="eager"
+              class="hero-banner__bg hero-banner__bg--mobile"
+              width="{{ slide_bg_image_mobile.width }}"
+              height="{{ slide_bg_image_mobile.height }}"
+            >
+          {% elsif slide_bg_image_desktop != blank %}
+            <img
+              src="{{ slide_bg_image_desktop | image_url: width: 1200 }}"
+              alt=""
+              loading="eager"
+              class="hero-banner__bg hero-banner__bg--mobile"
+              width="{{ slide_bg_image_desktop.width }}"
+              height="{{ slide_bg_image_desktop.height }}"
+            >
+          {% endif %}
+
+          {%- comment -%} Background image — Desktop {%- endcomment -%}
+          {% if slide_bg_image_desktop != blank %}
+            <img
+              src="{{ slide_bg_image_desktop | image_url: width: 2400 }}"
+              alt=""
+              loading="eager"
+              class="hero-banner__bg hero-banner__bg--desktop"
+              width="{{ slide_bg_image_desktop.width }}"
+              height="{{ slide_bg_image_desktop.height }}"
+            >
+          {% endif %}
+
+          {%- comment -%} Content {%- endcomment -%}
+          <div class="hero-banner__content">
+            <div class="hero-banner__content-inner">
+
+              {% if rating_text != blank %}
+                <div class="hero-banner__rating hero-banner__rating--desktop">
+                  {% if block.settings.show_rating_star %}
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" style="color: #ffffff;">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                    </svg>
+                  {% endif %}
+                  <span>{{ rating_text }}</span>
+                </div>
+              {% endif %}
+
+              {% if headline != blank %}
+                <div class="hero-banner__headline">
+                  {{ headline }}
+                  {% if block.settings.show_headline_badge and block.settings.headline_badge_text != blank %}
+                    <span
+                      class="hero-banner__headline-badge"
+                      style="{% if block.settings.headline_badge_bg != blank and block.settings.headline_badge_bg.alpha != 0 %}background-color: {{ block.settings.headline_badge_bg }};{% endif %}{% if block.settings.headline_badge_color != blank and block.settings.headline_badge_color.alpha != 0 %}color: {{ block.settings.headline_badge_color }};{% endif %}"
+                    >{{ block.settings.headline_badge_text }}</span>
+                  {% endif %}
+                </div>
+              {% endif %}
+
+              {%- assign subtitle = block.settings.subtitle -%}
+              {% if subtitle != blank %}
+                <div class="hero-banner__subtitle">{{ subtitle }}</div>
+              {% endif %}
+
+              {% if description != blank %}
+                <div class="hero-banner__description">
+                  {{ description }}
+                </div>
+              {% endif %}
+
+              {% if cta_label != blank %}
+                <div class="hero-banner__cta-wrap">
+                  <a href="{{ cta_url }}" class="hero-banner__cta">
+                    {{ cta_label }}
+                    {% if cta_badge_text != blank %}
+                      <span
+                        class="hero-banner__cta-badge"
+                        style="{% if cta_badge_bg != blank %}background-color: {{ cta_badge_bg }};{% endif %}{% if cta_badge_color != blank %}color: {{ cta_badge_color }};{% endif %}"
+                      >
+                        {{ cta_badge_text }}
+                      </span>
+                    {% endif %}
+                  </a>
+                </div>
+              {% endif %}
+
+              {% if rating_text != blank %}
+                <div class="hero-banner__rating hero-banner__rating--mobile">
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" style="color: #ffffff;">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                  </svg>
+                  <span>{{ rating_text }}</span>
+                </div>
+              {% endif %}
+
+              {% if badge_1 != blank or badge_2 != blank or badge_3 != blank or badge_4 != blank %}
+                <div class="hero-banner__badges{% if block.settings.custom_badge_styles %} m-custom{% endif %}">
+                  {% if badge_1 != blank %}
+                    <span class="hero-banner__badge-item">
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                        <path d="M11.667 3.5L5.25 9.917 2.333 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                      {{ badge_1 }}
+                    </span>
+                  {% endif %}
+                  {% if badge_2 != blank %}
+                    <span class="hero-banner__badge-item">
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                        <path d="M11.667 3.5L5.25 9.917 2.333 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                      {{ badge_2 }}
+                    </span>
+                  {% endif %}
+                  {% if badge_3 != blank %}
+                    <span class="hero-banner__badge-item">
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                        <path d="M11.667 3.5L5.25 9.917 2.333 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                      {{ badge_3 }}
+                    </span>
+                  {% endif %}
+                  {% if badge_4 != blank %}
+                    <span class="hero-banner__badge-item">
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                        <path d="M11.667 3.5L5.25 9.917 2.333 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                      {{ badge_4 }}
+                    </span>
+                  {% endif %}
+                </div>
+              {% endif %}
+
+            </div>
+          </div>
+        </div>
+
+      {%- endfor -%}
+
+    </div>
+
+    {%- comment -%} Pagination dots {%- endcomment -%}
+    {% if section.blocks.size > 1 %}
+      <div class="hero-banner__pagination">
+        {% for block in section.blocks %}
+          <button
+            class="hero-banner__dot"
+            :class="content_slider.state.activeIndex === {{ forloop.index0 }} ? 'hero-banner__dot--active' : ''"
+            @click="content_slider.scrollToIndex({{ forloop.index0 }})"
+            aria-label="Slide {{ forloop.index }}"
+          ></button>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {%- comment -%} Trust line {%- endcomment -%}
+    {% if trust_line_text != blank %}
+      <div class="hero-banner__trust-line">
+        {{ trust_line_text }}
+      </div>
+    {% endif %}
+
+  </section>
+
+  {%- comment -%} Clinicians widget — outside slider {%- endcomment -%}
+  {% if section.settings.clinicians_show %}
+    <div class="hero-banner__clinicians clinicians" data-style-id="{{ section.id }}" role="button" tabindex="0">
+
+      {% if section.settings.clinicians_image_1 != blank %}
+        <div class="hero-banner__clinicians-img1">
+          <img
+            src="{{ section.settings.clinicians_image_1 | image_url: width: 400 }}"
+            alt="{{ section.settings.clinicians_image_1.alt | default: '' }}"
+            loading="lazy"
+            width="{{ section.settings.clinicians_image_1.width }}"
+            height="{{ section.settings.clinicians_image_1.height }}"
+          >
+        </div>
+      {% endif %}
+
+      <div class="hero-banner__clinicians-bottom">
+        {% if section.settings.clinicians_image_2 != blank %}
+          <div class="hero-banner__clinicians-img2">
+            <img
+              src="{{ section.settings.clinicians_image_2 | image_url: width: 300 }}"
+              alt="{{ section.settings.clinicians_image_2.alt | default: '' }}"
+              loading="lazy"
+              width="{{ section.settings.clinicians_image_2.width }}"
+              height="{{ section.settings.clinicians_image_2.height }}"
+            >
+          </div>
+        {% endif %}
+
+        {% if section.settings.clinicians_text != blank %}
+          <div class="hero-banner__clinicians-text">{{ section.settings.clinicians_text }}</div>
+        {% endif %}
+      </div>
+
+    </div>
+  {% endif %}
+{% endcapture %}
+
+{{ section_content }}
+
+{% schema %}
+{
+  "name": "Hero Banner",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Logo"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_image",
+      "label": "Logo image"
+    },
+    {
+      "type": "range",
+      "id": "logo_width",
+      "label": "Logo width (px)",
+      "default": 140,
+      "min": 40,
+      "max": 400,
+      "step": 5,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "logo_left_desktop",
+      "label": "Logo left position — Desktop (%)",
+      "default": 3,
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%"
+    },
+    {
+      "type": "range",
+      "id": "logo_top_desktop",
+      "label": "Logo top position — Desktop (%)",
+      "default": 4,
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%"
+    },
+    {
+      "type": "range",
+      "id": "logo_left_mobile",
+      "label": "Logo left position — Mobile (%)",
+      "default": 4,
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%"
+    },
+    {
+      "type": "range",
+      "id": "logo_top_mobile",
+      "label": "Logo top position — Mobile (%)",
+      "default": 4,
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:all.empty_char"
+    },
+    {
+      "type": "header",
+      "content": "Trust Line"
+    },
+    {
+      "type": "richtext",
+      "id": "trust_line_text",
+      "label": "Trust line text"
+    },
+    {
+      "type": "color",
+      "alpha": true,
+      "id": "trust_line_color",
+      "label": "Trust line text color"
+    },
+    {
+      "type": "range",
+      "id": "trust_line_size",
+      "label": "Trust line font size (px)",
+      "default": 14,
+      "min": 10,
+      "max": 24,
+      "step": 1,
+      "unit": "px"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:all.empty_char"
+    },
+    {
+      "type": "header",
+      "content": "Slider Settings"
+    },
+    {
+      "type": "range",
+      "id": "auto_rotate",
+      "label": "Auto rotate",
+      "default": 0,
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "unit": "s",
+      "info": "Set to 0 to disable. Only applies when more than 1 slide."
+    },
+    {
+      "type": "checkbox",
+      "id": "pause_on_hover",
+      "label": "Pause on hover",
+      "default": true,
+      "visible_if": "{{ section.settings.auto_rotate != 0 }}"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:all.empty_char"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "min_height_desktop",
+      "label": "Min height — Desktop (px)",
+      "default": 650,
+      "min": 300,
+      "max": 1000,
+      "step": 10,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "min_height_mobile",
+      "label": "Min height — Mobile (px)",
+      "default": 550,
+      "min": 250,
+      "max": 900,
+      "step": 10,
+      "unit": "px"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:all.empty_char"
+    },
+    {
+      "type": "header",
+      "content": "Clinicians Widget"
+    },
+    {
+      "type": "checkbox",
+      "id": "clinicians_show",
+      "label": "Show clinicians widget",
+      "default": true
+    },
+    {
+      "type": "image_picker",
+      "id": "clinicians_image_1",
+      "label": "Image 1",
+      "info": "Desktop: left, Mobile: top center"
+    },
+    {
+      "type": "image_picker",
+      "id": "clinicians_image_2",
+      "label": "Image 2",
+      "info": "Desktop: middle, Mobile: bottom left"
+    },
+    {
+      "type": "richtext",
+      "id": "clinicians_text",
+      "label": "Text",
+      "default": "<p><strong>900+ clinicians</strong> shared our products on <strong>FrontrowMD</strong>, with no compensation.</p>"
+    },
+    {
+      "type": "color",
+      "id": "clinicians_bg",
+      "label": "Widget background",
+      "default": "#f5f5f5"
+    },
+    {
+      "type": "color",
+      "id": "clinicians_text_color",
+      "label": "Widget text color",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:all.empty_char"
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "textarea",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_header",
+      "label": "Hide header",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "section_id",
+      "label": "Section Id"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "Slide",
+      "limit": 10,
+      "settings": [
+        {
+          "type": "header",
+          "content": "Background"
+        },
+        {
+          "type": "color",
+          "alpha": true,
+          "id": "background_color",
+          "label": "Background color",
+          "default": "#0a0a0a"
+        },
+        {
+          "type": "image_picker",
+          "id": "bg_image_desktop",
+          "label": "Background image — Desktop"
+        },
+        {
+          "type": "image_picker",
+          "id": "bg_image_mobile",
+          "label": "Background image — Mobile",
+          "info": "Falls back to desktop image if empty."
+        },
+        {
+          "type": "select",
+          "id": "bg_position_desktop",
+          "label": "Background position — Desktop",
+          "default": "center center",
+          "options": [
+            { "value": "left center", "label": "Left" },
+            { "value": "center center", "label": "Center" },
+            { "value": "right center", "label": "Right" }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "bg_position_mobile",
+          "label": "Background position — Mobile",
+          "default": "center center",
+          "options": [
+            { "value": "left center", "label": "Left" },
+            { "value": "center center", "label": "Center" },
+            { "value": "right center", "label": "Right" }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": "t:all.empty_char"
+        },
+        {
+          "type": "header",
+          "content": "Content Container"
+        },
+        {
+          "type": "range",
+          "id": "content_width_desktop",
+          "label": "Content width — Desktop (px)",
+          "default": 620,
+          "min": 300,
+          "max": 1200,
+          "step": 10,
+          "unit": "px"
+        },
+        {
+          "type": "range",
+          "id": "content_width_mobile",
+          "label": "Content width — Mobile (%)",
+          "default": 100,
+          "min": 30,
+          "max": 100,
+          "step": 5,
+          "unit": "%"
+        },
+        {
+          "type": "paragraph",
+          "content": "t:all.empty_char"
+        },
+        {
+          "type": "header",
+          "content": "Content Positioning"
+        },
+        {
+          "type": "select",
+          "id": "content_horizontal_desktop",
+          "label": "Horizontal align — Desktop",
+          "default": "right",
+          "options": [
+            { "value": "left", "label": "Left" },
+            { "value": "center", "label": "Center" },
+            { "value": "right", "label": "Right" }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "content_vertical_desktop",
+          "label": "Vertical align — Desktop",
+          "default": "center",
+          "options": [
+            { "value": "top", "label": "Top" },
+            { "value": "center", "label": "Center" },
+            { "value": "bottom", "label": "Bottom" }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "content_horizontal_mobile",
+          "label": "Horizontal align — Mobile",
+          "default": "left",
+          "options": [
+            { "value": "left", "label": "Left" },
+            { "value": "center", "label": "Center" },
+            { "value": "right", "label": "Right" }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "content_vertical_mobile",
+          "label": "Vertical align — Mobile",
+          "default": "bottom",
+          "options": [
+            { "value": "top", "label": "Top" },
+            { "value": "center", "label": "Center" },
+            { "value": "bottom", "label": "Bottom" }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": "t:all.empty_char"
+        },
+        {
+          "type": "header",
+          "content": "Text Alignment"
+        },
+        {
+          "type": "select",
+          "id": "text_align_desktop",
+          "label": "Text align — Desktop",
+          "default": "left",
+          "options": [
+            { "value": "left", "label": "Left" },
+            { "value": "center", "label": "Center" },
+            { "value": "right", "label": "Right" }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "text_align_mobile",
+          "label": "Text align — Mobile",
+          "default": "left",
+          "options": [
+            { "value": "left", "label": "Left" },
+            { "value": "center", "label": "Center" },
+            { "value": "right", "label": "Right" }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": "t:all.empty_char"
+        },
+        {
+          "type": "header",
+          "content": "Rating"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_rating_star",
+          "label": "Show rating star icon",
+          "default": true
+        },
+        {
+          "type": "text",
+          "id": "rating_text",
+          "label": "Rating text",
+          "default": "4.84/5 from 10,000+ verified reviews"
+        },
+        {
+          "type": "color",
+          "alpha": true,
+          "id": "rating_color",
+          "label": "Rating text color",
+          "default": "#ffffff"
+        },
+        {
+          "type": "range",
+          "id": "rating_size",
+          "label": "Rating font size (px)",
+          "default": 14,
+          "min": 10,
+          "max": 24,
+          "step": 1,
+          "unit": "px"
+        },
+        {
+          "type": "paragraph",
+          "content": "t:all.empty_char"
+        },
+        {
+          "type": "header",
+          "content": "Headline"
+        },
+        {
+          "type": "richtext",
+          "id": "headline",
+          "label": "Headline",
+          "default": "<p>Most Supplements Target One Pathway. This Targets Four.</p>"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_headline_badge",
+          "label": "Show headline badge",
+          "default": false
+        },
+        {
+          "type": "text",
+          "id": "headline_badge_text",
+          "label": "Headline badge text",
+          "default": "Save up to 35%",
+          "visible_if": "{{ block.settings.show_headline_badge }}"
+        },
+        {
+          "type": "color",
+          "alpha": true,
+          "id": "headline_badge_bg",
+          "label": "Headline badge background",
+          "default": "#536dff",
+          "visible_if": "{{ block.settings.show_headline_badge }}"
+        },
+        {
+          "type": "color",
+          "alpha": true,
+          "id": "headline_badge_color",
+          "label": "Headline badge text color",
+          "default": "#ffffff",
+          "visible_if": "{{ block.settings.show_headline_badge }}"
+        },
+        {
+          "type": "color",
+          "alpha": true,
+          "id": "headline_color",
+          "label": "Headline color",
+          "default": "#ffffff"
+        },
+        {
+          "type": "range",
+          "id": "headline_size_desktop",
+          "label": "Headline size — Desktop (px)",
+          "default": 52,
+          "min": 20,
+          "max": 100,
+          "step": 1,
+          "unit": "px"
+        },
+        {
+          "type": "range",
+          "id": "headline_size_mobile",
+          "label": "Headline size — Mobile (px)",
+          "default": 32,
+          "min": 16,
+          "max": 72,
+          "step": 1,
+          "unit": "px"
+        },
+        {
+          "type": "paragraph",
+          "content": "t:all.empty_char"
+        },
+        {
+          "type": "header",
+          "content": "Subtitle"
+        },
+        {
+          "type": "richtext",
+          "id": "subtitle",
+          "label": "Subtitle text",
+          "default": "<p>Most People Only Do 1</p>"
+        },
+        {
+          "type": "color",
+          "alpha": true,
+          "id": "subtitle_color",
+          "label": "Subtitle color",
+          "default": "#ff7816"
+        },
+        {
+          "type": "range",
+          "id": "subtitle_size",
+          "label": "Subtitle size (px)",
+          "default": 18,
+          "min": 12,
+          "max": 32,
+          "step": 1,
+          "unit": "px"
+        },
+        {
+          "type": "paragraph",
+          "content": "t:all.empty_char"
+        },
+        {
+          "type": "header",
+          "content": "Description"
+        },
+        {
+          "type": "richtext",
+          "id": "description",
+          "label": "Description",
+          "default": "<p>WLP-1™ + Berberine. Up to 12% body weight reduction in 10 weeks.* GLP-1 activity, appetite control, thermogenesis, and AMPK activation, all without a prescription.</p>"
+        },
+        {
+          "type": "color",
+          "alpha": true,
+          "id": "description_color",
+          "label": "Description color",
+          "default": "#cccccc"
+        },
+        {
+          "type": "range",
+          "id": "description_size_desktop",
+          "label": "Description size — Desktop (px)",
+          "default": 18,
+          "min": 12,
+          "max": 36,
+          "step": 1,
+          "unit": "px"
+        },
+        {
+          "type": "range",
+          "id": "description_size_mobile",
+          "label": "Description size — Mobile (px)",
+          "default": 15,
+          "min": 10,
+          "max": 28,
+          "step": 1,
+          "unit": "px"
+        },
+        {
+          "type": "paragraph",
+          "content": "t:all.empty_char"
+        },
+        {
+          "type": "header",
+          "content": "CTA Button"
+        },
+        {
+          "type": "text",
+          "id": "cta_label",
+          "label": "Button label",
+          "default": "Get The Ultimate Weight Management Stack"
+        },
+        {
+          "type": "url",
+          "id": "cta_url",
+          "label": "Button URL"
+        },
+        {
+          "type": "color",
+          "id": "cta_bg_color",
+          "label": "Button background color",
+          "default": "#ffffff"
+        },
+        {
+          "type": "color",
+          "id": "cta_text_color",
+          "label": "Button text color",
+          "default": "#000000"
+        },
+        {
+          "type": "range",
+          "id": "cta_size_desktop",
+          "label": "Button text size — Desktop (px)",
+          "default": 18,
+          "min": 12,
+          "max": 28,
+          "step": 1,
+          "unit": "px"
+        },
+        {
+          "type": "range",
+          "id": "cta_size_mobile",
+          "label": "Button text size — Mobile (px)",
+          "default": 18,
+          "min": 12,
+          "max": 28,
+          "step": 1,
+          "unit": "px"
+        },
+        {
+          "type": "checkbox",
+          "id": "cta_full_width",
+          "label": "Full width button",
+          "default": false
+        },
+        {
+          "type": "text",
+          "id": "cta_badge_text",
+          "label": "Button badge text",
+          "default": "30% OFF",
+          "info": "Small badge on top-right of button. Leave empty to hide."
+        },
+        {
+          "type": "color",
+          "id": "cta_badge_color",
+          "label": "Badge text color",
+          "default": "#ffffff"
+        },
+        {
+          "type": "color",
+          "id": "cta_badge_bg",
+          "label": "Badge background color",
+          "default": "#7c5cfc"
+        },
+        {
+          "type": "paragraph",
+          "content": "t:all.empty_char"
+        },
+        {
+          "type": "header",
+          "content": "Trust Badges"
+        },
+        {
+          "type": "text",
+          "id": "badge_1",
+          "label": "Badge 1",
+          "default": "30-Day Guarantee"
+        },
+        {
+          "type": "text",
+          "id": "badge_2",
+          "label": "Badge 2",
+          "default": "Free Shipping on $50+"
+        },
+        {
+          "type": "text",
+          "id": "badge_3",
+          "label": "Badge 3",
+          "default": "HSA/FSA Eligible"
+        },
+        {
+          "type": "text",
+          "id": "badge_4",
+          "label": "Badge 4"
+        },
+        {
+          "type": "color",
+          "alpha": true,
+          "id": "badges_color",
+          "label": "Badges text color",
+          "default": "#ffffff"
+        },
+        {
+          "type": "range",
+          "id": "badges_size",
+          "label": "Badges font size (px)",
+          "default": 13,
+          "min": 10,
+          "max": 20,
+          "step": 1,
+          "unit": "px"
+        },
+        {
+          "type": "checkbox",
+          "id": "custom_badge_styles",
+          "label": "Custom Badge Styles",
+          "default": false
+        },
+        {
+          "type": "color",
+          "alpha": true,
+          "id": "badge_background",
+          "label": "Badge background",
+          "default": "#ffffff",
+          "visible_if": "{{ block.settings.custom_badge_styles }}"
+        },
+        {
+          "type": "color",
+          "alpha": true,
+          "id": "badge_text_color",
+          "label": "Badge text color",
+          "default": "#000000",
+          "visible_if": "{{ block.settings.custom_badge_styles }}"
+        },
+        {
+          "type": "range",
+          "id": "badge_border_radius",
+          "label": "Badge border radius",
+          "default": 100,
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "px",
+          "visible_if": "{{ block.settings.custom_badge_styles }}"
+        },
+        {
+          "type": "range",
+          "id": "badge_padding_vertical",
+          "label": "Badge vertical padding",
+          "default": 6,
+          "min": 0,
+          "max": 24,
+          "step": 1,
+          "unit": "px",
+          "visible_if": "{{ block.settings.custom_badge_styles }}"
+        },
+        {
+          "type": "range",
+          "id": "badge_padding_horizontal",
+          "label": "Badge horizontal padding",
+          "default": 10,
+          "min": 0,
+          "max": 40,
+          "step": 1,
+          "unit": "px",
+          "visible_if": "{{ block.settings.custom_badge_styles }}"
+        },
+        {
+          "type": "paragraph",
+          "content": "t:all.empty_char"
+        },
+        {
+          "type": "header",
+          "content": "Advanced"
+        },
+        {
+          "type": "textarea",
+          "id": "custom_css",
+          "label": "Custom CSS",
+          "default": "& {\n}\n"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "CTR Hero Banner",
+      "category": "Banner",
+      "blocks": [
+        {
+          "type": "slide",
+          "settings": {
+            "background_color": "#0a0a0a",
+            "content_horizontal_desktop": "right",
+            "content_vertical_desktop": "center",
+            "content_horizontal_mobile": "left",
+            "content_vertical_mobile": "bottom",
+            "text_align_desktop": "left",
+            "text_align_mobile": "left",
+            "rating_text": "4.84/5 from 10,000+ verified reviews",
+            "headline": "<p>Most Supplements Target One Pathway. This Targets Four.</p>",
+            "description": "<p>WLP-1™ + Berberine. Up to 12% body weight reduction in 10 weeks.* GLP-1 activity, appetite control, thermogenesis, and AMPK activation, all without a prescription.</p>",
+            "cta_label": "Get The Ultimate Weight Management Stack",
+            "cta_badge_text": "30% OFF",
+            "badge_1": "30-Day Guarantee",
+            "badge_2": "Free Shipping on $50+",
+            "badge_3": "HSA/FSA Eligible"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

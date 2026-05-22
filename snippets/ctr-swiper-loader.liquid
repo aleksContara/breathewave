@@ -1,0 +1,35 @@
+{%- comment -%}
+  CTR Swiper Loader
+  ─────────────────────────────────────────────────────────────────────────────
+  Rendered once before </body> by layout/theme.liquid.
+
+  Any section that needs Swiper must:
+    1.  Set  {% assign ctr_swiper_needed = true %}  at the top of the file.
+    2.  Register its init callback before this snippet runs:
+
+        <script>
+          window._ctrSwiperQ = window._ctrSwiperQ || [];
+          window._ctrSwiperQ.push(function () {
+            var el = document.getElementById('my-swiper-id');
+            if (!el || el._sw) return;
+            el._sw = new Swiper(el, { ... });
+          });
+        </script>
+
+  This snippet then loads Swiper (CSS + JS) once, synchronously, and executes
+  every queued callback. No race conditions, no duplicate requests.
+{%- endcomment -%}
+
+{% if ctr_swiper_needed %}
+  {% # theme-check-disable RemoteAsset %}
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
+    id="ctr-swiper-css"
+  >
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  <script>
+    (window._ctrSwiperQ || []).forEach(function (fn) { fn(); });
+  </script>
+  {% # theme-check-enable RemoteAsset %}
+{% endif %}

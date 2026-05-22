@@ -1,0 +1,675 @@
+{%- comment -%} Product Highlight Section {%- endcomment -%}
+{%- liquid
+  assign section_id     = section.settings.section_id
+  assign two_col        = section.settings.two_column_layout
+  assign badge_cols_d   = section.settings.badge_cols_desktop
+  assign custom_css     = section.settings.custom_css
+-%}
+
+{% capture selector %}[data-style-id="{{ section.id }}"]{% endcapture %}
+
+{% capture css %}
+  & {
+    {% if section.settings.bg_color != blank and section.settings.bg_color.alpha != 0 %}background-color: {{ section.settings.bg_color }};{% endif %}
+    {% if section.settings.text_color != blank and section.settings.text_color.alpha != 0 %}color: {{ section.settings.text_color }};{% endif %}
+    padding: {{ section.settings.padding_top }}px {{ section.settings.padding_horizontal }}px {{ section.settings.padding_bottom }}px;
+    box-sizing: border-box;
+  }
+
+  & .ph__inner {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+  }
+
+  & .ph__columns {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    margin-bottom: {{ section.settings.image_gap }}px;
+  }
+
+  & .ph__left {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  & .ph__right {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  & .ph__heading {
+    font-weight: 700;
+    line-height: 1.1;
+    font-size: {{ section.settings.heading_size_mobile }}px;
+    margin: 0;
+  }
+  & .ph__heading h1,
+  & .ph__heading h2,
+  & .ph__heading h3,
+  & .ph__heading p {
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+    color: inherit;
+    margin: 0;
+    display: inline;
+  }
+
+  & .ph__body {
+    line-height: 1.6;
+    font-size: {{ section.settings.body_size_mobile }}px;
+  }
+  & .ph__body p { margin: 0 0 1em; }
+  & .ph__body p:last-child { margin-bottom: 0; }
+
+  & .ph__cta-wrap {
+    display: flex;
+  }
+  & .ph__cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 32px;
+    border-radius: 100px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: opacity 0.2s;
+    font-size: {{ section.settings.cta_size }}px;
+  }
+  & .ph__cta:hover { opacity: 0.85; }
+
+  & .ph__divider {
+    border: none;
+    border-top: 1px solid rgba(0,0,0,0.1);
+    margin: 4px 0;
+  }
+
+  & .ph__badges {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  & .ph__badge {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(0,0,0,0.08);
+    background: {{ section.settings.badge_bg | default: '#ffffff' }};
+  }
+
+  & .ph__badge-icon {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: {{ section.settings.badge_icon_color | default: '#1a1a1a' }};
+  }
+  & .ph__badge-icon svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  & .ph__badge-label {
+    font-size: {{ section.settings.badge_size }}px;
+    font-weight: 600;
+    line-height: 1.3;
+    color: {{ section.settings.badge_text_color | default: '#1a1a1a' }};
+  }
+
+  & .ph__image-wrap {
+    width: 100%;
+    border-radius: {{ section.settings.image_border_radius }}px;
+    overflow: hidden;
+    line-height: 0;
+  }
+  & .ph__image-wrap img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  @media (min-width: 768px) {
+    & .ph__heading {
+      font-size: {{ section.settings.heading_size_desktop }}px;
+    }
+    & .ph__body {
+      font-size: {{ section.settings.body_size_desktop }}px;
+    }
+    {% if two_col %}
+    & .ph__columns {
+      flex-direction: row;
+      align-items: flex-start;
+      gap: 48px;
+    }
+    & .ph__left {
+      flex: 0 0 {{ section.settings.left_col_width }}%;
+      max-width: {{ section.settings.left_col_width }}%;
+    }
+    & .ph__right {
+      flex: 1;
+      min-width: 0;
+    }
+    {% endif %}
+    & .ph__badges {
+      grid-template-columns: repeat({{ badge_cols_d }}, 1fr);
+    }
+  }
+{% endcapture %}
+
+<style>
+  {{ css | append: custom_css | replace: '&', selector | strip_newlines }}
+</style>
+
+<div
+  data-style-id="{{ section.id }}"
+  {% if section_id != blank %}id="{{ section_id }}"{% endif %}
+>
+  <div class="ph__inner">
+
+    <div class="ph__columns">
+
+      {%- comment -%} LEFT: heading + cta {%- endcomment -%}
+      <div class="ph__left">
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'heading' -%}
+            <div
+              class="ph__heading"
+              {{ block.shopify_attributes }}
+              {% if block.settings.heading_color != blank and block.settings.heading_color.alpha != 0 %}
+                style="color: {{ block.settings.heading_color }};"
+              {% endif %}
+            >{{ block.settings.heading_text }}</div>
+          {%- elsif block.type == 'cta' -%}
+            <div class="ph__cta-wrap" {{ block.shopify_attributes }}>
+              <a
+                href="{{ block.settings.cta_url }}"
+                class="ph__cta"
+                style="
+                  {% if block.settings.cta_bg != blank and block.settings.cta_bg.alpha != 0 %}background-color: {{ block.settings.cta_bg }};{% endif %}
+                  {% if block.settings.cta_color != blank and block.settings.cta_color.alpha != 0 %}color: {{ block.settings.cta_color }};{% endif %}
+                "
+              >{{ block.settings.cta_label }}</a>
+            </div>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+
+      {%- comment -%} RIGHT: body + badges {%- endcomment -%}
+      <div class="ph__right">
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'body' -%}
+            <div class="ph__body" {{ block.shopify_attributes }}>
+              {{ block.settings.body_text }}
+            </div>
+            <hr class="ph__divider">
+          {%- endif -%}
+        {%- endfor -%}
+
+        {%- assign badge_blocks = section.blocks | where: 'type', 'badge' -%}
+        {%- if badge_blocks.size > 0 -%}
+          <div class="ph__badges">
+            {%- for block in badge_blocks -%}
+              <div class="ph__badge" {{ block.shopify_attributes }}>
+                <div class="ph__badge-icon">
+                  {%- case block.settings.icon -%}
+                    {%- when 'waves' -%}
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6c1.5-2 3-2 4.5 0s3 2 4.5 0 3-2 4.5 0 3 2 4.5 0"/><path d="M2 12c1.5-2 3-2 4.5 0s3 2 4.5 0 3-2 4.5 0 3 2 4.5 0"/><path d="M2 18c1.5-2 3-2 4.5 0s3 2 4.5 0 3-2 4.5 0 3 2 4.5 0"/></svg>
+                    {%- when 'shield' -%}
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+                    {%- when 'thumbsup' -%}
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+                    {%- when 'volume' -%}
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+                    {%- when 'heart' -%}
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                    {%- when 'leaf' -%}
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8C8 10 5.9 16.17 3.82 22l2.61-1.1C8 19.35 9.7 18 12 18c3.87 0 7-3.13 7-7 0-5.5-4.5-9-9-9-3.5 0-6.5 2-8 5 1.5-1.5 3.5-2 5-2 4 0 9 3 10 8z"/></svg>
+                    {%- when 'star' -%}
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    {%- when 'check' -%}
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    {%- when 'moon' -%}
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                    {%- when 'lungs' -%}
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6v6"/><path d="M8 9C5 9 3 11 3 14c0 2.5 1.5 5 3 6h2.5c.5 0 .5-.5 .5-1v-4"/><path d="M16 9c3 0 5 2 5 5 0 2.5-1.5 5-3 6h-2.5c-.5 0-.5-.5-.5-1v-4"/></svg>
+                    {%- when 'custom' -%}
+                      {%- if block.settings.custom_icon != blank -%}{{ block.settings.custom_icon }}{%- endif -%}
+                    {%- else -%}
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                  {%- endcase -%}
+                </div>
+                <span class="ph__badge-label">{{ block.settings.badge_label }}</span>
+              </div>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+      </div>
+
+    </div>
+
+    {%- comment -%} Feature image — full width below columns {%- endcomment -%}
+    {%- for block in section.blocks -%}
+      {%- if block.type == 'feature_image' and block.settings.image != blank -%}
+        <div class="ph__image-wrap" {{ block.shopify_attributes }}>
+          <img
+            src="{{ block.settings.image | image_url: width: 2400 }}"
+            alt="{{ block.settings.image.alt | default: '' }}"
+            loading="lazy"
+            width="{{ block.settings.image.width }}"
+            height="{{ block.settings.image.height }}"
+          >
+        </div>
+      {%- endif -%}
+    {%- endfor -%}
+
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Product Highlight",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "checkbox",
+      "id": "two_column_layout",
+      "label": "Two-column layout (desktop)",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "left_col_width",
+      "label": "Left column width (%)",
+      "default": 38,
+      "min": 20,
+      "max": 60,
+      "step": 1,
+      "unit": "%"
+    },
+    {
+      "type": "select",
+      "id": "badge_cols_desktop",
+      "label": "Badge columns — Desktop",
+      "default": "4",
+      "options": [
+        { "value": "2", "label": "2" },
+        { "value": "3", "label": "3" },
+        { "value": "4", "label": "4" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "label": "Max width (px)",
+      "default": 1200,
+      "min": 800,
+      "max": 1800,
+      "step": 40,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding top (px)",
+      "default": 60,
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding bottom (px)",
+      "default": 60,
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_horizontal",
+      "label": "Padding horizontal (px)",
+      "default": 24,
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "image_gap",
+      "label": "Gap before feature image (px)",
+      "default": 32,
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:all.empty_char"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "alpha": true,
+      "id": "bg_color",
+      "label": "Background color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "alpha": true,
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "color",
+      "alpha": true,
+      "id": "badge_bg",
+      "label": "Badge card background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "alpha": true,
+      "id": "badge_icon_color",
+      "label": "Badge icon color",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "color",
+      "alpha": true,
+      "id": "badge_text_color",
+      "label": "Badge text color",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:all.empty_char"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "heading_size_desktop",
+      "label": "Heading size — Desktop (px)",
+      "default": 52,
+      "min": 24,
+      "max": 96,
+      "step": 2,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "heading_size_mobile",
+      "label": "Heading size — Mobile (px)",
+      "default": 36,
+      "min": 20,
+      "max": 60,
+      "step": 2,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "body_size_desktop",
+      "label": "Body size — Desktop (px)",
+      "default": 15,
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "body_size_mobile",
+      "label": "Body size — Mobile (px)",
+      "default": 14,
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "cta_size",
+      "label": "CTA button text size (px)",
+      "default": 16,
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "badge_size",
+      "label": "Badge label size (px)",
+      "default": 13,
+      "min": 10,
+      "max": 18,
+      "step": 1,
+      "unit": "px"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:all.empty_char"
+    },
+    {
+      "type": "header",
+      "content": "Image"
+    },
+    {
+      "type": "range",
+      "id": "image_border_radius",
+      "label": "Image border radius (px)",
+      "default": 16,
+      "min": 0,
+      "max": 48,
+      "step": 2,
+      "unit": "px"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:all.empty_char"
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "textarea",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    },
+    {
+      "type": "text",
+      "id": "section_id",
+      "label": "Section ID"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "heading",
+      "name": "Heading",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "heading_text",
+          "label": "Heading text",
+          "default": "<p>world's most comfortable nasal dilator</p>"
+        },
+        {
+          "type": "color",
+          "alpha": true,
+          "id": "heading_color",
+          "label": "Heading color",
+          "default": "#1a1a1a"
+        }
+      ]
+    },
+    {
+      "type": "body",
+      "name": "Body text",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "body_text",
+          "label": "Body text",
+          "default": "<p><strong>Breathewave restores your biological expectations.</strong> Nasal breathing enhances nitric oxide, CO₂ regulation, and nervous system balance — paired with science-backed chronotherapy and circadian strategies to support sleep and long-term health.</p>"
+        }
+      ]
+    },
+    {
+      "type": "cta",
+      "name": "CTA Button",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "cta_label",
+          "label": "Button label",
+          "default": "Buy now"
+        },
+        {
+          "type": "url",
+          "id": "cta_url",
+          "label": "Button URL"
+        },
+        {
+          "type": "color",
+          "alpha": true,
+          "id": "cta_bg",
+          "label": "Button background",
+          "default": "#3de8c8"
+        },
+        {
+          "type": "color",
+          "alpha": true,
+          "id": "cta_color",
+          "label": "Button text color",
+          "default": "#000000"
+        }
+      ]
+    },
+    {
+      "type": "feature_image",
+      "name": "Feature Image",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        }
+      ]
+    },
+    {
+      "type": "badge",
+      "name": "Trust Badge",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "default": "shield",
+          "options": [
+            { "value": "waves",    "label": "Waves" },
+            { "value": "shield",   "label": "Shield + Check" },
+            { "value": "thumbsup", "label": "Thumbs Up" },
+            { "value": "volume",   "label": "Volume / Mute" },
+            { "value": "heart",    "label": "Heart" },
+            { "value": "leaf",     "label": "Leaf" },
+            { "value": "star",     "label": "Star" },
+            { "value": "check",    "label": "Checkmark" },
+            { "value": "moon",     "label": "Moon" },
+            { "value": "lungs",    "label": "Lungs / Breathing" },
+            { "value": "custom",   "label": "Custom SVG" }
+          ]
+        },
+        {
+          "type": "html",
+          "id": "custom_icon",
+          "label": "Custom SVG icon",
+          "info": "Paste raw SVG markup. Only used when Icon is set to 'Custom SVG'."
+        },
+        {
+          "type": "text",
+          "id": "badge_label",
+          "label": "Label",
+          "default": "Feature"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "CTR Product Highlight",
+      "category": "Product",
+      "blocks": [
+        {
+          "type": "heading",
+          "settings": {
+            "heading_text": "<p>world's most comfortable nasal dilator</p>",
+            "heading_color": "#1a1a1a"
+          }
+        },
+        {
+          "type": "cta",
+          "settings": {
+            "cta_label": "Buy now",
+            "cta_bg": "#3de8c8",
+            "cta_color": "#000000"
+          }
+        },
+        {
+          "type": "body",
+          "settings": {
+            "body_text": "<p><strong>Breathewave restores your biological expectations.</strong> Nasal breathing enhances nitric oxide, CO₂ regulation, and nervous system balance — paired with science-backed chronotherapy and circadian strategies to support sleep and long-term health.</p>"
+          }
+        },
+        {
+          "type": "badge",
+          "settings": { "icon": "waves",    "badge_label": "Improves Breathing" }
+        },
+        {
+          "type": "badge",
+          "settings": { "icon": "shield",   "badge_label": "Medical Grade" }
+        },
+        {
+          "type": "badge",
+          "settings": { "icon": "thumbsup", "badge_label": "Reduces Stress" }
+        },
+        {
+          "type": "badge",
+          "settings": { "icon": "volume",   "badge_label": "Reduces Snoring" }
+        },
+        {
+          "type": "feature_image"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

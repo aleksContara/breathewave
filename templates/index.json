@@ -7,7 +7,7 @@
  * made to this file may be overwritten.
  * ------------------------------------------------------------
  */
-{
+ {
   "sections": {
     "hero_jVaWmY": {
       "type": "hero",
@@ -112,9 +112,11 @@
         "text_PRBDwC",
         "button_H9gpTf"
       ],
+      "disabled": true,
       "name": "t:names.hero",
       "settings": {
         "media_type_1": "image",
+        "image_1": "shopify://shop_images/BW-REST-Peace-13_2.jpg",
         "media_type_2": "image",
         "stack_media_on_mobile": false,
         "custom_mobile_media": false,
@@ -144,203 +146,498 @@
         "padding-block-end": 72
       }
     },
-    "product_list_fa6P9H": {
-      "type": "product-list",
+    "ctr_hero_banner_YiCFkF": {
+      "type": "ctr-hero_banner",
       "blocks": {
-        "static-header": {
-          "type": "_product-list-content",
-          "name": "t:names.header",
-          "static": true,
+        "slide_bgAW8m": {
+          "type": "slide",
           "settings": {
-            "content_direction": "row",
-            "vertical_on_mobile": false,
-            "horizontal_alignment": "space-between",
-            "vertical_alignment": "flex-end",
-            "align_baseline": true,
-            "horizontal_alignment_flex_direction_column": "flex-start",
-            "vertical_alignment_flex_direction_column": "center",
-            "gap": 12,
-            "width": "fill",
-            "custom_width": 100,
-            "width_mobile": "fill",
-            "custom_width_mobile": 100,
-            "height": "fit",
-            "custom_height": 100,
-            "inherit_color_scheme": true,
-            "color_scheme": "",
-            "background_media": "none",
-            "video_position": "cover",
-            "background_image_position": "cover",
-            "border": "none",
-            "border_width": 1,
-            "border_opacity": 100,
-            "border_radius": 0,
-            "padding-block-start": 0,
-            "padding-block-end": 0,
-            "padding-inline-start": 0,
-            "padding-inline-end": 0
-          },
-          "blocks": {
-            "product_list_text_YFtzcL": {
-              "type": "_product-list-text",
-              "name": "t:names.collection_title",
-              "settings": {
-                "text": "<h3>{{ closest.collection.title }}</h3>",
-                "width": "fit-content",
-                "max_width": "normal",
-                "alignment": "left",
-                "type_preset": "h4",
-                "font": "var(--font-body--family)",
-                "font_size": "",
-                "line_height": "normal",
-                "letter_spacing": "normal",
-                "case": "none",
-                "wrap": "pretty",
-                "color": "var(--color-foreground)",
-                "background": false,
-                "background_color": "#00000026",
-                "corner_radius": 0,
-                "padding-block-start": 0,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
-              },
-              "blocks": {}
-            },
-            "product_list_button_MWeP9V": {
-              "type": "_product-list-button",
-              "name": "t:names.product_list_button",
-              "settings": {
-                "label": "View all",
-                "open_in_new_tab": false,
-                "style_class": "link",
-                "width": "fit-content",
-                "custom_width": 100,
-                "width_mobile": "fit-content",
-                "custom_width_mobile": 100
-              },
-              "blocks": {}
-            }
-          },
-          "block_order": [
-            "product_list_text_YFtzcL",
-            "product_list_button_MWeP9V"
-          ]
-        },
-        "static-product-card": {
-          "type": "_product-card",
-          "name": "t:names.product_card",
-          "static": true,
-          "settings": {
-            "product_card_gap": 4,
-            "inherit_color_scheme": true,
-            "color_scheme": "",
-            "border": "none",
-            "border_width": 1,
-            "border_opacity": 100,
-            "border_radius": 0,
-            "padding-block-start": 0,
-            "padding-block-end": 0,
-            "padding-inline-start": 0,
-            "padding-inline-end": 0
-          },
-          "blocks": {
-            "product_card_gallery_677WP3": {
-              "type": "_product-card-gallery",
-              "name": "t:names.product_card_media",
-              "settings": {
-                "image_ratio": "adapt",
-                "border": "none",
-                "border_width": 1,
-                "border_opacity": 100,
-                "border_radius": 0,
-                "padding-block-start": 0,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
-              },
-              "blocks": {}
-            },
-            "product_title_YXxMTj": {
-              "type": "product-title",
-              "name": "t:names.product_title",
-              "settings": {
-                "width": "100%",
-                "max_width": "normal",
-                "alignment": "left",
-                "type_preset": "rte",
-                "font": "var(--font-body--family)",
-                "font_size": "1rem",
-                "line_height": "normal",
-                "letter_spacing": "normal",
-                "case": "none",
-                "wrap": "pretty",
-                "color": "var(--color-foreground)",
-                "background": false,
-                "background_color": "#00000026",
-                "corner_radius": 0,
-                "padding-block-start": 4,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
-              },
-              "blocks": {}
-            },
-            "price_JQzVV4": {
-              "type": "price",
-              "name": "t:names.product_price",
-              "settings": {
-                "show_sale_price_first": true,
-                "show_installments": false,
-                "show_tax_info": false,
-                "type_preset": "h6",
-                "width": "100%",
-                "alignment": "left",
-                "font": "var(--font-body--family)",
-                "font_size": "1rem",
-                "line_height": "normal",
-                "letter_spacing": "normal",
-                "case": "none",
-                "color": "var(--color-foreground)",
-                "padding-block-start": 0,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
-              },
-              "blocks": {}
-            }
-          },
-          "block_order": [
-            "product_card_gallery_677WP3",
-            "product_title_YXxMTj",
-            "price_JQzVV4"
-          ]
+            "background_color": "#0a0a0a",
+            "bg_image_desktop": "shopify://shop_images/BW-REST-Peace-13-1.jpg",
+            "bg_position_desktop": "center center",
+            "bg_position_mobile": "center center",
+            "content_width_desktop": 620,
+            "content_width_mobile": 100,
+            "content_horizontal_desktop": "left",
+            "content_vertical_desktop": "center",
+            "content_horizontal_mobile": "left",
+            "content_vertical_mobile": "bottom",
+            "text_align_desktop": "left",
+            "text_align_mobile": "left",
+            "show_rating_star": false,
+            "rating_text": "BREATHING 2.0",
+            "rating_color": "#6cfff5",
+            "rating_size": 14,
+            "headline": "<h1>breathe better. live better.</h1>",
+            "show_headline_badge": false,
+            "headline_badge_text": "Save up to 35%",
+            "headline_badge_bg": "#536dff",
+            "headline_badge_color": "#ffffff",
+            "headline_color": "#ffffff",
+            "headline_size_desktop": 52,
+            "headline_size_mobile": 32,
+            "subtitle": "",
+            "subtitle_color": "#ff7816",
+            "subtitle_size": 18,
+            "description": "<p>Your biology is built to breathe through your nose — not your mouth.¹ ² 11 seconds, 5.5 in, 5.5 out. Breathewave helps restore that natural function for better sleep, energy, and long-term health.³ ⁵ ⁶ ¹⁰</p>",
+            "description_color": "#ffffff",
+            "description_size_desktop": 16,
+            "description_size_mobile": 14,
+            "cta_label": "Buy now",
+            "cta_url": "",
+            "cta_bg_color": "#6cfff5",
+            "cta_text_color": "#1a1a1a",
+            "cta_size_desktop": 16,
+            "cta_size_mobile": 16,
+            "cta_full_width": false,
+            "cta_badge_text": "",
+            "cta_badge_color": "#ffffff",
+            "cta_badge_bg": "#7c5cfc",
+            "badge_1": "",
+            "badge_2": "",
+            "badge_3": "",
+            "badge_4": "",
+            "badges_color": "#ffffff",
+            "badges_size": 13,
+            "custom_badge_styles": false,
+            "badge_background": "#ffffff",
+            "badge_text_color": "#000000",
+            "badge_border_radius": 100,
+            "badge_padding_vertical": 6,
+            "badge_padding_horizontal": 10,
+            "custom_css": "& {\n}"
+          }
         }
       },
-      "name": "Featured collection",
+      "block_order": [
+        "slide_bgAW8m"
+      ],
+      "name": "CTR Hero Banner",
       "settings": {
-        "collection": "all",
-        "layout_type": "grid",
-        "carousel_on_mobile": false,
-        "max_products": 8,
-        "columns": 4,
-        "mobile_columns": "2",
-        "mobile_card_size": "60cqw",
-        "columns_gap": 8,
-        "rows_gap": 24,
-        "icons_style": "arrow",
-        "icons_shape": "none",
-        "section_width": "page-width",
-        "horizontal_alignment": "flex-start",
-        "gap": 28,
-        "color_scheme": "scheme-1",
-        "padding-block-start": 48,
-        "padding-block-end": 48
+        "logo_width": 140,
+        "logo_left_desktop": 3,
+        "logo_top_desktop": 4,
+        "logo_left_mobile": 4,
+        "logo_top_mobile": 4,
+        "trust_line_text": "",
+        "trust_line_color": "",
+        "trust_line_size": 14,
+        "auto_rotate": 0,
+        "pause_on_hover": true,
+        "min_height_desktop": 640,
+        "min_height_mobile": 550,
+        "clinicians_show": false,
+        "clinicians_text": "",
+        "clinicians_bg": "#f5f5f5",
+        "clinicians_text_color": "#1a1a1a",
+        "custom_css": "",
+        "hide_header": false,
+        "section_id": ""
+      }
+    },
+    "ctr_product_highlight_KiYj48": {
+      "type": "ctr-product-highlight",
+      "blocks": {
+        "heading_iY4iTP": {
+          "type": "heading",
+          "settings": {
+            "heading_text": "<p>world's most comfortable nasal dilator</p>",
+            "heading_color": "#1a1a1a"
+          }
+        },
+        "cta_P7AfKG": {
+          "type": "cta",
+          "settings": {
+            "cta_label": "Buy now",
+            "cta_url": "",
+            "cta_bg": "#3de8c8",
+            "cta_color": "#000000"
+          }
+        },
+        "body_hpmy3q": {
+          "type": "body",
+          "settings": {
+            "body_text": "<p><strong>Breathewave restores your biological expectations.</strong> Nasal breathing enhances nitric oxide, CO₂ regulation, and nervous system balance — paired with science-backed chronotherapy and circadian strategies to support sleep and long-term health.</p>"
+          }
+        },
+        "badge_WHnbDb": {
+          "type": "badge",
+          "settings": {
+            "icon": "waves",
+            "custom_icon": "",
+            "badge_label": "Improves Breathing"
+          }
+        },
+        "badge_RiPhNk": {
+          "type": "badge",
+          "settings": {
+            "icon": "shield",
+            "custom_icon": "",
+            "badge_label": "Medical Grade"
+          }
+        },
+        "badge_TYpgKm": {
+          "type": "badge",
+          "settings": {
+            "icon": "thumbsup",
+            "custom_icon": "",
+            "badge_label": "Reduces Stress"
+          }
+        },
+        "badge_BJRgTc": {
+          "type": "badge",
+          "settings": {
+            "icon": "volume",
+            "custom_icon": "",
+            "badge_label": "Reduces Snoring"
+          }
+        },
+        "feature_image_DrFhUE": {
+          "type": "feature_image",
+          "settings": {
+            "image": "shopify://shop_images/cloud-banner.png"
+          }
+        }
+      },
+      "block_order": [
+        "heading_iY4iTP",
+        "cta_P7AfKG",
+        "body_hpmy3q",
+        "badge_WHnbDb",
+        "badge_RiPhNk",
+        "badge_TYpgKm",
+        "badge_BJRgTc",
+        "feature_image_DrFhUE"
+      ],
+      "name": "CTR Product Highlight",
+      "settings": {
+        "two_column_layout": true,
+        "left_col_width": 38,
+        "badge_cols_desktop": "4",
+        "max_width": 1200,
+        "padding_top": 60,
+        "padding_bottom": 60,
+        "padding_horizontal": 24,
+        "image_gap": 32,
+        "bg_color": "#ffffff",
+        "text_color": "#1a1a1a",
+        "badge_bg": "#ffffff",
+        "badge_icon_color": "#1a1a1a",
+        "badge_text_color": "#1a1a1a",
+        "heading_size_desktop": 52,
+        "heading_size_mobile": 36,
+        "body_size_desktop": 15,
+        "body_size_mobile": 14,
+        "cta_size": 16,
+        "badge_size": 13,
+        "image_border_radius": 16,
+        "custom_css": "",
+        "section_id": ""
+      }
+    },
+    "ctr_icon_cards_JxYGd7": {
+      "type": "ctr-icon-cards",
+      "blocks": {
+        "card_EGmbri": {
+          "type": "card",
+          "settings": {
+            "icon": "shopify://shop_images/image_8.jpg",
+            "title": "Boosted Oxygen",
+            "body": "<p>Properly dilated nasal passages increase airflow by 15–30%, improving oxygen saturation and cellular energy production.</p>"
+          }
+        },
+        "card_FNhETq": {
+          "type": "card",
+          "settings": {
+            "icon": "shopify://shop_images/image_9.jpg",
+            "title": "Nitric Oxide Production",
+            "body": "<p>The nasal cavity produces nitric oxide, a molecule that dilates blood vessels, regulates blood pressure, and enhances circulation.</p>"
+          }
+        },
+        "card_Leje8m": {
+          "type": "card",
+          "settings": {
+            "icon": "shopify://shop_images/image_10.jpg",
+            "title": "Respiratory Efficiency",
+            "body": "<p>Nasal breathing filters, warms, and humidifies air, creating optimal conditions for comfortable breathing.</p>"
+          }
+        },
+        "card_GL8gaG": {
+          "type": "card",
+          "settings": {
+            "icon": "shopify://shop_images/image_11.jpg",
+            "title": "Improved Sleep Quality",
+            "body": "<p>Open nasal airways reduce snoring, nighttime awakenings, and improve overall sleep architecture.</p>"
+          }
+        },
+        "card_gUeRBa": {
+          "type": "card",
+          "settings": {
+            "icon": "shopify://shop_images/image_12.jpg",
+            "title": "Athletic Performance",
+            "body": "<p>Enhanced oxygen uptake through optimal nasal breathing improves endurance and recovery during physical activity.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "card_EGmbri",
+        "card_FNhETq",
+        "card_Leje8m",
+        "card_GL8gaG",
+        "card_gUeRBa"
+      ],
+      "name": "CTR Icon Cards",
+      "settings": {
+        "eyebrow": "",
+        "heading": "<p>to live you breathe. to optimize you only nose-breathe.</p>",
+        "heading_size_desktop": 48,
+        "heading_size_mobile": 28,
+        "header_gap": 40,
+        "mobile_layout": "carousel",
+        "desktop_cols": "5",
+        "slides_per_view_mobile": "1.2",
+        "mobile_gap": 12,
+        "show_dots": true,
+        "max_width": 1200,
+        "padding_top": 60,
+        "padding_bottom": 60,
+        "padding_horizontal": 24,
+        "card_padding": 24,
+        "card_radius": 16,
+        "icon_size": 96,
+        "bg_color": "#ffffff",
+        "card_bg": "#eef2f8",
+        "card_border_color": "",
+        "heading_color": "#1a1a1a",
+        "eyebrow_color": "#1a1a1a",
+        "title_color": "#1a1a1a",
+        "body_color": "#444444",
+        "dot_color": "#1a1a1a",
+        "eyebrow_size": 12,
+        "title_size": 16,
+        "body_size": 14,
+        "custom_css": "",
+        "section_id": ""
+      }
+    },
+    "ctr_marquee_AYiLqH": {
+      "type": "ctr-marquee",
+      "blocks": {
+        "text_feiWEj": {
+          "type": "text",
+          "settings": {
+            "text": "30 day risk free trial"
+          }
+        },
+        "text_EQA4b6": {
+          "type": "text",
+          "settings": {
+            "text": "30 day risk free trial"
+          }
+        },
+        "text_TLfL7r": {
+          "type": "text",
+          "settings": {
+            "text": "30 day risk free trial"
+          }
+        },
+        "text_nnXQeh": {
+          "type": "text",
+          "settings": {
+            "text": "30 day risk free trial"
+          }
+        },
+        "text_Bt8Gzh": {
+          "type": "text",
+          "settings": {
+            "text": "30 day risk free trial"
+          }
+        }
+      },
+      "block_order": [
+        "text_feiWEj",
+        "text_EQA4b6",
+        "text_TLfL7r",
+        "text_nnXQeh",
+        "text_Bt8Gzh"
+      ],
+      "name": "CTR Marquee",
+      "settings": {
+        "speed": 20,
+        "direction": "left",
+        "separator": "•",
+        "sep_gap": 20,
+        "sep_size": 10,
+        "bg_color": "#1a2032",
+        "text_color": "#ffffff",
+        "sep_color": "",
+        "font_size": 14,
+        "font_weight": "400",
+        "padding_v": 14,
+        "item_gap": 16,
+        "hide_on_mobile": false,
+        "aria_label": "Scrolling announcement",
+        "custom_css": "",
+        "section_id": ""
+      }
+    },
+    "ctr_how_to_use_UAmaqK": {
+      "type": "ctr-how-to-use",
+      "blocks": {
+        "step_gLzn4D": {
+          "type": "step",
+          "settings": {
+            "image": "shopify://shop_images/how-to-use-1a.png",
+            "step_label": "step 1",
+            "description": "<p>Align left (L) and right (R) indicators. Insert gently.</p>"
+          }
+        },
+        "step_PmcdrK": {
+          "type": "step",
+          "settings": {
+            "image": "shopify://shop_images/how-to-use-2a.png",
+            "step_label": "step 2",
+            "description": "<p>Push in gently until only the bridge is visible.</p>"
+          }
+        },
+        "step_77JN9h": {
+          "type": "step",
+          "settings": {
+            "image": "shopify://shop_images/how-to-use-3a.png",
+            "step_label": "step 3",
+            "description": "<p>Adjust until it feels right. Comfort is key.</p>"
+          }
+        },
+        "note_R4mqRC": {
+          "type": "note",
+          "settings": {
+            "text": "<p>*care matters. after use, soak 2 to 3 minutes in warm water, wipe, rinse, and store dry.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "step_gLzn4D",
+        "step_PmcdrK",
+        "step_77JN9h",
+        "note_R4mqRC"
+      ],
+      "name": "CTR How To Use",
+      "settings": {
+        "eyebrow": "3 EASY STEPS FOR BETTER BREATHING",
+        "heading": "<p>how to use</p>",
+        "heading_size_desktop": 52,
+        "heading_size_mobile": 36,
+        "header_gap": 40,
+        "desktop_cols": "3",
+        "steps_gap": 24,
+        "note_gap": 32,
+        "max_width": 1200,
+        "section_bg": "#000000",
+        "section_padding_v": 40,
+        "section_padding_h": 24,
+        "card_bg": "#1e2235",
+        "card_radius": 24,
+        "card_padding_v": 52,
+        "card_padding_h": 40,
+        "step_card_bg": "",
+        "step_card_border": "",
+        "step_card_radius": 16,
+        "eyebrow_color": "#3de8c8",
+        "heading_color": "#ffffff",
+        "label_color": "#ffffff",
+        "label_size": 22,
+        "desc_color": "#aaaabc",
+        "desc_size": 15,
+        "note_color": "#777790",
+        "note_size": 14,
+        "eyebrow_size": 12,
+        "custom_css": "",
+        "section_id": ""
+      }
+    },
+    "ctr_reviews_carousel_ympdEN": {
+      "type": "ctr-reviews-carousel",
+      "blocks": {
+        "cta_bVkRXC": {
+          "type": "cta",
+          "settings": {
+            "cta_label": "Buy now",
+            "cta_url": "",
+            "cta_bg": "#3de8c8",
+            "cta_color": "#000000"
+          }
+        },
+        "testimonial_tKE4Kq": {
+          "type": "testimonial",
+          "settings": {
+            "quote_headline": "game changer!",
+            "quote_body": "<p>\"I never realized I could actually BREATHE better, because I'd never had obvious breathing problems. But once I tried the nasal dilator, I felt an incredible new openness I'd never experienced before. I love it—so simple and such a boost to my health. I only wish I'd understood its importance so.\" - Victoria A.</p>",
+            "reviewer": ""
+          }
+        },
+        "testimonial_8LW9Wt": {
+          "type": "testimonial",
+          "settings": {
+            "quote_headline": "best sleep of my life",
+            "quote_body": "<p>\"I've been using this for 3 weeks and my sleep tracker shows a 40% improvement in deep sleep. My partner says the snoring is almost gone. Absolutely worth it.\" - James R.</p>",
+            "reviewer": ""
+          }
+        },
+        "testimonial_VGRyBr": {
+          "type": "testimonial",
+          "settings": {
+            "quote_headline": "I breathe so much better",
+            "quote_body": "<p>\"As someone who runs marathons, nasal breathing was always a struggle. Since using Breathewave my endurance has noticeably improved. Simple but incredibly effective.\" - Sarah M.</p>",
+            "reviewer": ""
+          }
+        }
+      },
+      "block_order": [
+        "cta_bVkRXC",
+        "testimonial_tKE4Kq",
+        "testimonial_8LW9Wt",
+        "testimonial_VGRyBr"
+      ],
+      "name": "CTR Reviews Carousel",
+      "settings": {
+        "star_count": 5,
+        "star_size": 28,
+        "star_color": "#3de8c8",
+        "heading": "<p>real reviews</p>",
+        "heading_size_desktop": 48,
+        "heading_size_mobile": 36,
+        "autoplay": false,
+        "autoplay_speed": 5,
+        "show_dots": true,
+        "left_col_width": 28,
+        "col_gap": 80,
+        "max_width": 1200,
+        "padding_v": 80,
+        "padding_h": 24,
+        "bg_color": "#16192a",
+        "heading_color": "#ffffff",
+        "quote_headline_color": "#ffffff",
+        "quote_body_color": "#ccccdd",
+        "reviewer_color": "#888899",
+        "dot_color": "#ffffff",
+        "quote_headline_size_desktop": 32,
+        "quote_headline_size_mobile": 24,
+        "quote_body_size_desktop": 18,
+        "quote_body_size_mobile": 15,
+        "reviewer_size": 14,
+        "cta_size": 16,
+        "custom_css": "",
+        "section_id": ""
       }
     }
   },
   "order": [
     "hero_jVaWmY",
-    "product_list_fa6P9H"
+    "ctr_hero_banner_YiCFkF",
+    "ctr_product_highlight_KiYj48",
+    "ctr_icon_cards_JxYGd7",
+    "ctr_marquee_AYiLqH",
+    "ctr_how_to_use_UAmaqK",
+    "ctr_reviews_carousel_ympdEN"
   ]
 }

@@ -1,0 +1,591 @@
+{%- comment -%} How To Use Section {%- endcomment -%}
+{%- liquid
+  assign custom_css      = section.settings.custom_css
+  assign section_id_attr = section.settings.section_id
+-%}
+
+{% capture selector %}[data-style-id="{{ section.id }}"]{% endcapture %}
+
+{% capture css %}
+  & {
+    {% if section.settings.section_bg != blank and section.settings.section_bg.alpha != 0 %}
+      background-color: {{ section.settings.section_bg }};
+    {% endif %}
+    padding: {{ section.settings.section_padding_v }}px {{ section.settings.section_padding_h }}px;
+    box-sizing: border-box;
+  }
+
+  & .htu__inner {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+  }
+
+  & .htu__card {
+    {% if section.settings.card_bg != blank and section.settings.card_bg.alpha != 0 %}
+      background-color: {{ section.settings.card_bg }};
+    {% endif %}
+    border-radius: {{ section.settings.card_radius }}px;
+    padding: {{ section.settings.card_padding_v }}px {{ section.settings.card_padding_h }}px;
+    box-sizing: border-box;
+  }
+
+  & .htu__header {
+    text-align: center;
+    margin-bottom: {{ section.settings.header_gap }}px;
+  }
+
+  & .htu__eyebrow {
+    display: block;
+    font-size: {{ section.settings.eyebrow_size }}px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    {% if section.settings.eyebrow_color != blank and section.settings.eyebrow_color.alpha != 0 %}
+      color: {{ section.settings.eyebrow_color }};
+    {% endif %}
+  }
+
+  & .htu__heading {
+    font-size: {{ section.settings.heading_size_mobile }}px;
+    font-weight: 700;
+    line-height: 1.15;
+    margin: 0;
+    {% if section.settings.heading_color != blank and section.settings.heading_color.alpha != 0 %}
+      color: {{ section.settings.heading_color }};
+    {% endif %}
+  }
+  & .htu__heading h1,
+  & .htu__heading h2,
+  & .htu__heading h3,
+  & .htu__heading p {
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+    color: inherit;
+    margin: 0;
+  }
+
+  & .htu__steps {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: {{ section.settings.steps_gap }}px;
+    margin-bottom: {{ section.settings.note_gap }}px;
+  }
+
+  & .htu__step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 16px;
+  }
+
+  & .htu__step-image-wrap {
+    width: 100%;
+    border-radius: {{ section.settings.step_card_radius }}px;
+    overflow: hidden;
+    border: 1px solid {{ section.settings.step_card_border | default: 'rgba(255,255,255,0.15)' }};
+    line-height: 0;
+    background: {{ section.settings.step_card_bg | default: 'rgba(255,255,255,0.04)' }};
+  }
+  & .htu__step-image-wrap img {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+  }
+
+  & .htu__step-label {
+    font-size: {{ section.settings.label_size }}px;
+    font-weight: 400;
+    margin: 0;
+    {% if section.settings.label_color != blank and section.settings.label_color.alpha != 0 %}
+      color: {{ section.settings.label_color }};
+    {% endif %}
+  }
+
+  & .htu__step-desc {
+    font-size: {{ section.settings.desc_size }}px;
+    line-height: 1.55;
+    margin: 0;
+    max-width: 300px;
+    {% if section.settings.desc_color != blank and section.settings.desc_color.alpha != 0 %}
+      color: {{ section.settings.desc_color }};
+    {% endif %}
+  }
+  & .htu__step-desc p { margin: 0; }
+
+  & .htu__note {
+    text-align: center;
+    font-size: {{ section.settings.note_size }}px;
+    line-height: 1.6;
+    {% if section.settings.note_color != blank and section.settings.note_color.alpha != 0 %}
+      color: {{ section.settings.note_color }};
+    {% endif %}
+  }
+  & .htu__note p { margin: 0; }
+
+  @media (min-width: 768px) {
+    & .htu__heading {
+      font-size: {{ section.settings.heading_size_desktop }}px;
+    }
+    & .htu__steps {
+      grid-template-columns: repeat({{ section.settings.desktop_cols }}, 1fr);
+    }
+  }
+{% endcapture %}
+
+<style>
+  {{ css | append: custom_css | replace: '&', selector | strip_newlines }}
+</style>
+
+<div
+  data-style-id="{{ section.id }}"
+  {% if section_id_attr != blank %}id="{{ section_id_attr }}"{% endif %}
+>
+  <div class="htu__inner">
+    <div class="htu__card">
+
+      {%- comment -%} Header {%- endcomment -%}
+      {%- if section.settings.eyebrow != blank or section.settings.heading != blank -%}
+        <div class="htu__header">
+          {%- if section.settings.eyebrow != blank -%}
+            <span class="htu__eyebrow">{{ section.settings.eyebrow }}</span>
+          {%- endif -%}
+          {%- if section.settings.heading != blank -%}
+            <div class="htu__heading">{{ section.settings.heading }}</div>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+
+      {%- comment -%} Steps {%- endcomment -%}
+      {%- assign step_blocks = section.blocks | where: 'type', 'step' -%}
+      {%- if step_blocks.size > 0 -%}
+        <div class="htu__steps">
+          {%- for block in step_blocks -%}
+            <div class="htu__step" {{ block.shopify_attributes }}>
+
+              {%- if block.settings.image != blank -%}
+                <div class="htu__step-image-wrap">
+                  <img
+                    src="{{ block.settings.image | image_url: width: 800 }}"
+                    alt="{{ block.settings.image.alt | default: block.settings.step_label }}"
+                    loading="lazy"
+                    width="{{ block.settings.image.width }}"
+                    height="{{ block.settings.image.height }}"
+                  >
+                </div>
+              {%- endif -%}
+
+              {%- if block.settings.step_label != blank -%}
+                <div class="htu__step-label">{{ block.settings.step_label }}</div>
+              {%- endif -%}
+
+              {%- if block.settings.description != blank -%}
+                <div class="htu__step-desc">{{ block.settings.description }}</div>
+              {%- endif -%}
+
+            </div>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+
+      {%- comment -%} Note blocks {%- endcomment -%}
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'note' and block.settings.text != blank -%}
+          <div class="htu__note" {{ block.shopify_attributes }}>
+            {{ block.settings.text }}
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
+
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "How To Use",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Heading"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow text",
+      "default": "3 EASY STEPS FOR BETTER BREATHING"
+    },
+    {
+      "type": "richtext",
+      "id": "heading",
+      "label": "Heading",
+      "default": "<p>how to use</p>"
+    },
+    {
+      "type": "range",
+      "id": "heading_size_desktop",
+      "label": "Heading size — Desktop (px)",
+      "default": 52,
+      "min": 24,
+      "max": 80,
+      "step": 2,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "heading_size_mobile",
+      "label": "Heading size — Mobile (px)",
+      "default": 36,
+      "min": 20,
+      "max": 56,
+      "step": 2,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "header_gap",
+      "label": "Gap after heading (px)",
+      "default": 40,
+      "min": 8,
+      "max": 80,
+      "step": 4,
+      "unit": "px"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:all.empty_char"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "desktop_cols",
+      "label": "Desktop columns",
+      "default": "3",
+      "options": [
+        { "value": "2", "label": "2" },
+        { "value": "3", "label": "3" },
+        { "value": "4", "label": "4" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "steps_gap",
+      "label": "Gap between steps (px)",
+      "default": 24,
+      "min": 8,
+      "max": 60,
+      "step": 4,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "note_gap",
+      "label": "Gap before footnote (px)",
+      "default": 32,
+      "min": 0,
+      "max": 64,
+      "step": 4,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "label": "Max width (px)",
+      "default": 1200,
+      "min": 800,
+      "max": 1800,
+      "step": 40,
+      "unit": "px"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:all.empty_char"
+    },
+    {
+      "type": "header",
+      "content": "Section Wrapper"
+    },
+    {
+      "type": "color",
+      "alpha": true,
+      "id": "section_bg",
+      "label": "Section background"
+    },
+    {
+      "type": "range",
+      "id": "section_padding_v",
+      "label": "Section padding vertical (px)",
+      "default": 40,
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "section_padding_h",
+      "label": "Section padding horizontal (px)",
+      "default": 24,
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:all.empty_char"
+    },
+    {
+      "type": "header",
+      "content": "Inner Card"
+    },
+    {
+      "type": "color",
+      "alpha": true,
+      "id": "card_bg",
+      "label": "Card background",
+      "default": "#1e2235"
+    },
+    {
+      "type": "range",
+      "id": "card_radius",
+      "label": "Card border radius (px)",
+      "default": 24,
+      "min": 0,
+      "max": 48,
+      "step": 2,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "card_padding_v",
+      "label": "Card padding vertical (px)",
+      "default": 52,
+      "min": 16,
+      "max": 100,
+      "step": 4,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "card_padding_h",
+      "label": "Card padding horizontal (px)",
+      "default": 40,
+      "min": 16,
+      "max": 80,
+      "step": 4,
+      "unit": "px"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:all.empty_char"
+    },
+    {
+      "type": "header",
+      "content": "Step Cards"
+    },
+    {
+      "type": "color",
+      "alpha": true,
+      "id": "step_card_bg",
+      "label": "Step image card background"
+    },
+    {
+      "type": "color",
+      "alpha": true,
+      "id": "step_card_border",
+      "label": "Step image card border color"
+    },
+    {
+      "type": "range",
+      "id": "step_card_radius",
+      "label": "Step image card radius (px)",
+      "default": 16,
+      "min": 0,
+      "max": 32,
+      "step": 2,
+      "unit": "px"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:all.empty_char"
+    },
+    {
+      "type": "header",
+      "content": "Colors & Typography"
+    },
+    {
+      "type": "color",
+      "alpha": true,
+      "id": "eyebrow_color",
+      "label": "Eyebrow color",
+      "default": "#3de8c8"
+    },
+    {
+      "type": "color",
+      "alpha": true,
+      "id": "heading_color",
+      "label": "Heading color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "alpha": true,
+      "id": "label_color",
+      "label": "Step label color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "label_size",
+      "label": "Step label size (px)",
+      "default": 22,
+      "min": 14,
+      "max": 36,
+      "step": 1,
+      "unit": "px"
+    },
+    {
+      "type": "color",
+      "alpha": true,
+      "id": "desc_color",
+      "label": "Description color",
+      "default": "#aaaabc"
+    },
+    {
+      "type": "range",
+      "id": "desc_size",
+      "label": "Description size (px)",
+      "default": 15,
+      "min": 12,
+      "max": 22,
+      "step": 1,
+      "unit": "px"
+    },
+    {
+      "type": "color",
+      "alpha": true,
+      "id": "note_color",
+      "label": "Footnote color",
+      "default": "#777790"
+    },
+    {
+      "type": "range",
+      "id": "note_size",
+      "label": "Footnote size (px)",
+      "default": 14,
+      "min": 10,
+      "max": 18,
+      "step": 1,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "eyebrow_size",
+      "label": "Eyebrow size (px)",
+      "default": 12,
+      "min": 10,
+      "max": 18,
+      "step": 1,
+      "unit": "px"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:all.empty_char"
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "textarea",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    },
+    {
+      "type": "text",
+      "id": "section_id",
+      "label": "Section ID"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "step",
+      "name": "Step",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Illustration image"
+        },
+        {
+          "type": "text",
+          "id": "step_label",
+          "label": "Step label",
+          "default": "step 1"
+        },
+        {
+          "type": "richtext",
+          "id": "description",
+          "label": "Description",
+          "default": "<p>Align left (L) and right (R) indicators. Insert gently.</p>"
+        }
+      ]
+    },
+    {
+      "type": "note",
+      "name": "Footnote",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Note text",
+          "default": "<p>*care matters. after use, soak 2 to 3 minutes in warm water, wipe, rinse, and store dry.</p>"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "CTR How To Use",
+      "category": "Instructional",
+      "blocks": [
+        {
+          "type": "step",
+          "settings": {
+            "step_label": "step 1",
+            "description": "<p>Align left (L) and right (R) indicators. Insert gently.</p>"
+          }
+        },
+        {
+          "type": "step",
+          "settings": {
+            "step_label": "step 2",
+            "description": "<p>Push in gently until only the bridge is visible.</p>"
+          }
+        },
+        {
+          "type": "step",
+          "settings": {
+            "step_label": "step 3",
+            "description": "<p>Adjust until it feels right. Comfort is key.</p>"
+          }
+        },
+        {
+          "type": "note",
+          "settings": {
+            "text": "<p>*care matters. after use, soak 2 to 3 minutes in warm water, wipe, rinse, and store dry.</p>"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
