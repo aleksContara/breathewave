@@ -1,0 +1,642 @@
+{%- comment -%} Comparison Cards Section {%- endcomment -%}
+{%- liquid
+  assign custom_css      = section.settings.custom_css
+  assign section_id_attr = section.settings.section_id
+-%}
+
+{% capture selector %}[data-style-id="{{ section.id }}"]{% endcapture %}
+
+{% capture css %}
+  & {
+    {% if section.settings.bg_color != blank and section.settings.bg_color.alpha != 0 %}
+      background-color: {{ section.settings.bg_color }};
+    {% endif %}
+    padding: {{ section.settings.padding_v }}px {{ section.settings.padding_h }}px;
+    box-sizing: border-box;
+  }
+
+  & .cc__inner {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+  }
+
+  & .cc__header {
+    margin-bottom: {{ section.settings.header_gap }}px;
+  }
+
+  & .cc__eyebrow {
+    display: block;
+    font-size: {{ section.settings.eyebrow_size }}px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    {% if section.settings.eyebrow_color != blank and section.settings.eyebrow_color.alpha != 0 %}
+      color: {{ section.settings.eyebrow_color }};
+    {% endif %}
+  }
+
+  & .cc__heading {
+    font-size: {{ section.settings.heading_size_mobile }}px;
+    font-weight: 700;
+    line-height: 1.2;
+    margin: 0;
+    {% if section.settings.heading_color != blank and section.settings.heading_color.alpha != 0 %}
+      color: {{ section.settings.heading_color }};
+    {% endif %}
+  }
+  & .cc__heading h1, & .cc__heading h2, & .cc__heading h3, & .cc__heading p {
+    font-size: inherit; font-weight: inherit; line-height: inherit; color: inherit; margin: 0;
+  }
+
+  & .cc__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: {{ section.settings.card_gap }}px;
+  }
+
+  & .cc__card {
+    display: flex;
+    flex-direction: column;
+    border-radius: {{ section.settings.card_radius }}px;
+    overflow: hidden;
+    {% if section.settings.card_bg != blank and section.settings.card_bg.alpha != 0 %}
+      background-color: {{ section.settings.card_bg }};
+    {% endif %}
+    {% if section.settings.card_border != blank and section.settings.card_border.alpha != 0 %}
+      border: 1px solid {{ section.settings.card_border }};
+    {% endif %}
+  }
+
+  & .cc__card-image-wrap {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: {{ section.settings.image_padding }}px;
+    box-sizing: border-box;
+    {% if section.settings.image_bg != blank and section.settings.image_bg.alpha != 0 %}
+      background-color: {{ section.settings.image_bg }};
+    {% endif %}
+    min-height: {{ section.settings.image_min_height }}px;
+  }
+  & .cc__card-image-wrap img {
+    display: block;
+    max-width: 100%;
+    max-height: {{ section.settings.image_min_height }}px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+  }
+
+  & .cc__card-body {
+    padding: {{ section.settings.body_padding }}px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  & .cc__card-title-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  & .cc__card-icon {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  & .cc__card-icon svg {
+    display: block;
+    width: 28px;
+    height: 28px;
+  }
+
+  & .cc__card-title {
+    font-size: {{ section.settings.title_size }}px;
+    font-weight: 700;
+    line-height: 1.2;
+    margin: 0;
+    {% if section.settings.title_color != blank and section.settings.title_color.alpha != 0 %}
+      color: {{ section.settings.title_color }};
+    {% endif %}
+  }
+
+  & .cc__card-bullets {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  & .cc__card-bullets li {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    font-size: {{ section.settings.bullet_size }}px;
+    line-height: 1.5;
+    {% if section.settings.bullet_color != blank and section.settings.bullet_color.alpha != 0 %}
+      color: {{ section.settings.bullet_color }};
+    {% endif %}
+  }
+  & .cc__card-bullets li::before {
+    content: '•';
+    flex-shrink: 0;
+    {% if section.settings.bullet_color != blank and section.settings.bullet_color.alpha != 0 %}
+      color: {{ section.settings.bullet_color }};
+    {% endif %}
+  }
+  & .cc__card-bullets sup {
+    font-size: 0.65em;
+    vertical-align: super;
+    line-height: 0;
+    opacity: 0.6;
+  }
+
+  @media (min-width: 768px) {
+    & .cc__heading {
+      font-size: {{ section.settings.heading_size_desktop }}px;
+    }
+    & .cc__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+{% endcapture %}
+
+<style>
+  {{ css | append: custom_css | replace: '&', selector | strip_newlines }}
+</style>
+
+<div
+  data-style-id="{{ section.id }}"
+  {% if section_id_attr != blank %}id="{{ section_id_attr }}"{% endif %}
+>
+  <div class="cc__inner">
+
+    {%- if section.settings.eyebrow != blank or section.settings.heading != blank -%}
+      <div class="cc__header">
+        {%- if section.settings.eyebrow != blank -%}
+          <span class="cc__eyebrow">{{ section.settings.eyebrow }}</span>
+        {%- endif -%}
+        {%- if section.settings.heading != blank -%}
+          <div class="cc__heading">{{ section.settings.heading }}</div>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    <div class="cc__grid">
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'comparison_card' -%}
+          <div class="cc__card" {{ block.shopify_attributes }}>
+
+            {%- comment -%} Image area {%- endcomment -%}
+            {%- if block.settings.image != blank -%}
+              <div class="cc__card-image-wrap">
+                <img
+                  src="{{ block.settings.image | image_url: width: 900 }}"
+                  alt="{{ block.settings.image.alt | default: block.settings.title }}"
+                  loading="lazy"
+                  width="{{ block.settings.image.width }}"
+                  height="{{ block.settings.image.height }}"
+                >
+              </div>
+            {%- endif -%}
+
+            {%- comment -%} Body {%- endcomment -%}
+            <div class="cc__card-body">
+
+              <div class="cc__card-title-row">
+                <div class="cc__card-icon">
+                  {%- if block.settings.status == 'check' -%}
+                    <svg viewBox="0 0 28 28" fill="none">
+                      <circle cx="14" cy="14" r="13" stroke="{{ block.settings.icon_color | default: '#22c55e' }}" stroke-width="2"/>
+                      <path d="M8 14l4 4 8-8" stroke="{{ block.settings.icon_color | default: '#22c55e' }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  {%- else -%}
+                    <svg viewBox="0 0 28 28" fill="none">
+                      <circle cx="14" cy="14" r="13" stroke="{{ block.settings.icon_color | default: '#ef4444' }}" stroke-width="2"/>
+                      <path d="M9.5 9.5l9 9M18.5 9.5l-9 9" stroke="{{ block.settings.icon_color | default: '#ef4444' }}" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                  {%- endif -%}
+                </div>
+                {%- if block.settings.title != blank -%}
+                  <div class="cc__card-title">{{ block.settings.title }}</div>
+                {%- endif -%}
+              </div>
+
+              {%- comment -%} Bullet list {%- endcomment -%}
+              {%- assign has_bullets = false -%}
+              {%- for n in (1..8) -%}
+                {%- assign key = 'bullet_' | append: n -%}
+                {%- if block.settings[key] != blank -%}{%- assign has_bullets = true -%}{%- endif -%}
+              {%- endfor -%}
+
+              {%- if has_bullets -%}
+                <ul class="cc__card-bullets">
+                  {%- for n in (1..8) -%}
+                    {%- assign key = 'bullet_' | append: n -%}
+                    {%- if block.settings[key] != blank -%}
+                      <li>{{ block.settings[key] }}</li>
+                    {%- endif -%}
+                  {%- endfor -%}
+                </ul>
+              {%- endif -%}
+
+            </div>
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Comparison Cards",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Heading"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow text",
+      "default": "EXTERNAL vs INTERNAL"
+    },
+    {
+      "type": "richtext",
+      "id": "heading",
+      "label": "Heading",
+      "default": "<p>See why internal is better: more comfort, more airflow, zero hassle.</p>"
+    },
+    {
+      "type": "range",
+      "id": "heading_size_desktop",
+      "label": "Heading size — Desktop (px)",
+      "default": 36,
+      "min": 20,
+      "max": 64,
+      "step": 2,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "heading_size_mobile",
+      "label": "Heading size — Mobile (px)",
+      "default": 24,
+      "min": 16,
+      "max": 44,
+      "step": 2,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "header_gap",
+      "label": "Gap after heading (px)",
+      "default": 40,
+      "min": 8,
+      "max": 80,
+      "step": 4,
+      "unit": "px"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:all.empty_char"
+    },
+    {
+      "type": "header",
+      "content": "Layout & Spacing"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "label": "Max width (px)",
+      "default": 1200,
+      "min": 600,
+      "max": 1800,
+      "step": 40,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_v",
+      "label": "Section padding vertical (px)",
+      "default": 64,
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_h",
+      "label": "Section padding horizontal (px)",
+      "default": 24,
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "card_gap",
+      "label": "Gap between cards (px)",
+      "default": 24,
+      "min": 8,
+      "max": 60,
+      "step": 4,
+      "unit": "px"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:all.empty_char"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "alpha": true,
+      "id": "bg_color",
+      "label": "Section background",
+      "default": "#eef1f8"
+    },
+    {
+      "type": "color",
+      "alpha": true,
+      "id": "eyebrow_color",
+      "label": "Eyebrow color",
+      "default": "#444444"
+    },
+    {
+      "type": "color",
+      "alpha": true,
+      "id": "heading_color",
+      "label": "Heading color",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "color",
+      "alpha": true,
+      "id": "card_bg",
+      "label": "Card background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "alpha": true,
+      "id": "card_border",
+      "label": "Card border color",
+      "info": "Leave transparent to hide."
+    },
+    {
+      "type": "color",
+      "alpha": true,
+      "id": "image_bg",
+      "label": "Image area background",
+      "default": "#f5f7fa"
+    },
+    {
+      "type": "color",
+      "alpha": true,
+      "id": "title_color",
+      "label": "Card title color",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "color",
+      "alpha": true,
+      "id": "bullet_color",
+      "label": "Bullet text color",
+      "default": "#444444"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:all.empty_char"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "eyebrow_size",
+      "label": "Eyebrow size (px)",
+      "default": 12,
+      "min": 10,
+      "max": 18,
+      "step": 1,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "label": "Card title size (px)",
+      "default": 20,
+      "min": 14,
+      "max": 32,
+      "step": 1,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "bullet_size",
+      "label": "Bullet text size (px)",
+      "default": 15,
+      "min": 12,
+      "max": 22,
+      "step": 1,
+      "unit": "px"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:all.empty_char"
+    },
+    {
+      "type": "header",
+      "content": "Card Style"
+    },
+    {
+      "type": "range",
+      "id": "card_radius",
+      "label": "Card border radius (px)",
+      "default": 16,
+      "min": 0,
+      "max": 32,
+      "step": 2,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "image_padding",
+      "label": "Image area padding (px)",
+      "default": 32,
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "image_min_height",
+      "label": "Image area min height (px)",
+      "default": 260,
+      "min": 100,
+      "max": 500,
+      "step": 10,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "body_padding",
+      "label": "Card body padding (px)",
+      "default": 24,
+      "min": 8,
+      "max": 48,
+      "step": 4,
+      "unit": "px"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:all.empty_char"
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "textarea",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    },
+    {
+      "type": "text",
+      "id": "section_id",
+      "label": "Section ID"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "comparison_card",
+      "name": "Comparison Card",
+      "settings": [
+        {
+          "type": "select",
+          "id": "status",
+          "label": "Status icon",
+          "default": "x",
+          "options": [
+            { "value": "x",     "label": "✗ Bad (red X)" },
+            { "value": "check", "label": "✓ Good (green check)" }
+          ]
+        },
+        {
+          "type": "color",
+          "id": "icon_color",
+          "label": "Icon color",
+          "default": "#ef4444"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Product image"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Card title",
+          "default": "External - Pull (Resists)"
+        },
+        {
+          "type": "paragraph",
+          "content": "t:all.empty_char"
+        },
+        {
+          "type": "header",
+          "content": "Bullet Points (up to 8)"
+        },
+        {
+          "type": "text",
+          "id": "bullet_1",
+          "label": "Bullet 1"
+        },
+        {
+          "type": "text",
+          "id": "bullet_2",
+          "label": "Bullet 2"
+        },
+        {
+          "type": "text",
+          "id": "bullet_3",
+          "label": "Bullet 3"
+        },
+        {
+          "type": "text",
+          "id": "bullet_4",
+          "label": "Bullet 4"
+        },
+        {
+          "type": "text",
+          "id": "bullet_5",
+          "label": "Bullet 5"
+        },
+        {
+          "type": "text",
+          "id": "bullet_6",
+          "label": "Bullet 6"
+        },
+        {
+          "type": "text",
+          "id": "bullet_7",
+          "label": "Bullet 7"
+        },
+        {
+          "type": "text",
+          "id": "bullet_8",
+          "label": "Bullet 8"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "CTR Comparison Cards",
+      "category": "Comparison",
+      "blocks": [
+        {
+          "type": "comparison_card",
+          "settings": {
+            "status": "x",
+            "icon_color": "#ef4444",
+            "title": "External - Pull (Resists)",
+            "bullet_1": "Magnets, glues, and gadgets that pull from outside",
+            "bullet_2": "Pulls on skin, not the airway itself",
+            "bullet_3": "Adhesive weakens, slips and may cause irritation",
+            "bullet_4": "Nasal valve still collapses during inhalation"
+          }
+        },
+        {
+          "type": "comparison_card",
+          "settings": {
+            "status": "check",
+            "icon_color": "#22c55e",
+            "title": "Internal - Lift (Releases)",
+            "bullet_1": "Mechanically opens the nasal valve from within",
+            "bullet_2": "Support of airway allows for more airflow",
+            "bullet_3": "Soft, reusable and reliable day or night",
+            "bullet_4": "Fit that stays secure through sleep or sport"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

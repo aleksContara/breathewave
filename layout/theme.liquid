@@ -135,6 +135,6 @@
       {% render 'quick-add-modal' %}
     {% endif %}
 
-    {%- render 'ctr-swiper-loader', ctr_swiper_needed: ctr_swiper_needed -%}
+    {%- comment -%} ctr-swiper-loader not needed — sections load Swiper themselves via asset_url {%- endcomment -%}
   </body>
 </html>

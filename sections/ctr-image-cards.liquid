@@ -1,0 +1,691 @@
+{%- comment -%} Image Cards — ctr-image-cards.liquid {%- endcomment -%}
+{%- liquid
+  assign custom_css      = section.settings.custom_css
+  assign section_id_attr = section.settings.section_id
+  assign swiper_id       = 'imgc-' | append: section.id
+  assign is_carousel     = false
+  if section.settings.mobile_layout == 'carousel'
+    assign is_carousel = true
+  endif
+-%}
+
+{% capture selector %}[data-style-id="{{ section.id }}"]{% endcapture %}
+
+{% capture css %}
+  & {
+    {% if section.settings.bg_color != blank and section.settings.bg_color.alpha != 0 %}
+      background-color: {{ section.settings.bg_color }};
+    {% endif %}
+    padding: {{ section.settings.padding_v }}px {{ section.settings.padding_h }}px;
+    box-sizing: border-box;
+  }
+
+  & .imgc__inner {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+  }
+
+  & .imgc__header {
+    text-align: {{ section.settings.header_align }};
+    margin-bottom: {{ section.settings.header_gap }}px;
+  }
+
+  & .imgc__eyebrow {
+    display: block;
+    font-size: {{ section.settings.eyebrow_size }}px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    {% if section.settings.eyebrow_color != blank and section.settings.eyebrow_color.alpha != 0 %}
+      color: {{ section.settings.eyebrow_color }};
+    {% endif %}
+  }
+
+  & .imgc__heading {
+    font-size: {{ section.settings.heading_size_mobile }}px;
+    font-weight: 700;
+    line-height: 1.2;
+    margin: 0;
+    {% if section.settings.heading_color != blank and section.settings.heading_color.alpha != 0 %}
+      color: {{ section.settings.heading_color }};
+    {% endif %}
+  }
+  & .imgc__heading h1,
+  & .imgc__heading h2,
+  & .imgc__heading h3,
+  & .imgc__heading p { font-size: inherit; font-weight: inherit; line-height: inherit; color: inherit; margin: 0; }
+
+  /* ─── Card shared styles ─── */
+  & .imgc__card {
+    display: flex;
+    flex-direction: column;
+    border-radius: {{ section.settings.card_radius }}px;
+    overflow: hidden;
+    {% if section.settings.card_bg != blank and section.settings.card_bg.alpha != 0 %}
+      background-color: {{ section.settings.card_bg }};
+    {% endif %}
+    {% if section.settings.card_shadow %}
+      box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+    {% endif %}
+  }
+
+  & .imgc__card-image {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: {{ section.settings.card_aspect }};
+    object-fit: cover;
+  }
+  & .imgc__card-image-placeholder {
+    display: block;
+    width: 100%;
+    aspect-ratio: {{ section.settings.card_aspect }};
+    background: #d4d8e4;
+  }
+
+  & .imgc__card-body {
+    padding: {{ section.settings.body_padding }}px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    text-align: {{ section.settings.card_text_align }};
+    flex: 1;
+  }
+
+  & .imgc__card-title {
+    font-size: {{ section.settings.card_title_size }}px;
+    font-weight: 700;
+    line-height: 1.3;
+    margin: 0;
+    {% if section.settings.card_title_color != blank and section.settings.card_title_color.alpha != 0 %}
+      color: {{ section.settings.card_title_color }};
+    {% endif %}
+  }
+
+  & .imgc__card-desc {
+    font-size: {{ section.settings.card_desc_size }}px;
+    line-height: 1.55;
+    margin: 0;
+    {% if section.settings.card_desc_color != blank and section.settings.card_desc_color.alpha != 0 %}
+      color: {{ section.settings.card_desc_color }};
+    {% endif %}
+  }
+  & .imgc__card-desc p { margin: 0; }
+  & .imgc__card-desc sup {
+    font-size: 0.65em;
+    vertical-align: super;
+    line-height: 0;
+    opacity: 0.7;
+  }
+
+  /* ─── Grid layout (non-carousel or desktop override) ─── */
+  {% if is_carousel %}
+    /*
+     * Carousel mode:
+     * – Mobile  → Swiper JS takes full control (flex + transform)
+     * – Desktop → force back to CSS grid with !important overrides
+     */
+    & .imgc__grid {
+      overflow: hidden;
+    }
+
+    @media (min-width: 768px) {
+      & .imgc__grid .swiper-wrapper {
+        display: grid !important;
+        grid-template-columns: repeat({{ section.settings.desktop_cols }}, 1fr) !important;
+        gap: {{ section.settings.card_gap }}px !important;
+        transform: none !important;
+        width: auto !important;
+      }
+      & .imgc__grid .swiper-slide {
+        width: auto !important;
+        height: auto !important;
+      }
+    }
+
+  {% else %}
+    /*
+     * Non-carousel mode:
+     * swiper-wrapper is just a plain div — set as CSS grid always.
+     */
+    & .imgc__grid .swiper-wrapper {
+      display: grid;
+      grid-template-columns: repeat({{ section.settings.desktop_cols }}, 1fr);
+      gap: {{ section.settings.card_gap }}px;
+    }
+    & .imgc__grid .swiper-slide {
+      width: auto;
+      height: auto;
+    }
+
+    @media (max-width: 767px) {
+      {% if section.settings.mobile_layout == '2col' %}
+        & .imgc__grid .swiper-wrapper {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      {% else %}
+        & .imgc__grid .swiper-wrapper {
+          grid-template-columns: 1fr;
+        }
+      {% endif %}
+    }
+  {% endif %}
+
+  /* ─── Desktop heading size ─── */
+  @media (min-width: 768px) {
+    & .imgc__heading {
+      font-size: {{ section.settings.heading_size_desktop }}px;
+    }
+  }
+
+  /* ─── Swiper pagination dots ─── */
+  & .swiper-pagination {
+    position: relative;
+    margin-top: 20px;
+    text-align: center;
+  }
+  & .swiper-pagination-bullet {
+    background: {{ section.settings.heading_color | default: '#1a1a1a' }};
+    opacity: 0.25;
+  }
+  & .swiper-pagination-bullet-active {
+    opacity: 1;
+  }
+{% endcapture %}
+
+<style>
+  {{ css | append: custom_css | replace: '&', selector | strip_newlines }}
+</style>
+
+<div
+  data-style-id="{{ section.id }}"
+  {% if section_id_attr != blank %}id="{{ section_id_attr }}"{% endif %}
+>
+  <div class="imgc__inner">
+
+    {%- if section.settings.eyebrow != blank or section.settings.heading != blank -%}
+      <div class="imgc__header">
+        {%- if section.settings.eyebrow != blank -%}
+          <span class="imgc__eyebrow">{{ section.settings.eyebrow }}</span>
+        {%- endif -%}
+        {%- if section.settings.heading != blank -%}
+          <div class="imgc__heading">{{ section.settings.heading }}</div>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    <div
+      class="imgc__grid{% if is_carousel %} swiper{% endif %}"
+      id="{{ swiper_id }}"
+    >
+      <div class="swiper-wrapper">
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'card' -%}
+            <div class="imgc__card swiper-slide" {{ block.shopify_attributes }}>
+              {%- if block.settings.image != blank -%}
+                <img
+                  class="imgc__card-image"
+                  src="{{ block.settings.image | image_url: width: 800 }}"
+                  alt="{{ block.settings.image.alt | default: block.settings.title }}"
+                  loading="lazy"
+                  width="{{ block.settings.image.width }}"
+                  height="{{ block.settings.image.height }}"
+                >
+              {%- else -%}
+                <div class="imgc__card-image-placeholder"></div>
+              {%- endif -%}
+              <div class="imgc__card-body">
+                {%- if block.settings.title != blank -%}
+                  <div class="imgc__card-title">{{ block.settings.title }}</div>
+                {%- endif -%}
+                {%- if block.settings.body != blank -%}
+                  <div class="imgc__card-desc">{{ block.settings.body }}</div>
+                {%- endif -%}
+              </div>
+            </div>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+
+      {%- if is_carousel and section.settings.show_dots -%}
+        <div class="swiper-pagination"></div>
+      {%- endif -%}
+    </div>
+
+  </div>
+</div>
+
+{%- if is_carousel -%}
+<script>
+(function () {
+  var SWIPER_JS  = {{ 'swiper-bundle.min.js'  | asset_url | json }};
+  var SWIPER_CSS = {{ 'swiper-bundle.min.css' | asset_url | json }};
+  var swiperId   = {{ swiper_id | json }};
+  var spv        = parseFloat({{ section.settings.slides_per_view_mobile | json }}) || 1.2;
+  var showDots   = {{ section.settings.show_dots | json }};
+
+  function init() {
+    if (window.innerWidth >= 768) return;
+    var el = document.getElementById(swiperId);
+    if (!el || el._sw) return;
+    el._sw = new Swiper(el, {
+      slidesPerView: spv,
+      spaceBetween: 16,
+      grabCursor: true,
+      pagination: showDots ? { el: el.querySelector('.swiper-pagination'), clickable: true } : false,
+    });
+  }
+
+  function onResize() {
+    var el = document.getElementById(swiperId);
+    if (!el) return;
+    if (window.innerWidth >= 768) {
+      if (el._sw) { el._sw.destroy(true, true); el._sw = null; }
+    } else {
+      if (!el._sw) init();
+    }
+  }
+  window.addEventListener('resize', onResize);
+
+  if (window.Swiper) { init(); return; }
+  window._ctrSwiperCBs = window._ctrSwiperCBs || [];
+  window._ctrSwiperCBs.push(init);
+  if (document.getElementById('ctr-swiper-js')) return;
+  if (!document.getElementById('ctr-swiper-css')) {
+    var l = document.createElement('link');
+    l.id = 'ctr-swiper-css'; l.rel = 'stylesheet'; l.href = SWIPER_CSS;
+    document.head.appendChild(l);
+  }
+  var s = document.createElement('script');
+  s.id = 'ctr-swiper-js'; s.src = SWIPER_JS;
+  s.onload = function () { (window._ctrSwiperCBs || []).forEach(function (fn) { fn(); }); };
+  document.head.appendChild(s);
+})();
+</script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Image Cards",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Heading"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow text",
+      "default": "BREATHEWAVE BENEFITS"
+    },
+    {
+      "type": "richtext",
+      "id": "heading",
+      "label": "Heading",
+      "default": "<p>unlock the power of your nose</p>"
+    },
+    {
+      "type": "range",
+      "id": "heading_size_desktop",
+      "label": "Heading size — Desktop (px)",
+      "default": 48,
+      "min": 24,
+      "max": 80,
+      "step": 2,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "heading_size_mobile",
+      "label": "Heading size — Mobile (px)",
+      "default": 28,
+      "min": 18,
+      "max": 52,
+      "step": 2,
+      "unit": "px"
+    },
+    {
+      "type": "select",
+      "id": "header_align",
+      "label": "Header alignment",
+      "default": "center",
+      "options": [
+        { "value": "left",   "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right",  "label": "Right" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "header_gap",
+      "label": "Gap below heading (px)",
+      "default": 48,
+      "min": 8,
+      "max": 96,
+      "step": 4,
+      "unit": "px"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:all.empty_char"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "desktop_cols",
+      "label": "Desktop columns",
+      "default": "4",
+      "options": [
+        { "value": "2", "label": "2 columns" },
+        { "value": "3", "label": "3 columns" },
+        { "value": "4", "label": "4 columns" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "mobile_layout",
+      "label": "Mobile layout",
+      "default": "carousel",
+      "options": [
+        { "value": "carousel", "label": "Carousel (Swiper)" },
+        { "value": "2col",     "label": "2-column grid" },
+        { "value": "1col",     "label": "1-column stack" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "slides_per_view_mobile",
+      "label": "Cards visible on mobile (carousel only)",
+      "default": "1.2",
+      "options": [
+        { "value": "1",   "label": "1" },
+        { "value": "1.2", "label": "1.2 (peek)" },
+        { "value": "1.5", "label": "1.5" },
+        { "value": "2",   "label": "2" }
+      ]
+    },
+    {
+      "type": "checkbox",
+      "id": "show_dots",
+      "label": "Show pagination dots (carousel only)",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "card_aspect",
+      "label": "Card image aspect ratio",
+      "default": "4/5",
+      "options": [
+        { "value": "4/5",  "label": "Portrait (4:5)" },
+        { "value": "3/4",  "label": "Portrait (3:4)" },
+        { "value": "1/1",  "label": "Square (1:1)" },
+        { "value": "16/9", "label": "Landscape (16:9)" },
+        { "value": "3/2",  "label": "Photo (3:2)" }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": "t:all.empty_char"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "label": "Max width (px)",
+      "default": 1280,
+      "min": 600,
+      "max": 1800,
+      "step": 40,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_v",
+      "label": "Section padding vertical (px)",
+      "default": 72,
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_h",
+      "label": "Section padding horizontal (px)",
+      "default": 24,
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "card_gap",
+      "label": "Gap between cards (px)",
+      "default": 24,
+      "min": 8,
+      "max": 60,
+      "step": 4,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "body_padding",
+      "label": "Card body padding (px)",
+      "default": 20,
+      "min": 8,
+      "max": 48,
+      "step": 4,
+      "unit": "px"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:all.empty_char"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "alpha": true,
+      "id": "bg_color",
+      "label": "Section background",
+      "default": "#edf0f7"
+    },
+    {
+      "type": "color",
+      "alpha": true,
+      "id": "eyebrow_color",
+      "label": "Eyebrow color",
+      "default": "#555555"
+    },
+    {
+      "type": "color",
+      "alpha": true,
+      "id": "heading_color",
+      "label": "Heading color",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "color",
+      "alpha": true,
+      "id": "card_bg",
+      "label": "Card background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "checkbox",
+      "id": "card_shadow",
+      "label": "Card shadow",
+      "default": true
+    },
+    {
+      "type": "color",
+      "alpha": true,
+      "id": "card_title_color",
+      "label": "Card title color",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "color",
+      "alpha": true,
+      "id": "card_desc_color",
+      "label": "Card description color",
+      "default": "#555555"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:all.empty_char"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "eyebrow_size",
+      "label": "Eyebrow size (px)",
+      "default": 12,
+      "min": 10,
+      "max": 18,
+      "step": 1,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "card_title_size",
+      "label": "Card title size (px)",
+      "default": 18,
+      "min": 14,
+      "max": 28,
+      "step": 1,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "card_desc_size",
+      "label": "Card description size (px)",
+      "default": 14,
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px"
+    },
+    {
+      "type": "select",
+      "id": "card_text_align",
+      "label": "Card text alignment",
+      "default": "center",
+      "options": [
+        { "value": "left",   "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right",  "label": "Right" }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": "t:all.empty_char"
+    },
+    {
+      "type": "header",
+      "content": "Card Style"
+    },
+    {
+      "type": "range",
+      "id": "card_radius",
+      "label": "Card border radius (px)",
+      "default": 16,
+      "min": 0,
+      "max": 32,
+      "step": 2,
+      "unit": "px"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:all.empty_char"
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "textarea",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    },
+    {
+      "type": "text",
+      "id": "section_id",
+      "label": "Section ID"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "card",
+      "name": "Card",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Card Title"
+        },
+        {
+          "type": "richtext",
+          "id": "body",
+          "label": "Description"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "CTR Image Cards",
+      "category": "Benefits",
+      "blocks": [
+        {
+          "type": "card",
+          "settings": {
+            "title": "Sleep and Recover Deeply",
+            "body": "<p>Night breathing is critical. Minimize snoring to deepen sleep and wake feeling refreshed.</p>"
+          }
+        },
+        {
+          "type": "card",
+          "settings": {
+            "title": "Optimize Your Breathing",
+            "body": "<p>Reduce mouth breathing by enhancing nasal airflow for better oxygen uptake.</p>"
+          }
+        },
+        {
+          "type": "card",
+          "settings": {
+            "title": "Elevate Your Performance",
+            "body": "<p>Boost athletic endurance and expand lung capacity for peak performance and results.</p>"
+          }
+        },
+        {
+          "type": "card",
+          "settings": {
+            "title": "Reclaim Natural Breathing",
+            "body": "<p>Your mouth is for eating. Your nose is for breathing. Align with your biology for better energy, sleep, and health.</p>"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -629,6 +629,635 @@
         "custom_css": "",
         "section_id": ""
       }
+    },
+    "ctr_comparison_cards_YQFHtm": {
+      "type": "ctr-comparison-cards",
+      "blocks": {
+        "comparison_card_DJ3bMR": {
+          "type": "comparison_card",
+          "settings": {
+            "status": "x",
+            "icon_color": "#ef4444",
+            "image": "shopify://shop_images/nasal_strip.png",
+            "title": "External - Pull (Resists)",
+            "bullet_1": "Magnets, glues, and gadgets that pull from outside",
+            "bullet_2": "Pulls on skin, not the airway itself",
+            "bullet_3": "Adhesive weakens, slips and may cause irritation",
+            "bullet_4": "Nasal valve still collapses during inhalation",
+            "bullet_5": "",
+            "bullet_6": "",
+            "bullet_7": "",
+            "bullet_8": ""
+          }
+        },
+        "comparison_card_YKQ3ht": {
+          "type": "comparison_card",
+          "settings": {
+            "status": "check",
+            "icon_color": "#22c55e",
+            "image": "shopify://shop_images/cnd-dilator.png",
+            "title": "Internal - Lift (Releases)",
+            "bullet_1": "Mechanically opens the nasal valve from within",
+            "bullet_2": "Support of airway allows for more airflow",
+            "bullet_3": "Soft, reusable and reliable day or night",
+            "bullet_4": "Fit that stays secure through sleep or sport",
+            "bullet_5": "",
+            "bullet_6": "",
+            "bullet_7": "",
+            "bullet_8": ""
+          }
+        }
+      },
+      "block_order": [
+        "comparison_card_DJ3bMR",
+        "comparison_card_YKQ3ht"
+      ],
+      "name": "CTR Comparison Cards",
+      "settings": {
+        "eyebrow": "EXTERNAL vs INTERNAL",
+        "heading": "<p>See why internal is better: more comfort, more airflow, zero hassle.</p>",
+        "heading_size_desktop": 36,
+        "heading_size_mobile": 24,
+        "header_gap": 40,
+        "max_width": 1200,
+        "padding_v": 64,
+        "padding_h": 24,
+        "card_gap": 24,
+        "bg_color": "#eef1f8",
+        "eyebrow_color": "#444444",
+        "heading_color": "#1a1a1a",
+        "card_bg": "#ffffff",
+        "card_border": "",
+        "image_bg": "#f5f7fa",
+        "title_color": "#1a1a1a",
+        "bullet_color": "#444444",
+        "eyebrow_size": 12,
+        "title_size": 20,
+        "bullet_size": 15,
+        "card_radius": 16,
+        "image_padding": 32,
+        "image_min_height": 260,
+        "body_padding": 24,
+        "custom_css": "",
+        "section_id": ""
+      }
+    },
+    "ctr_image_cards_GwyFWQ": {
+      "type": "ctr-image-cards",
+      "blocks": {
+        "card_zFCJqA": {
+          "type": "card",
+          "settings": {
+            "image": "shopify://shop_images/BW-Product-Ola-12-1.jpg",
+            "title": "Sleep and Recover Deeply",
+            "body": "<p>Night breathing is critical. Minimize snoring to deepen sleep and wake feeling refreshed.</p>"
+          }
+        },
+        "card_N9FbzW": {
+          "type": "card",
+          "settings": {
+            "image": "shopify://shop_images/BW-Peace-40-1.jpg",
+            "title": "Optimize Your Breathing",
+            "body": "<p>Reduce mouth breathing by enhancing nasal airflow for better oxygen uptake.</p>"
+          }
+        },
+        "card_HW34zH": {
+          "type": "card",
+          "settings": {
+            "image": "shopify://shop_images/Screen_Shots-10-320x400.jpg",
+            "title": "Elevate Your Performance",
+            "body": "<p>Boost athletic endurance and expand lung capacity for peak performance and results.</p>"
+          }
+        },
+        "card_JPPnft": {
+          "type": "card",
+          "settings": {
+            "image": "shopify://shop_images/BW-Product-Ola-41-1.jpg",
+            "title": "Reclaim Natural Breathing",
+            "body": "<p>Your mouth is for eating. Your nose is for breathing. Align with your biology for better energy, sleep, and health.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "card_zFCJqA",
+        "card_N9FbzW",
+        "card_HW34zH",
+        "card_JPPnft"
+      ],
+      "name": "CTR Image Cards",
+      "settings": {
+        "eyebrow": "BREATHEWAVE BENEFITS",
+        "heading": "<p>unlock the power of your nose</p>",
+        "heading_size_desktop": 48,
+        "heading_size_mobile": 28,
+        "header_align": "center",
+        "header_gap": 48,
+        "desktop_cols": "4",
+        "mobile_layout": "carousel",
+        "slides_per_view_mobile": "1.2",
+        "show_dots": true,
+        "card_aspect": "4/5",
+        "max_width": 1280,
+        "padding_v": 72,
+        "padding_h": 24,
+        "card_gap": 24,
+        "body_padding": 20,
+        "bg_color": "#edf0f7",
+        "eyebrow_color": "#555555",
+        "heading_color": "#1a1a1a",
+        "card_bg": "#ffffff",
+        "card_shadow": true,
+        "card_title_color": "#1a1a1a",
+        "card_desc_color": "#555555",
+        "eyebrow_size": 12,
+        "card_title_size": 18,
+        "card_desc_size": 14,
+        "card_text_align": "center",
+        "card_radius": 16,
+        "custom_css": "",
+        "section_id": ""
+      }
+    },
+    "ctr_hero_banner_pmTit6": {
+      "type": "ctr-hero_banner",
+      "blocks": {
+        "slide_xwWWfK": {
+          "type": "slide",
+          "settings": {
+            "background_color": "#0a0a0a",
+            "bg_image_desktop": "shopify://shop_images/Group_3.png",
+            "bg_position_desktop": "center center",
+            "bg_position_mobile": "center center",
+            "content_width_desktop": 620,
+            "content_width_mobile": 100,
+            "content_horizontal_desktop": "left",
+            "content_vertical_desktop": "center",
+            "content_horizontal_mobile": "left",
+            "content_vertical_mobile": "bottom",
+            "text_align_desktop": "left",
+            "text_align_mobile": "left",
+            "show_rating_star": false,
+            "rating_text": "BREATHING 2.0",
+            "rating_color": "#6cfff5",
+            "rating_size": 14,
+            "headline": "<h1>find your flow.<br/>ride your breath.</h1>",
+            "show_headline_badge": false,
+            "headline_badge_text": "Save up to 35%",
+            "headline_badge_bg": "#536dff",
+            "headline_badge_color": "#ffffff",
+            "headline_color": "#ffffff",
+            "headline_size_desktop": 52,
+            "headline_size_mobile": 32,
+            "subtitle": "",
+            "subtitle_color": "#ff7816",
+            "subtitle_size": 18,
+            "description": "<p>Your biology is built to breathe through your nose — not your mouth.¹ ² Breathewave helps restore that natural function for better sleep, energy, and long-term health.³ ⁵ ⁶ ¹⁰</p>",
+            "description_color": "#ffffff",
+            "description_size_desktop": 16,
+            "description_size_mobile": 14,
+            "cta_label": "Buy now",
+            "cta_url": "",
+            "cta_bg_color": "#6cfff5",
+            "cta_text_color": "#000000",
+            "cta_size_desktop": 16,
+            "cta_size_mobile": 18,
+            "cta_full_width": false,
+            "cta_badge_text": "",
+            "cta_badge_color": "#ffffff",
+            "cta_badge_bg": "#7c5cfc",
+            "badge_1": "",
+            "badge_2": "",
+            "badge_3": "",
+            "badge_4": "",
+            "badges_color": "#ffffff",
+            "badges_size": 13,
+            "custom_badge_styles": false,
+            "badge_background": "#ffffff",
+            "badge_text_color": "#000000",
+            "badge_border_radius": 100,
+            "badge_padding_vertical": 6,
+            "badge_padding_horizontal": 10,
+            "custom_css": "& {\n}"
+          }
+        },
+        "slide_Wtipxe": {
+          "type": "slide",
+          "settings": {
+            "background_color": "#0a0a0a",
+            "bg_image_desktop": "shopify://shop_images/renith-r-A9VpotrPr1k-unsplash.png",
+            "bg_position_desktop": "center center",
+            "bg_position_mobile": "center center",
+            "content_width_desktop": 620,
+            "content_width_mobile": 100,
+            "content_horizontal_desktop": "left",
+            "content_vertical_desktop": "center",
+            "content_horizontal_mobile": "left",
+            "content_vertical_mobile": "bottom",
+            "text_align_desktop": "left",
+            "text_align_mobile": "left",
+            "show_rating_star": false,
+            "rating_text": "BREATHING 2.0",
+            "rating_color": "#6cfff5",
+            "rating_size": 14,
+            "headline": "<h1>breathe better.<br/>live better.</h1>",
+            "show_headline_badge": false,
+            "headline_badge_text": "Save up to 35%",
+            "headline_badge_bg": "#536dff",
+            "headline_badge_color": "#ffffff",
+            "headline_color": "#ffffff",
+            "headline_size_desktop": 52,
+            "headline_size_mobile": 32,
+            "subtitle": "",
+            "subtitle_color": "#ff7816",
+            "subtitle_size": 18,
+            "description": "<p>Your biology is built to breathe through your nose — not your mouth.¹ ² Breathewave helps restore that natural function for better sleep, energy, and long-term health.³ ⁵ ⁶ ¹⁰</p>",
+            "description_color": "#ffffff",
+            "description_size_desktop": 16,
+            "description_size_mobile": 14,
+            "cta_label": "Buy now",
+            "cta_url": "",
+            "cta_bg_color": "#6cfff5",
+            "cta_text_color": "#000000",
+            "cta_size_desktop": 16,
+            "cta_size_mobile": 18,
+            "cta_full_width": false,
+            "cta_badge_text": "",
+            "cta_badge_color": "#ffffff",
+            "cta_badge_bg": "#7c5cfc",
+            "badge_1": "",
+            "badge_2": "",
+            "badge_3": "",
+            "badge_4": "",
+            "badges_color": "#ffffff",
+            "badges_size": 13,
+            "custom_badge_styles": false,
+            "badge_background": "#ffffff",
+            "badge_text_color": "#000000",
+            "badge_border_radius": 100,
+            "badge_padding_vertical": 6,
+            "badge_padding_horizontal": 10,
+            "custom_css": "& {\n}"
+          }
+        }
+      },
+      "block_order": [
+        "slide_xwWWfK",
+        "slide_Wtipxe"
+      ],
+      "name": "CTR Hero Banner",
+      "settings": {
+        "logo_width": 140,
+        "logo_left_desktop": 3,
+        "logo_top_desktop": 4,
+        "logo_left_mobile": 4,
+        "logo_top_mobile": 4,
+        "trust_line_text": "",
+        "trust_line_color": "",
+        "trust_line_size": 14,
+        "auto_rotate": 0,
+        "pause_on_hover": true,
+        "min_height_desktop": 640,
+        "min_height_mobile": 550,
+        "clinicians_show": true,
+        "clinicians_text": "<p><strong>900+ clinicians</strong> shared our products on <strong>FrontrowMD</strong>, with no compensation.</p>",
+        "clinicians_bg": "#f5f5f5",
+        "clinicians_text_color": "#1a1a1a",
+        "custom_css": "",
+        "hide_header": false,
+        "section_id": ""
+      }
+    },
+    "ctr_image_content_card_ntReRP": {
+      "type": "ctr-image-content-card",
+      "blocks": {
+        "heading_8rfUxW": {
+          "type": "heading",
+          "settings": {
+            "heading": "<p>rooted in biology.<br/>backed by science.</p>",
+            "size_desktop": 38,
+            "size_mobile": 24
+          }
+        },
+        "body_fgA4Bf": {
+          "type": "body",
+          "settings": {
+            "text": "<p><strong>Mouth breathing during sleep robs you of rest when your body needs it most</strong> for repair, memory consolidation, and hormonal balance. But the damage doesn't stop at night — daytime mouth breathing disrupts cognition, O2/CO2 balance, and focus. Breathewave fine-tunes your systems by restoring nasal breathing for energy, clarity, recovery, and longevity.</p>",
+            "size_desktop": 16,
+            "size_mobile": 14
+          }
+        },
+        "cta_mzmwXD": {
+          "type": "cta",
+          "settings": {
+            "label": "The Science",
+            "url": "",
+            "cta_bg": "#3de8c8",
+            "cta_color": "#0a0a0a",
+            "size": 15
+          }
+        }
+      },
+      "block_order": [
+        "heading_8rfUxW",
+        "body_fgA4Bf",
+        "cta_mzmwXD"
+      ],
+      "name": "CTR Image Content Card",
+      "settings": {
+        "bg_image_desktop": "shopify://shop_images/BW-Product-Ola-19-1.jpg",
+        "bg_image_mobile": "shopify://shop_images/BW-Product-Ola-19-1a-1.jpg",
+        "bg_position_desktop": "center center",
+        "bg_position_mobile": "center center",
+        "overlay_direction": "right",
+        "overlay_color": "#000000",
+        "overlay_opacity": 90,
+        "content_position": "bottom-left",
+        "content_padding_desktop": 48,
+        "content_padding_mobile": 28,
+        "content_width_desktop": 560,
+        "content_width_mobile": 100,
+        "content_gap": 16,
+        "card_max_width": 1280,
+        "min_height_desktop": 560,
+        "min_height_mobile": 480,
+        "card_radius": 24,
+        "padding_v": 40,
+        "padding_h": 24,
+        "section_bg": "#ffffff",
+        "card_bg": "#0a0a0a",
+        "eyebrow_size": 12,
+        "eyebrow_color": "#ffffff",
+        "heading_size_desktop": 52,
+        "heading_size_mobile": 32,
+        "heading_color": "#ffffff",
+        "body_size_desktop": 16,
+        "body_size_mobile": 14,
+        "body_color": "#dddddd",
+        "cta_size": 15,
+        "cta_weight": "500",
+        "cta_padding_v": 14,
+        "cta_padding_h": 28,
+        "cta_radius": 100,
+        "custom_css": "",
+        "section_id": ""
+      }
+    },
+    "ctr_collection_showcase_xHmx4P": {
+      "type": "ctr-collection-showcase",
+      "blocks": {
+        "product_girP3E": {
+          "type": "product",
+          "settings": {
+            "product": "mouth-tape",
+            "button_label": "View details",
+            "show_rating": true,
+            "rating_count": "",
+            "show_sale_badge": true
+          }
+        },
+        "product_GnBLPQ": {
+          "type": "product",
+          "settings": {
+            "product": "sensory-mask",
+            "button_label": "View details",
+            "show_rating": true,
+            "rating_count": "",
+            "show_sale_badge": true
+          }
+        },
+        "product_hWrMKK": {
+          "type": "product",
+          "settings": {
+            "product": "nasal-dilator-starter",
+            "button_label": "View details",
+            "show_rating": true,
+            "rating_count": "",
+            "show_sale_badge": true
+          }
+        },
+        "intro_BXGAM3": {
+          "type": "intro",
+          "settings": {
+            "heading": "<p>explore our collection</p>",
+            "body": "<p>Every Breathewave product is designed to support better breathing and whole-body wellness. Explore the full lineup and find what fits your flow.</p>",
+            "cta_label": "See All",
+            "cta_url": "#"
+          }
+        }
+      },
+      "block_order": [
+        "product_girP3E",
+        "product_GnBLPQ",
+        "product_hWrMKK",
+        "intro_BXGAM3"
+      ],
+      "name": "CTR Collection Showcase",
+      "settings": {
+        "section_id": "",
+        "max_products": 3,
+        "desktop_columns": 4,
+        "mobile_layout": "horizontal_scroll",
+        "mobile_card_width": 82,
+        "mobile_columns": "1",
+        "max_width": 1680,
+        "card_gap": 28,
+        "card_gap_mobile": 16,
+        "card_radius": 24,
+        "intro_min_height": 520,
+        "intro_min_height_mobile": 420,
+        "intro_padding": 32,
+        "intro_padding_mobile": 28,
+        "intro_text_gap": 32,
+        "heading_size_desktop": 38,
+        "heading_size_mobile": 28,
+        "body_size_desktop": 16,
+        "body_size_mobile": 14,
+        "body_max_width": 360,
+        "cta_height": 54,
+        "cta_size": 16,
+        "cta_border_width": 2,
+        "cta_hover_bg": "#0f0f0f",
+        "cta_hover_color": "#ffffff",
+        "product_media_height": 390,
+        "product_media_height_mobile": 320,
+        "product_body_padding": 32,
+        "product_body_padding_mobile": 24,
+        "product_title_size": 16,
+        "rating_size": 15,
+        "rating_count_size": 15,
+        "price_size": 15,
+        "product_button_height": 54,
+        "product_button_size": 16,
+        "sale_badge_size": 15,
+        "bg_color": "",
+        "card_bg": "#f3f7ff",
+        "product_media_bg": "#f7f4f1",
+        "product_button_bg": "#86f3e8",
+        "product_button_color": "#0f0f0f",
+        "rating_color": "#000000",
+        "rating_count_color": "#5f6270",
+        "sale_badge_color": "#e23333",
+        "text_color": "#0f0f0f",
+        "padding_top": 56,
+        "padding_bottom": 56,
+        "padding_horizontal": 40,
+        "padding_top_mobile": 36,
+        "padding_bottom_mobile": 36,
+        "padding_horizontal_mobile": 18,
+        "custom_css": ""
+      }
+    },
+    "ctr_articles_list_VWT7EU": {
+      "type": "ctr-articles-list",
+      "blocks": {
+        "article_rHpmm6": {
+          "type": "article",
+          "settings": {
+            "article": "community-blog/broken-breath-broken-system"
+          }
+        },
+        "article_CjFfRc": {
+          "type": "article",
+          "settings": {
+            "article": "community-blog/does-your-breath-have-a-pulse"
+          }
+        }
+      },
+      "block_order": [
+        "article_rHpmm6",
+        "article_CjFfRc"
+      ],
+      "name": "CTR Articles List",
+      "settings": {
+        "section_id": "",
+        "blog": "community-blog",
+        "featured_article": "breathewave/breathewave-guarantee",
+        "eyebrow": "COMMUNITY BLOG",
+        "heading": "latest articles",
+        "all_articles_label": "All Articles",
+        "all_articles_link": "",
+        "show_featured": true,
+        "featured_badge": "Featured",
+        "article_limit": 2,
+        "date_format": "%b %d, %Y",
+        "show_excerpt": true,
+        "excerpt_length": 120,
+        "read_more_label": "Read More",
+        "max_width": 1680,
+        "featured_width": 2,
+        "list_width": 2,
+        "columns_gap": 28,
+        "list_gap": 48,
+        "list_text_gap": 32,
+        "list_image_width": 48,
+        "list_image_aspect": "1.55 / 1",
+        "featured_height": 620,
+        "featured_height_mobile": 520,
+        "card_radius": 24,
+        "list_image_radius": 18,
+        "featured_content_inset": 38,
+        "featured_content_inset_mobile": 24,
+        "badge_offset": 34,
+        "eyebrow_size": 20,
+        "heading_size_desktop": 46,
+        "heading_size_mobile": 38,
+        "featured_title_size": 36,
+        "featured_title_size_mobile": 30,
+        "list_title_size": 28,
+        "list_title_size_mobile": 26,
+        "date_size": 16,
+        "excerpt_size": 22,
+        "excerpt_size_mobile": 18,
+        "read_more_size": 20,
+        "all_link_size": 22,
+        "badge_size": 18,
+        "bg_color": "#f3f7ff",
+        "text_color": "#0f0f0f",
+        "eyebrow_color": "#6d7080",
+        "muted_color": "#858b9e",
+        "divider_color": "#ccd2e2",
+        "padding_top": 88,
+        "padding_bottom": 88,
+        "padding_horizontal": 40,
+        "padding_top_mobile": 52,
+        "padding_bottom_mobile": 52,
+        "padding_horizontal_mobile": 18,
+        "header_gap": 46,
+        "header_gap_mobile": 32,
+        "mobile_gap": 34,
+        "custom_css": ""
+      }
+    },
+    "ctr_instagram_grid_qcMWrX": {
+      "type": "ctr-instagram-grid",
+      "blocks": {
+        "image_7FmPAe": {
+          "type": "image",
+          "settings": {
+            "link": ""
+          }
+        },
+        "image_B6XmJG": {
+          "type": "image",
+          "settings": {
+            "link": ""
+          }
+        },
+        "image_eKKGtw": {
+          "type": "image",
+          "settings": {
+            "link": ""
+          }
+        },
+        "image_7QffYc": {
+          "type": "image",
+          "settings": {
+            "link": ""
+          }
+        },
+        "image_Qw7mgg": {
+          "type": "image",
+          "settings": {
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "image_7FmPAe",
+        "image_B6XmJG",
+        "image_eKKGtw",
+        "image_7QffYc",
+        "image_Qw7mgg"
+      ],
+      "name": "CTR Instagram Grid",
+      "settings": {
+        "section_id": "",
+        "heading": "follow us",
+        "handle_text": "@breathewave",
+        "handle_link": "",
+        "placeholder_count": 5,
+        "max_width": 1680,
+        "columns_desktop": 5,
+        "columns_mobile": "2",
+        "gap": 20,
+        "gap_mobile": 14,
+        "image_aspect": "1 / 1",
+        "image_radius": 22,
+        "heading_size_desktop": 48,
+        "heading_size_mobile": 38,
+        "heading_gap": 64,
+        "heading_gap_mobile": 34,
+        "bg_color": "",
+        "heading_color": "#000000",
+        "handle_color": "#c8cedd",
+        "padding_top": 52,
+        "padding_bottom": 72,
+        "padding_horizontal": 40,
+        "padding_top_mobile": 40,
+        "padding_bottom_mobile": 52,
+        "padding_horizontal_mobile": 18,
+        "custom_css": ""
+      }
     }
   },
   "order": [
@@ -638,6 +1267,13 @@
     "ctr_icon_cards_JxYGd7",
     "ctr_marquee_AYiLqH",
     "ctr_how_to_use_UAmaqK",
-    "ctr_reviews_carousel_ympdEN"
+    "ctr_reviews_carousel_ympdEN",
+    "ctr_comparison_cards_YQFHtm",
+    "ctr_image_cards_GwyFWQ",
+    "ctr_hero_banner_pmTit6",
+    "ctr_image_content_card_ntReRP",
+    "ctr_collection_showcase_xHmx4P",
+    "ctr_articles_list_VWT7EU",
+    "ctr_instagram_grid_qcMWrX"
   ]
 }

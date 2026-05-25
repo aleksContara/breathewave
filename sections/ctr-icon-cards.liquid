@@ -265,33 +265,58 @@
 
 {%- if use_swiper -%}
   <script>
-    window._ctrSwiperQ = window._ctrSwiperQ || [];
-    window._ctrSwiperQ.push(function () {
-      var el = document.getElementById({{ swiper_id | json }});
-      if (!el) return;
+    (function () {
+      var SWIPER_JS  = {{ 'swiper-bundle.min.js'  | asset_url | json }};
+      var SWIPER_CSS = {{ 'swiper-bundle.min.css' | asset_url | json }};
 
-      var mq  = window.matchMedia('(max-width: 767px)');
-      var sw  = null;
+      function init() {
+        var el = document.getElementById({{ swiper_id | json }});
+        if (!el) return;
 
-      function activate() {
-        if (mq.matches && !sw) {
-          sw = new Swiper(el, {
-            slidesPerView: {{ section.settings.slides_per_view_mobile }},
-            spaceBetween: {{ section.settings.mobile_gap }},
-            grabCursor: true,
-            {% if show_dots %}
-            pagination: { el: el.querySelector('.swiper-pagination'), clickable: true },
-            {% endif %}
-          });
-        } else if (!mq.matches && sw) {
-          sw.destroy(true, true);
-          sw = null;
+        var mq = window.matchMedia('(max-width: 767px)');
+        var sw = null;
+
+        function activate() {
+          if (mq.matches && !sw) {
+            sw = new Swiper(el, {
+              slidesPerView: {{ section.settings.slides_per_view_mobile }},
+              spaceBetween: {{ section.settings.mobile_gap }},
+              grabCursor: true,
+              {% if show_dots %}
+              pagination: { el: el.querySelector('.swiper-pagination'), clickable: true },
+              {% endif %}
+            });
+          } else if (!mq.matches && sw) {
+            sw.destroy(true, true);
+            sw = null;
+          }
         }
+
+        activate();
+        mq.addEventListener('change', activate);
       }
 
-      activate();
-      mq.addEventListener('change', activate);
-    });
+      if (window.Swiper) { init(); return; }
+
+      window._ctrSwiperCBs = window._ctrSwiperCBs || [];
+      window._ctrSwiperCBs.push(init);
+
+      if (document.getElementById('ctr-swiper-js')) return;
+
+      if (!document.getElementById('ctr-swiper-css')) {
+        var l = document.createElement('link');
+        l.id = 'ctr-swiper-css'; l.rel = 'stylesheet'; l.href = SWIPER_CSS;
+        document.head.appendChild(l);
+      }
+
+      var s = document.createElement('script');
+      s.id  = 'ctr-swiper-js';
+      s.src = SWIPER_JS;
+      s.onload = function () {
+        (window._ctrSwiperCBs || []).forEach(function (fn) { fn(); });
+      };
+      document.head.appendChild(s);
+    })();
   </script>
 {%- endif -%}
 

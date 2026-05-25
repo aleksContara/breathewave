@@ -1,0 +1,940 @@
+{%- comment -%} Image Content Card — ctr-image-content-card.liquid {%- endcomment -%}
+{%- liquid
+  assign custom_css      = section.settings.custom_css
+  assign section_id_attr = section.settings.section_id
+
+  comment
+    Map content_position to CSS flex values
+  endcomment
+  case section.settings.content_position
+    when 'top-left'
+      assign pos_justify = 'flex-start'
+      assign pos_align   = 'flex-start'
+    when 'top-center'
+      assign pos_justify = 'center'
+      assign pos_align   = 'flex-start'
+    when 'top-right'
+      assign pos_justify = 'flex-end'
+      assign pos_align   = 'flex-start'
+    when 'center-left'
+      assign pos_justify = 'flex-start'
+      assign pos_align   = 'center'
+    when 'center'
+      assign pos_justify = 'center'
+      assign pos_align   = 'center'
+    when 'center-right'
+      assign pos_justify = 'flex-end'
+      assign pos_align   = 'center'
+    when 'bottom-right'
+      assign pos_justify = 'flex-end'
+      assign pos_align   = 'flex-end'
+    when 'bottom-center'
+      assign pos_justify = 'center'
+      assign pos_align   = 'flex-end'
+    else
+      assign pos_justify = 'flex-start'
+      assign pos_align   = 'flex-end'
+  endcase
+-%}
+
+{% capture selector %}[data-style-id="{{ section.id }}"]{% endcapture %}
+
+{% capture css %}
+  & {
+    {% if section.settings.section_bg != blank and section.settings.section_bg.alpha != 0 %}
+      background-color: {{ section.settings.section_bg }};
+    {% endif %}
+    padding: {{ section.settings.padding_v }}px {{ section.settings.padding_h }}px;
+    box-sizing: border-box;
+  }
+
+  & .icc__inner {
+    max-width: {{ section.settings.card_max_width }}px;
+    margin: 0 auto;
+  }
+
+  /* ── Card ── */
+  & .icc__card {
+    position: relative;
+    overflow: hidden;
+    border-radius: {{ section.settings.card_radius }}px;
+    min-height: {{ section.settings.min_height_mobile }}px;
+    display: flex;
+    flex-direction: column;
+    {% if section.settings.card_bg != blank and section.settings.card_bg.alpha != 0 %}
+      background-color: {{ section.settings.card_bg }};
+    {% endif %}
+  }
+
+  /* ── Background images ── */
+  & .icc__bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: {{ section.settings.bg_position_mobile }};
+    z-index: 0;
+  }
+  & .icc__bg--desktop { display: none; }
+  & .icc__bg--mobile  { display: block; }
+
+  /* ── Gradient overlay ── */
+  & .icc__overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    opacity: {{ section.settings.overlay_opacity | times: 0.01 }};
+    {% if section.settings.overlay_direction == 'none' %}
+      display: none;
+    {% elsif section.settings.overlay_direction == 'fill' %}
+      background: {{ section.settings.overlay_color }};
+    {% elsif section.settings.overlay_direction == 'left' %}
+      background: linear-gradient(to right, {{ section.settings.overlay_color }}, transparent 70%);
+    {% elsif section.settings.overlay_direction == 'right' %}
+      background: linear-gradient(to left, {{ section.settings.overlay_color }}, transparent 70%);
+    {% elsif section.settings.overlay_direction == 'top' %}
+      background: linear-gradient(to bottom, {{ section.settings.overlay_color }}, transparent 70%);
+    {% elsif section.settings.overlay_direction == 'bottom' %}
+      background: linear-gradient(to top, {{ section.settings.overlay_color }}, transparent 70%);
+    {% endif %}
+  }
+
+  /* ── Content positioning ── */
+  & .icc__content {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: flex;
+    align-items: {{ pos_align }};
+    justify-content: {{ pos_justify }};
+    padding: {{ section.settings.content_padding_mobile }}px;
+    box-sizing: border-box;
+  }
+
+  & .icc__content-inner {
+    display: flex;
+    flex-direction: column;
+    gap: {{ section.settings.content_gap }}px;
+    max-width: {{ section.settings.content_width_mobile }}%;
+    width: 100%;
+  }
+
+  /* ── Eyebrow ── */
+  & .icc__eyebrow {
+    display: block;
+    font-size: {{ section.settings.eyebrow_size }}px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin: 0;
+    {% if section.settings.eyebrow_color != blank and section.settings.eyebrow_color.alpha != 0 %}
+      color: {{ section.settings.eyebrow_color }};
+    {% endif %}
+  }
+
+  /* ── Heading ── */
+  & .icc__heading {
+    font-size: {{ section.settings.heading_size_mobile }}px;
+    font-weight: 300;
+    line-height: 1.1;
+    margin: 0;
+    {% if section.settings.heading_color != blank and section.settings.heading_color.alpha != 0 %}
+      color: {{ section.settings.heading_color }};
+    {% endif %}
+  }
+  & .icc__heading h1,
+  & .icc__heading h2,
+  & .icc__heading h3,
+  & .icc__heading p {
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+    color: inherit;
+    margin: 0;
+  }
+
+  /* ── Body ── */
+  & .icc__body {
+    font-size: {{ section.settings.body_size_mobile }}px;
+    line-height: 1.6;
+    font-weight: 300;
+    margin: 0;
+    {% if section.settings.body_color != blank and section.settings.body_color.alpha != 0 %}
+      color: {{ section.settings.body_color }};
+    {% endif %}
+  }
+  & .icc__body p   { margin: 0; }
+  & .icc__body sup {
+    font-size: 0.65em;
+    vertical-align: super;
+    line-height: 0;
+    opacity: 0.65;
+  }
+
+  /* ── CTA ── */
+  & .icc__cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: {{ section.settings.cta_padding_v }}px {{ section.settings.cta_padding_h }}px;
+    border-radius: {{ section.settings.cta_radius }}px;
+    font-size: {{ section.settings.cta_size }}px;
+    font-weight: {{ section.settings.cta_weight }};
+    text-decoration: none;
+    width: max-content;
+    transition: opacity 0.2s;
+    margin-top: 4px;
+  }
+  & .icc__cta:hover { opacity: 0.88; }
+
+  /* ── Desktop ── */
+  @media (min-width: 768px) {
+    & .icc__card {
+      min-height: {{ section.settings.min_height_desktop }}px;
+    }
+    & .icc__bg {
+      object-position: {{ section.settings.bg_position_desktop }};
+    }
+    & .icc__bg--desktop { display: block; }
+    & .icc__bg--mobile  { display: none; }
+    & .icc__content {
+      padding: {{ section.settings.content_padding_desktop }}px;
+    }
+    & .icc__content-inner {
+      max-width: {{ section.settings.content_width_desktop }}px;
+    }
+    & .icc__heading {
+      font-size: {{ section.settings.heading_size_desktop }}px;
+    }
+    & .icc__body {
+      font-size: {{ section.settings.body_size_desktop }}px;
+    }
+  }
+{% endcapture %}
+
+<style>
+  {{ css | append: custom_css | replace: '&', selector | strip_newlines }}
+</style>
+
+{%- comment -%} Per-block styles — size + color per block {%- endcomment -%}
+{%- for block in section.blocks -%}
+  {%- assign blk = section.id | append: '-' | append: block.id -%}
+
+  {%- if block.type == 'eyebrow' -%}
+    <style>[data-icc-block="{{ blk }}"] { font-size: {{ block.settings.size }}px; }</style>
+
+  {%- elsif block.type == 'heading' -%}
+    <style>
+      [data-icc-block="{{ blk }}"] { font-size: {{ block.settings.size_mobile }}px; }
+      @media (min-width: 768px) { [data-icc-block="{{ blk }}"] { font-size: {{ block.settings.size_desktop }}px; } }
+    </style>
+
+  {%- elsif block.type == 'body' -%}
+    <style>
+      [data-icc-block="{{ blk }}"] { font-size: {{ block.settings.size_mobile }}px; }
+      @media (min-width: 768px) { [data-icc-block="{{ blk }}"] { font-size: {{ block.settings.size_desktop }}px; } }
+    </style>
+
+  {%- elsif block.type == 'cta' -%}
+    <style>
+      [data-icc-block="{{ blk }}"] {
+        {% if block.settings.cta_bg != blank and block.settings.cta_bg.alpha != 0 %}background-color: {{ block.settings.cta_bg }};{% endif %}
+        {% if block.settings.cta_color != blank and block.settings.cta_color.alpha != 0 %}color: {{ block.settings.cta_color }};{% endif %}
+        font-size: {{ block.settings.size }}px;
+      }
+    </style>
+
+  {%- endif -%}
+{%- endfor -%}
+
+<div
+  data-style-id="{{ section.id }}"
+  {% if section_id_attr != blank %}id="{{ section_id_attr }}"{% endif %}
+>
+  <div class="icc__inner">
+    <div class="icc__card">
+
+      {%- comment -%} Background images {%- endcomment -%}
+      {%- if section.settings.bg_image_mobile != blank -%}
+        <img
+          class="icc__bg icc__bg--mobile"
+          src="{{ section.settings.bg_image_mobile | image_url: width: 1200 }}"
+          alt=""
+          loading="lazy"
+          width="{{ section.settings.bg_image_mobile.width }}"
+          height="{{ section.settings.bg_image_mobile.height }}"
+        >
+      {%- elsif section.settings.bg_image_desktop != blank -%}
+        <img
+          class="icc__bg icc__bg--mobile"
+          src="{{ section.settings.bg_image_desktop | image_url: width: 1200 }}"
+          alt=""
+          loading="lazy"
+          width="{{ section.settings.bg_image_desktop.width }}"
+          height="{{ section.settings.bg_image_desktop.height }}"
+        >
+      {%- endif -%}
+
+      {%- if section.settings.bg_image_desktop != blank -%}
+        <img
+          class="icc__bg icc__bg--desktop"
+          src="{{ section.settings.bg_image_desktop | image_url: width: 2400 }}"
+          alt=""
+          loading="lazy"
+          width="{{ section.settings.bg_image_desktop.width }}"
+          height="{{ section.settings.bg_image_desktop.height }}"
+        >
+      {%- endif -%}
+
+      {%- comment -%} Gradient overlay {%- endcomment -%}
+      {%- if section.settings.overlay_direction != 'none' -%}
+        <div class="icc__overlay"></div>
+      {%- endif -%}
+
+      {%- comment -%} Content {%- endcomment -%}
+      <div class="icc__content">
+        <div class="icc__content-inner">
+
+          {%- for block in section.blocks -%}
+
+            {%- assign blk = section.id | append: '-' | append: block.id -%}
+
+            {%- if block.type == 'eyebrow' and block.settings.text != blank -%}
+              <span class="icc__eyebrow" data-icc-block="{{ blk }}" {{ block.shopify_attributes }}>
+                {{ block.settings.text }}
+              </span>
+
+            {%- elsif block.type == 'heading' and block.settings.heading != blank -%}
+              <div class="icc__heading" data-icc-block="{{ blk }}" {{ block.shopify_attributes }}>
+                {{ block.settings.heading }}
+              </div>
+
+            {%- elsif block.type == 'body' and block.settings.text != blank -%}
+              <div class="icc__body" data-icc-block="{{ blk }}" {{ block.shopify_attributes }}>
+                {{ block.settings.text }}
+              </div>
+
+            {%- elsif block.type == 'cta' and block.settings.label != blank -%}
+              <a
+                href="{{ block.settings.url }}"
+                class="icc__cta"
+                data-icc-block="{{ blk }}"
+                {{ block.shopify_attributes }}
+              >
+                {{ block.settings.label }}
+              </a>
+
+            {%- endif -%}
+
+          {%- endfor -%}
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Image Content Card",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Background Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "bg_image_desktop",
+      "label": "Background image — Desktop"
+    },
+    {
+      "type": "image_picker",
+      "id": "bg_image_mobile",
+      "label": "Background image — Mobile",
+      "info": "Falls back to desktop image if empty."
+    },
+    {
+      "type": "select",
+      "id": "bg_position_desktop",
+      "label": "Image position — Desktop",
+      "default": "center center",
+      "options": [
+        { "value": "left top",      "label": "Left top" },
+        { "value": "left center",   "label": "Left center" },
+        { "value": "left bottom",   "label": "Left bottom" },
+        { "value": "center top",    "label": "Center top" },
+        { "value": "center center", "label": "Center" },
+        { "value": "center bottom", "label": "Center bottom" },
+        { "value": "right top",     "label": "Right top" },
+        { "value": "right center",  "label": "Right center" },
+        { "value": "right bottom",  "label": "Right bottom" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "bg_position_mobile",
+      "label": "Image position — Mobile",
+      "default": "center center",
+      "options": [
+        { "value": "left top",      "label": "Left top" },
+        { "value": "left center",   "label": "Left center" },
+        { "value": "left bottom",   "label": "Left bottom" },
+        { "value": "center top",    "label": "Center top" },
+        { "value": "center center", "label": "Center" },
+        { "value": "center bottom", "label": "Center bottom" },
+        { "value": "right top",     "label": "Right top" },
+        { "value": "right center",  "label": "Right center" },
+        { "value": "right bottom",  "label": "Right bottom" }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": "t:all.empty_char"
+    },
+    {
+      "type": "header",
+      "content": "Overlay"
+    },
+    {
+      "type": "select",
+      "id": "overlay_direction",
+      "label": "Gradient direction",
+      "default": "left",
+      "options": [
+        { "value": "none",   "label": "None" },
+        { "value": "fill",   "label": "Solid fill" },
+        { "value": "left",   "label": "From left" },
+        { "value": "right",  "label": "From right" },
+        { "value": "top",    "label": "From top" },
+        { "value": "bottom", "label": "From bottom" }
+      ]
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "Overlay color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Overlay opacity (%)",
+      "default": 65,
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:all.empty_char"
+    },
+    {
+      "type": "header",
+      "content": "Content Position"
+    },
+    {
+      "type": "select",
+      "id": "content_position",
+      "label": "Position",
+      "default": "bottom-left",
+      "options": [
+        { "value": "top-left",     "label": "Top left" },
+        { "value": "top-center",   "label": "Top center" },
+        { "value": "top-right",    "label": "Top right" },
+        { "value": "center-left",  "label": "Center left" },
+        { "value": "center",       "label": "Center" },
+        { "value": "center-right", "label": "Center right" },
+        { "value": "bottom-left",  "label": "Bottom left" },
+        { "value": "bottom-center","label": "Bottom center" },
+        { "value": "bottom-right", "label": "Bottom right" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "content_padding_desktop",
+      "label": "Content padding — Desktop (px)",
+      "default": 48,
+      "min": 16,
+      "max": 96,
+      "step": 4,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "content_padding_mobile",
+      "label": "Content padding — Mobile (px)",
+      "default": 28,
+      "min": 12,
+      "max": 60,
+      "step": 4,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "content_width_desktop",
+      "label": "Content max-width — Desktop (px)",
+      "default": 560,
+      "min": 200,
+      "max": 1000,
+      "step": 20,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "content_width_mobile",
+      "label": "Content max-width — Mobile (%)",
+      "default": 100,
+      "min": 40,
+      "max": 100,
+      "step": 5,
+      "unit": "%"
+    },
+    {
+      "type": "range",
+      "id": "content_gap",
+      "label": "Gap between blocks (px)",
+      "default": 16,
+      "min": 4,
+      "max": 40,
+      "step": 2,
+      "unit": "px"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:all.empty_char"
+    },
+    {
+      "type": "header",
+      "content": "Card Layout"
+    },
+    {
+      "type": "range",
+      "id": "card_max_width",
+      "label": "Card max width (px)",
+      "default": 1280,
+      "min": 600,
+      "max": 1800,
+      "step": 40,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "min_height_desktop",
+      "label": "Min height — Desktop (px)",
+      "default": 560,
+      "min": 200,
+      "max": 900,
+      "step": 10,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "min_height_mobile",
+      "label": "Min height — Mobile (px)",
+      "default": 480,
+      "min": 200,
+      "max": 800,
+      "step": 10,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "card_radius",
+      "label": "Card border radius (px)",
+      "default": 24,
+      "min": 0,
+      "max": 48,
+      "step": 2,
+      "unit": "px"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:all.empty_char"
+    },
+    {
+      "type": "header",
+      "content": "Section Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_v",
+      "label": "Section padding vertical (px)",
+      "default": 40,
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_h",
+      "label": "Section padding horizontal (px)",
+      "default": 24,
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:all.empty_char"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "alpha": true,
+      "id": "section_bg",
+      "label": "Section background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "alpha": true,
+      "id": "card_bg",
+      "label": "Card background (fallback)",
+      "default": "#0a0a0a",
+      "info": "Visible when no image is set."
+    },
+    {
+      "type": "paragraph",
+      "content": "t:all.empty_char"
+    },
+    {
+      "type": "header",
+      "content": "Typography — Eyebrow"
+    },
+    {
+      "type": "range",
+      "id": "eyebrow_size",
+      "label": "Eyebrow size (px)",
+      "default": 12,
+      "min": 10,
+      "max": 20,
+      "step": 1,
+      "unit": "px"
+    },
+    {
+      "type": "color",
+      "alpha": true,
+      "id": "eyebrow_color",
+      "label": "Eyebrow color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:all.empty_char"
+    },
+    {
+      "type": "header",
+      "content": "Typography — Heading"
+    },
+    {
+      "type": "range",
+      "id": "heading_size_desktop",
+      "label": "Heading size — Desktop (px)",
+      "default": 52,
+      "min": 20,
+      "max": 96,
+      "step": 2,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "heading_size_mobile",
+      "label": "Heading size — Mobile (px)",
+      "default": 32,
+      "min": 18,
+      "max": 64,
+      "step": 2,
+      "unit": "px"
+    },
+    {
+      "type": "color",
+      "alpha": true,
+      "id": "heading_color",
+      "label": "Heading color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:all.empty_char"
+    },
+    {
+      "type": "header",
+      "content": "Typography — Body"
+    },
+    {
+      "type": "range",
+      "id": "body_size_desktop",
+      "label": "Body size — Desktop (px)",
+      "default": 16,
+      "min": 12,
+      "max": 28,
+      "step": 1,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "body_size_mobile",
+      "label": "Body size — Mobile (px)",
+      "default": 14,
+      "min": 11,
+      "max": 22,
+      "step": 1,
+      "unit": "px"
+    },
+    {
+      "type": "color",
+      "alpha": true,
+      "id": "body_color",
+      "label": "Body color",
+      "default": "#dddddd"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:all.empty_char"
+    },
+    {
+      "type": "header",
+      "content": "CTA Button Defaults"
+    },
+    {
+      "type": "range",
+      "id": "cta_size",
+      "label": "Button font size (px)",
+      "default": 15,
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px"
+    },
+    {
+      "type": "select",
+      "id": "cta_weight",
+      "label": "Button font weight",
+      "default": "500",
+      "options": [
+        { "value": "400", "label": "Regular" },
+        { "value": "500", "label": "Medium" },
+        { "value": "600", "label": "Semi-bold" },
+        { "value": "700", "label": "Bold" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "cta_padding_v",
+      "label": "Button padding vertical (px)",
+      "default": 14,
+      "min": 6,
+      "max": 28,
+      "step": 2,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "cta_padding_h",
+      "label": "Button padding horizontal (px)",
+      "default": 28,
+      "min": 12,
+      "max": 64,
+      "step": 2,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "cta_radius",
+      "label": "Button border radius (px)",
+      "default": 100,
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:all.empty_char"
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "textarea",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    },
+    {
+      "type": "text",
+      "id": "section_id",
+      "label": "Section ID"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "eyebrow",
+      "name": "Eyebrow",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Eyebrow text",
+          "default": "THE SCIENCE"
+        },
+        {
+          "type": "range",
+          "id": "size",
+          "label": "Font size (px)",
+          "default": 12,
+          "min": 10,
+          "max": 24,
+          "step": 1,
+          "unit": "px"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "name": "Heading",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "heading",
+          "label": "Heading",
+          "default": "<p>rooted in biology.<br>backed by science.</p>"
+        },
+        {
+          "type": "range",
+          "id": "size_desktop",
+          "label": "Font size — Desktop (px)",
+          "default": 52,
+          "min": 20,
+          "max": 96,
+          "step": 2,
+          "unit": "px"
+        },
+        {
+          "type": "range",
+          "id": "size_mobile",
+          "label": "Font size — Mobile (px)",
+          "default": 32,
+          "min": 18,
+          "max": 64,
+          "step": 2,
+          "unit": "px"
+        }
+      ]
+    },
+    {
+      "type": "body",
+      "name": "Body Text",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Body text",
+          "default": "<p><strong>Mouth breathing during sleep robs you of rest when your body needs it most</strong> for repair, memory consolidation, and hormonal balance. But the damage doesn't stop at night — daytime mouth breathing disrupts cognition, O2/CO2 balance, and focus. Breathewave fine-tunes your systems by restoring nasal breathing for energy, clarity, recovery, and longevity.</p>"
+        },
+        {
+          "type": "range",
+          "id": "size_desktop",
+          "label": "Font size — Desktop (px)",
+          "default": 16,
+          "min": 12,
+          "max": 28,
+          "step": 1,
+          "unit": "px"
+        },
+        {
+          "type": "range",
+          "id": "size_mobile",
+          "label": "Font size — Mobile (px)",
+          "default": 14,
+          "min": 11,
+          "max": 22,
+          "step": 1,
+          "unit": "px"
+        }
+      ]
+    },
+    {
+      "type": "cta",
+      "name": "CTA Button",
+      "limit": 3,
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Button label",
+          "default": "The Science"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "Button URL"
+        },
+        {
+          "type": "color",
+          "alpha": true,
+          "id": "cta_bg",
+          "label": "Background color",
+          "default": "#3de8c8"
+        },
+        {
+          "type": "color",
+          "alpha": true,
+          "id": "cta_color",
+          "label": "Text color",
+          "default": "#0a0a0a"
+        },
+        {
+          "type": "range",
+          "id": "size",
+          "label": "Font size (px)",
+          "default": 15,
+          "min": 12,
+          "max": 24,
+          "step": 1,
+          "unit": "px"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "CTR Image Content Card",
+      "category": "Content",
+      "blocks": [
+        {
+          "type": "heading",
+          "settings": {
+            "heading": "<p>rooted in biology.<br>backed by science.</p>"
+          }
+        },
+        {
+          "type": "body",
+          "settings": {
+            "text": "<p><strong>Mouth breathing during sleep robs you of rest when your body needs it most</strong> for repair, memory consolidation, and hormonal balance. But the damage doesn't stop at night — daytime mouth breathing disrupts cognition, O2/CO2 balance, and focus. Breathewave fine-tunes your systems by restoring nasal breathing for energy, clarity, recovery, and longevity.</p>"
+          }
+        },
+        {
+          "type": "cta",
+          "settings": {
+            "label": "The Science",
+            "cta_bg": "#3de8c8",
+            "cta_color": "#0a0a0a"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

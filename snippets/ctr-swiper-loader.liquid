@@ -21,15 +21,11 @@
 {%- endcomment -%}
 
 {% if ctr_swiper_needed %}
-  {% # theme-check-disable RemoteAsset %}
-  <link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
-    id="ctr-swiper-css"
-  >
-  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  {{ 'swiper-bundle.min.css' | asset_url | stylesheet_tag }}
+  <script src="{{ 'swiper-bundle.min.js' | asset_url }}" defer="defer"></script>
   <script>
-    (window._ctrSwiperQ || []).forEach(function (fn) { fn(); });
+    document.addEventListener('DOMContentLoaded', function () {
+      (window._ctrSwiperQ || []).forEach(function (fn) { fn(); });
+    });
   </script>
-  {% # theme-check-enable RemoteAsset %}
 {% endif %}

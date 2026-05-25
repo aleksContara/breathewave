@@ -16,6 +16,7 @@
   assign min_height_mobile = section.settings.min_height_mobile
   assign custom_css = section.settings.custom_css
   assign section_id = section.settings.section_id
+  assign hero_swiper_id = 'hb-swiper-' | append: section.id
 -%}
 
 {% capture selector %}[data-style-id="{{ section.id }}"]{% endcapture %}
@@ -54,18 +55,10 @@
     height: auto;
   }
 
+  /* ── Swiper container ── */
   & .hero-banner__slides {
     position: relative;
-    display: grid;
-    grid-auto-flow: column;
-    grid-auto-columns: 100%;
-    overflow-x: auto;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    scroll-snap-type: x mandatory;
-  }
-  & .hero-banner__slides::-webkit-scrollbar {
-    display: none;
+    overflow: hidden;
   }
 
   & .hero-banner__slide {
@@ -74,7 +67,7 @@
     flex-direction: column;
     overflow: hidden;
     min-height: {{ min_height_mobile }}px;
-    scroll-snap-align: start;
+    height: auto !important;
   }
 
   & .hero-banner__bg {
@@ -111,7 +104,7 @@
   }
 
   & .hero-banner__headline {
-    font-weight: 700;
+    font-weight: 300;
     line-height: 1.1;
     margin: 0;
   }
@@ -200,7 +193,7 @@
     opacity: 0.9;
   }
   & .hero-banner__cta-badge {
-    position: absolute; 
+    position: absolute;
     top: -12px;
     right: -22px;
     padding: 2px 8px;
@@ -235,26 +228,26 @@
     flex-shrink: 0;
   }
 
+  /* ── Swiper pagination (white dots) ── */
   & .hero-banner__pagination {
     position: absolute;
-    bottom: 16px;
-    left: 50%;
-    transform: translateX(-50%);
+    bottom: 24px;
+    left: 48px;
+    transform: translateX(0);
     z-index: 20;
-    display: flex;
-    gap: 8px;
+    width: auto;
   }
-  & .hero-banner__dot {
+  & .hero-banner__pagination .swiper-pagination-bullet {
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    background-color: rgba(255,255,255,0.5);
-    border: none;
-    padding: 0;
+    background-color: rgba(255, 255, 255, 0.5);
+    opacity: 1;
+    margin: 0 4px !important;
     cursor: pointer;
     transition: background-color 0.2s;
   }
-  & .hero-banner__dot--active {
+  & .hero-banner__pagination .swiper-pagination-bullet-active {
     background-color: #ffffff;
   }
 
@@ -326,7 +319,7 @@
   @media (min-width: 768px) {
     .hero-banner__clinicians {
       flex-direction: row;
-      gap: 8px; 
+      gap: 8px;
       padding: 16px 16px 0;
     }
 
@@ -563,16 +556,8 @@
   {%- endfor -%}
 
   <section
-      data-style-id="{{ section.id }}"
-      {% if section_id != blank %}id="{{ section_id }}"{% endif %}
-      {% if section.blocks.size > 1 %}
-        x-data="{ ...utils.initContentSlider($el, $refs.heroScrollContainer, undefined, 'all', +`{{ auto_rotate }}`, false) }"
-        x-defer="intersect"
-        {% if pause_on_hover %}
-          @pointerover="content_slider.state.rotatePause = true"
-          @pointerout="content_slider.state.rotatePause = false"
-        {% endif %}
-      {% endif %}
+    data-style-id="{{ section.id }}"
+    {% if section_id != blank %}id="{{ section_id }}"{% endif %}
   >
 
     {%- comment -%} Logo overlay (global) {%- endcomment -%}
@@ -588,195 +573,183 @@
       </a>
     {% endif %}
 
-    {%- comment -%} Slides container {%- endcomment -%}
+    {%- comment -%} Swiper slides container {%- endcomment -%}
     <div
-      class="hero-banner__slides"
-      {% if section.blocks.size > 1 %}
-        x-ref="heroScrollContainer"
-        @scroll="content_slider.handleScroll"
-        @scrollend="content_slider.handleInfiniteScroll"
-        @resize.window="content_slider.handleResize"
-        x-init="$nextTick(() => content_slider.handleResize())"
-      {% endif %}
+      class="hero-banner__slides swiper"
+      id="{{ hero_swiper_id }}"
     >
+      <div class="swiper-wrapper">
 
-      {%- for block in section.blocks -%}
-        {%- liquid
-          assign slide_bg_image_desktop = block.settings.bg_image_desktop
-          assign slide_bg_image_mobile = block.settings.bg_image_mobile
-          assign rating_text = block.settings.rating_text
-          assign headline = block.settings.headline
-          assign description = block.settings.description
-          assign cta_label = block.settings.cta_label
-          assign cta_url = block.settings.cta_url
-          assign cta_badge_text = block.settings.cta_badge_text
-          assign cta_badge_color = block.settings.cta_badge_color
-          assign cta_badge_bg = block.settings.cta_badge_bg
-          assign badge_1 = block.settings.badge_1
-          assign badge_2 = block.settings.badge_2
-          assign badge_3 = block.settings.badge_3
-          assign badge_4 = block.settings.badge_4
-        -%}
+        {%- for block in section.blocks -%}
+          {%- liquid
+            assign slide_bg_image_desktop = block.settings.bg_image_desktop
+            assign slide_bg_image_mobile = block.settings.bg_image_mobile
+            assign rating_text = block.settings.rating_text
+            assign headline = block.settings.headline
+            assign description = block.settings.description
+            assign cta_label = block.settings.cta_label
+            assign cta_url = block.settings.cta_url
+            assign cta_badge_text = block.settings.cta_badge_text
+            assign cta_badge_color = block.settings.cta_badge_color
+            assign cta_badge_bg = block.settings.cta_badge_bg
+            assign badge_1 = block.settings.badge_1
+            assign badge_2 = block.settings.badge_2
+            assign badge_3 = block.settings.badge_3
+            assign badge_4 = block.settings.badge_4
+          -%}
 
-        <div
-          data-style-id="{{ section.id }}--{{ block.id }}"
-          {{ block.shopify_attributes }}
-          class="hero-banner__slide"
-        >
-          {%- comment -%} Background image — Mobile {%- endcomment -%}
-          {% if slide_bg_image_mobile != blank %}
-            <img
-              src="{{ slide_bg_image_mobile | image_url: width: 1200 }}"
-              alt=""
-              loading="eager"
-              class="hero-banner__bg hero-banner__bg--mobile"
-              width="{{ slide_bg_image_mobile.width }}"
-              height="{{ slide_bg_image_mobile.height }}"
-            >
-          {% elsif slide_bg_image_desktop != blank %}
-            <img
-              src="{{ slide_bg_image_desktop | image_url: width: 1200 }}"
-              alt=""
-              loading="eager"
-              class="hero-banner__bg hero-banner__bg--mobile"
-              width="{{ slide_bg_image_desktop.width }}"
-              height="{{ slide_bg_image_desktop.height }}"
-            >
-          {% endif %}
+          <div
+            data-style-id="{{ section.id }}--{{ block.id }}"
+            {{ block.shopify_attributes }}
+            class="hero-banner__slide swiper-slide"
+          >
+            {%- comment -%} Background image — Mobile {%- endcomment -%}
+            {% if slide_bg_image_mobile != blank %}
+              <img
+                src="{{ slide_bg_image_mobile | image_url: width: 1200 }}"
+                alt=""
+                loading="eager"
+                class="hero-banner__bg hero-banner__bg--mobile"
+                width="{{ slide_bg_image_mobile.width }}"
+                height="{{ slide_bg_image_mobile.height }}"
+              >
+            {% elsif slide_bg_image_desktop != blank %}
+              <img
+                src="{{ slide_bg_image_desktop | image_url: width: 1200 }}"
+                alt=""
+                loading="eager"
+                class="hero-banner__bg hero-banner__bg--mobile"
+                width="{{ slide_bg_image_desktop.width }}"
+                height="{{ slide_bg_image_desktop.height }}"
+              >
+            {% endif %}
 
-          {%- comment -%} Background image — Desktop {%- endcomment -%}
-          {% if slide_bg_image_desktop != blank %}
-            <img
-              src="{{ slide_bg_image_desktop | image_url: width: 2400 }}"
-              alt=""
-              loading="eager"
-              class="hero-banner__bg hero-banner__bg--desktop"
-              width="{{ slide_bg_image_desktop.width }}"
-              height="{{ slide_bg_image_desktop.height }}"
-            >
-          {% endif %}
+            {%- comment -%} Background image — Desktop {%- endcomment -%}
+            {% if slide_bg_image_desktop != blank %}
+              <img
+                src="{{ slide_bg_image_desktop | image_url: width: 2400 }}"
+                alt=""
+                loading="eager"
+                class="hero-banner__bg hero-banner__bg--desktop"
+                width="{{ slide_bg_image_desktop.width }}"
+                height="{{ slide_bg_image_desktop.height }}"
+              >
+            {% endif %}
 
-          {%- comment -%} Content {%- endcomment -%}
-          <div class="hero-banner__content">
-            <div class="hero-banner__content-inner">
+            {%- comment -%} Content {%- endcomment -%}
+            <div class="hero-banner__content">
+              <div class="hero-banner__content-inner">
 
-              {% if rating_text != blank %}
-                <div class="hero-banner__rating hero-banner__rating--desktop">
-                  {% if block.settings.show_rating_star %}
+                {% if rating_text != blank %}
+                  <div class="hero-banner__rating hero-banner__rating--desktop">
+                    {% if block.settings.show_rating_star %}
+                      <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" style="color: #ffffff;">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                      </svg>
+                    {% endif %}
+                    <span>{{ rating_text }}</span>
+                  </div>
+                {% endif %}
+
+                {% if headline != blank %}
+                  <div class="hero-banner__headline">
+                    {{ headline }}
+                    {% if block.settings.show_headline_badge and block.settings.headline_badge_text != blank %}
+                      <span
+                        class="hero-banner__headline-badge"
+                        style="{% if block.settings.headline_badge_bg != blank and block.settings.headline_badge_bg.alpha != 0 %}background-color: {{ block.settings.headline_badge_bg }};{% endif %}{% if block.settings.headline_badge_color != blank and block.settings.headline_badge_color.alpha != 0 %}color: {{ block.settings.headline_badge_color }};{% endif %}"
+                      >{{ block.settings.headline_badge_text }}</span>
+                    {% endif %}
+                  </div>
+                {% endif %}
+
+                {%- assign subtitle = block.settings.subtitle -%}
+                {% if subtitle != blank %}
+                  <div class="hero-banner__subtitle">{{ subtitle }}</div>
+                {% endif %}
+
+                {% if description != blank %}
+                  <div class="hero-banner__description">
+                    {{ description }}
+                  </div>
+                {% endif %}
+
+                {% if cta_label != blank %}
+                  <div class="hero-banner__cta-wrap">
+                    <a href="{{ cta_url }}" class="hero-banner__cta">
+                      {{ cta_label }}
+                      {% if cta_badge_text != blank %}
+                        <span
+                          class="hero-banner__cta-badge"
+                          style="{% if cta_badge_bg != blank %}background-color: {{ cta_badge_bg }};{% endif %}{% if cta_badge_color != blank %}color: {{ cta_badge_color }};{% endif %}"
+                        >
+                          {{ cta_badge_text }}
+                        </span>
+                      {% endif %}
+                    </a>
+                  </div>
+                {% endif %}
+
+                {% if rating_text != blank %}
+                  <div class="hero-banner__rating hero-banner__rating--mobile">
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" style="color: #ffffff;">
                       <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                     </svg>
-                  {% endif %}
-                  <span>{{ rating_text }}</span>
-                </div>
-              {% endif %}
+                    <span>{{ rating_text }}</span>
+                  </div>
+                {% endif %}
 
-              {% if headline != blank %}
-                <div class="hero-banner__headline">
-                  {{ headline }}
-                  {% if block.settings.show_headline_badge and block.settings.headline_badge_text != blank %}
-                    <span
-                      class="hero-banner__headline-badge"
-                      style="{% if block.settings.headline_badge_bg != blank and block.settings.headline_badge_bg.alpha != 0 %}background-color: {{ block.settings.headline_badge_bg }};{% endif %}{% if block.settings.headline_badge_color != blank and block.settings.headline_badge_color.alpha != 0 %}color: {{ block.settings.headline_badge_color }};{% endif %}"
-                    >{{ block.settings.headline_badge_text }}</span>
-                  {% endif %}
-                </div>
-              {% endif %}
-
-              {%- assign subtitle = block.settings.subtitle -%}
-              {% if subtitle != blank %}
-                <div class="hero-banner__subtitle">{{ subtitle }}</div>
-              {% endif %}
-
-              {% if description != blank %}
-                <div class="hero-banner__description">
-                  {{ description }}
-                </div>
-              {% endif %}
-
-              {% if cta_label != blank %}
-                <div class="hero-banner__cta-wrap">
-                  <a href="{{ cta_url }}" class="hero-banner__cta">
-                    {{ cta_label }}
-                    {% if cta_badge_text != blank %}
-                      <span
-                        class="hero-banner__cta-badge"
-                        style="{% if cta_badge_bg != blank %}background-color: {{ cta_badge_bg }};{% endif %}{% if cta_badge_color != blank %}color: {{ cta_badge_color }};{% endif %}"
-                      >
-                        {{ cta_badge_text }}
+                {% if badge_1 != blank or badge_2 != blank or badge_3 != blank or badge_4 != blank %}
+                  <div class="hero-banner__badges{% if block.settings.custom_badge_styles %} m-custom{% endif %}">
+                    {% if badge_1 != blank %}
+                      <span class="hero-banner__badge-item">
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                          <path d="M11.667 3.5L5.25 9.917 2.333 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        {{ badge_1 }}
                       </span>
                     {% endif %}
-                  </a>
-                </div>
-              {% endif %}
+                    {% if badge_2 != blank %}
+                      <span class="hero-banner__badge-item">
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                          <path d="M11.667 3.5L5.25 9.917 2.333 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        {{ badge_2 }}
+                      </span>
+                    {% endif %}
+                    {% if badge_3 != blank %}
+                      <span class="hero-banner__badge-item">
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                          <path d="M11.667 3.5L5.25 9.917 2.333 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        {{ badge_3 }}
+                      </span>
+                    {% endif %}
+                    {% if badge_4 != blank %}
+                      <span class="hero-banner__badge-item">
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                          <path d="M11.667 3.5L5.25 9.917 2.333 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        {{ badge_4 }}
+                      </span>
+                    {% endif %}
+                  </div>
+                {% endif %}
 
-              {% if rating_text != blank %}
-                <div class="hero-banner__rating hero-banner__rating--mobile">
-                  <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" style="color: #ffffff;">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                  </svg>
-                  <span>{{ rating_text }}</span>
-                </div>
-              {% endif %}
-
-              {% if badge_1 != blank or badge_2 != blank or badge_3 != blank or badge_4 != blank %}
-                <div class="hero-banner__badges{% if block.settings.custom_badge_styles %} m-custom{% endif %}">
-                  {% if badge_1 != blank %}
-                    <span class="hero-banner__badge-item">
-                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                        <path d="M11.667 3.5L5.25 9.917 2.333 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
-                      {{ badge_1 }}
-                    </span>
-                  {% endif %}
-                  {% if badge_2 != blank %}
-                    <span class="hero-banner__badge-item">
-                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                        <path d="M11.667 3.5L5.25 9.917 2.333 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
-                      {{ badge_2 }}
-                    </span>
-                  {% endif %}
-                  {% if badge_3 != blank %}
-                    <span class="hero-banner__badge-item">
-                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                        <path d="M11.667 3.5L5.25 9.917 2.333 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
-                      {{ badge_3 }}
-                    </span>
-                  {% endif %}
-                  {% if badge_4 != blank %}
-                    <span class="hero-banner__badge-item">
-                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                        <path d="M11.667 3.5L5.25 9.917 2.333 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
-                      {{ badge_4 }}
-                    </span>
-                  {% endif %}
-                </div>
-              {% endif %}
-
+              </div>
             </div>
           </div>
-        </div>
 
-      {%- endfor -%}
+        {%- endfor -%}
 
-    </div>
+      </div>{%- comment -%} /.swiper-wrapper {%- endcomment -%}
 
-    {%- comment -%} Pagination dots {%- endcomment -%}
-    {% if section.blocks.size > 1 %}
-      <div class="hero-banner__pagination">
-        {% for block in section.blocks %}
-          <button
-            class="hero-banner__dot"
-            :class="content_slider.state.activeIndex === {{ forloop.index0 }} ? 'hero-banner__dot--active' : ''"
-            @click="content_slider.scrollToIndex({{ forloop.index0 }})"
-            aria-label="Slide {{ forloop.index }}"
-          ></button>
-        {% endfor %}
-      </div>
-    {% endif %}
+      {%- comment -%} Pagination dots (rendered by Swiper) {%- endcomment -%}
+      {% if section.blocks.size > 1 %}
+        <div class="swiper-pagination hero-banner__pagination"></div>
+      {% endif %}
+
+    </div>{%- comment -%} /.swiper {%- endcomment -%}
 
     {%- comment -%} Trust line {%- endcomment -%}
     {% if trust_line_text != blank %}
@@ -826,6 +799,50 @@
 {% endcapture %}
 
 {{ section_content }}
+
+{%- comment -%} Swiper init — only when more than one slide {%- endcomment -%}
+{%- if section.blocks.size > 1 -%}
+<script>
+(function () {
+  var SWIPER_JS  = {{ 'swiper-bundle.min.js'  | asset_url | json }};
+  var SWIPER_CSS = {{ 'swiper-bundle.min.css' | asset_url | json }};
+  var swiperId   = {{ hero_swiper_id | json }};
+  var autoDelay  = {{ auto_rotate | times: 1000 }};
+  var pauseHover = {{ pause_on_hover | json }};
+
+  function init() {
+    var el = document.getElementById(swiperId);
+    if (!el || el._sw) return;
+    el._sw = new Swiper(el, {
+      slidesPerView: 1,
+      loop: true,
+      grabCursor: true,
+      autoplay: autoDelay > 0
+        ? { delay: autoDelay, disableOnInteraction: false, pauseOnMouseEnter: pauseHover }
+        : false,
+      pagination: {
+        el: el.querySelector('.swiper-pagination'),
+        clickable: true,
+      },
+    });
+  }
+
+  if (window.Swiper) { init(); return; }
+  window._ctrSwiperCBs = window._ctrSwiperCBs || [];
+  window._ctrSwiperCBs.push(init);
+  if (document.getElementById('ctr-swiper-js')) return;
+  if (!document.getElementById('ctr-swiper-css')) {
+    var l = document.createElement('link');
+    l.id = 'ctr-swiper-css'; l.rel = 'stylesheet'; l.href = SWIPER_CSS;
+    document.head.appendChild(l);
+  }
+  var s = document.createElement('script');
+  s.id = 'ctr-swiper-js'; s.src = SWIPER_JS;
+  s.onload = function () { (window._ctrSwiperCBs || []).forEach(function (fn) { fn(); }); };
+  document.head.appendChild(s);
+})();
+</script>
+{%- endif -%}
 
 {% schema %}
 {

@@ -227,7 +227,7 @@
         {%- endfor -%}
 
       </div>
-
+ 
       {%- comment -%} RIGHT: Swiper testimonials {%- endcomment -%}
       <div class="rv__right">
         <div class="rv__slider swiper" id="{{ swiper_id }}">
@@ -260,22 +260,52 @@
 </div>
 
 <script>
-  window._ctrSwiperQ = window._ctrSwiperQ || [];
-  window._ctrSwiperQ.push(function () {
-    var el = document.getElementById({{ swiper_id | json }});
-    if (!el || el._sw) return;
-    el._sw = new Swiper(el, {
-      slidesPerView: 1,
-      spaceBetween: 32,
-      grabCursor: true,
-      {% if autoplay_on %}
-      autoplay: { delay: {{ autoplay_speed | times: 1000 }}, disableOnInteraction: false },
-      {% endif %}
-      {% if show_dots %}
-      pagination: { el: el.querySelector('.swiper-pagination'), clickable: true },
-      {% endif %}
-    });
-  });
+  (function () {
+    var SWIPER_JS  = {{ 'swiper-bundle.min.js'  | asset_url | json }};
+    var SWIPER_CSS = {{ 'swiper-bundle.min.css' | asset_url | json }};
+
+    function init() {
+      var el = document.getElementById({{ swiper_id | json }});
+      if (!el || el._sw) return;
+      el._sw = new Swiper(el, {
+        slidesPerView: 1,
+        spaceBetween: 32,
+        grabCursor: true,
+        {% if autoplay_on %}
+        autoplay: { delay: {{ autoplay_speed | times: 1000 }}, disableOnInteraction: false },
+        {% endif %}
+        {% if show_dots %}
+        pagination: { el: el.querySelector('.swiper-pagination'), clickable: true },
+        {% endif %}
+      });
+    }
+
+    /* Swiper уже загружен (напр. другой секцией) */
+    if (window.Swiper) { init(); return; }
+
+    /* Ставим в очередь */
+    window._ctrSwiperCBs = window._ctrSwiperCBs || [];
+    window._ctrSwiperCBs.push(init);
+
+    /* Загрузка уже запущена другой секцией — просто ждём */
+    if (document.getElementById('ctr-swiper-js')) return;
+
+    /* CSS */
+    if (!document.getElementById('ctr-swiper-css')) {
+      var l = document.createElement('link');
+      l.id = 'ctr-swiper-css'; l.rel = 'stylesheet'; l.href = SWIPER_CSS;
+      document.head.appendChild(l);
+    }
+
+    /* JS — грузим один раз */
+    var s = document.createElement('script');
+    s.id  = 'ctr-swiper-js';
+    s.src = SWIPER_JS;
+    s.onload = function () {
+      (window._ctrSwiperCBs || []).forEach(function (fn) { fn(); });
+    };
+    document.head.appendChild(s);
+  })();
 </script>
 
 {% schema %}
