@@ -3,6 +3,11 @@
   assign custom_css      = section.settings.custom_css
   assign section_id_attr = section.settings.section_id
   assign swiper_id       = 'imgc-' | append: section.id
+  assign scrollbar_id    = 'imgc-sb-' | append: section.id
+  assign nav_prev_id     = 'imgc-prev-' | append: section.id
+  assign nav_next_id     = 'imgc-next-' | append: section.id
+  assign show_scrollbar  = section.settings.show_scrollbar
+  assign show_nav        = section.settings.show_nav
   assign is_carousel     = false
   if section.settings.mobile_layout == 'carousel'
     assign is_carousel = true
@@ -18,6 +23,14 @@
     {% endif %}
     padding: {{ section.settings.padding_v }}px {{ section.settings.padding_h }}px;
     box-sizing: border-box;
+  }
+  @media (max-width: 767px) {
+    & {
+      padding-top: {{ section.settings.padding_v_mobile }}px;
+      padding-bottom: {{ section.settings.padding_v_mobile }}px;
+      padding-left: {{ section.settings.padding_h_mobile }}px;
+      padding-right: {{ section.settings.padding_h_mobile }}px;
+    }
   }
 
   & .imgc__inner {
@@ -44,7 +57,7 @@
 
   & .imgc__heading {
     font-size: {{ section.settings.heading_size_mobile }}px;
-    font-weight: 700;
+    font-weight: 400;
     line-height: 1.2;
     margin: 0;
     {% if section.settings.heading_color != blank and section.settings.heading_color.alpha != 0 %}
@@ -192,6 +205,62 @@
   & .swiper-pagination-bullet-active {
     opacity: 1;
   }
+
+  /* ─── Scrollbar + nav bottom bar ─── */
+  & .imgc__bottom {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-top: 10px;
+    padding-bottom: 30px;
+  }
+  & .imgc__scrollbar {
+    flex: 1;
+    height: 2px !important;
+    background: rgba(0,0,0,0.12) !important;
+    border-radius: 2px !important;
+    position: relative !important;
+    overflow: visible !important;
+    cursor: pointer;
+  }
+  & .imgc__scrollbar .swiper-scrollbar-drag {
+    height: 100% !important;
+    background: {{ section.settings.heading_color | default: '#1a1a1a' }} !important;
+    border-radius: 2px !important;
+    top: 0 !important;
+  }
+  & .imgc__nav {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  & .imgc__btn {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(0,0,0,0.2);
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    color: {{ section.settings.heading_color | default: '#1a1a1a' }};
+    transition: opacity 0.2s, border-color 0.2s;
+    flex-shrink: 0;
+  }
+  & .imgc__btn:hover {
+    opacity: 0.6;
+  }
+  & .imgc__btn svg {
+    display: block;
+    flex-shrink: 0;
+  }
+  @media (min-width: 768px) {
+    & .imgc__bottom {
+      display: none;
+    }
+  }
 {% endcapture %}
 
 <style>
@@ -253,17 +322,47 @@
       {%- endif -%}
     </div>
 
+    {%- if is_carousel -%}{%- if show_scrollbar or show_nav -%}
+      <div class="imgc__bottom">
+
+        {%- if show_scrollbar -%}
+          <div class="imgc__scrollbar" id="{{ scrollbar_id }}"></div>
+        {%- endif -%}
+
+        {%- if show_nav -%}
+          <div class="imgc__nav">
+            <button class="imgc__btn imgc__btn--prev" id="{{ nav_prev_id }}" aria-label="Previous slide">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M10 12L6 8L10 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <button class="imgc__btn imgc__btn--next" id="{{ nav_next_id }}" aria-label="Next slide">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M6 4L10 8L6 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </div>
+        {%- endif -%}
+
+      </div>
+    {%- endif -%}{%- endif -%}
+
   </div>
 </div>
 
 {%- if is_carousel -%}
 <script>
 (function () {
-  var SWIPER_JS  = {{ 'swiper-bundle.min.js'  | asset_url | json }};
-  var SWIPER_CSS = {{ 'swiper-bundle.min.css' | asset_url | json }};
-  var swiperId   = {{ swiper_id | json }};
-  var spv        = parseFloat({{ section.settings.slides_per_view_mobile | json }}) || 1.2;
-  var showDots   = {{ section.settings.show_dots | json }};
+  var SWIPER_JS     = {{ 'swiper-bundle.min.js'  | asset_url | json }};
+  var SWIPER_CSS    = {{ 'swiper-bundle.min.css' | asset_url | json }};
+  var swiperId      = {{ swiper_id | json }};
+  var scrollbarId   = {{ scrollbar_id | json }};
+  var navPrevId     = {{ nav_prev_id | json }};
+  var navNextId     = {{ nav_next_id | json }};
+  var spv           = parseFloat({{ section.settings.slides_per_view_mobile | json }}) || 1.2;
+  var showDots      = {{ section.settings.show_dots | json }};
+  var showScrollbar = {{ show_scrollbar | json }};
+  var showNav       = {{ show_nav | json }};
 
   function init() {
     if (window.innerWidth >= 768) return;
@@ -274,6 +373,8 @@
       spaceBetween: 16,
       grabCursor: true,
       pagination: showDots ? { el: el.querySelector('.swiper-pagination'), clickable: true } : false,
+      scrollbar: showScrollbar ? { el: document.getElementById(scrollbarId), draggable: true } : false,
+      navigation: showNav ? { prevEl: document.getElementById(navPrevId), nextEl: document.getElementById(navNextId) } : false,
     });
   }
 
@@ -412,6 +513,18 @@
       "type": "checkbox",
       "id": "show_dots",
       "label": "Show pagination dots (carousel only)",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_scrollbar",
+      "label": "Show progress bar (carousel only)",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_nav",
+      "label": "Show prev/next arrows (carousel only)",
       "default": true
     },
     {
@@ -448,7 +561,7 @@
     {
       "type": "range",
       "id": "padding_v",
-      "label": "Section padding vertical (px)",
+      "label": "Padding vertical — Desktop (px)",
       "default": 72,
       "min": 0,
       "max": 120,
@@ -458,8 +571,28 @@
     {
       "type": "range",
       "id": "padding_h",
-      "label": "Section padding horizontal (px)",
+      "label": "Padding horizontal — Desktop (px)",
       "default": 24,
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_v_mobile",
+      "label": "Padding vertical — Mobile (px)",
+      "default": 48,
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_h_mobile",
+      "label": "Padding horizontal — Mobile (px)",
+      "default": 16,
       "min": 0,
       "max": 80,
       "step": 4,

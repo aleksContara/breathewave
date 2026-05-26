@@ -21,6 +21,12 @@
     padding: {{ section.settings.padding_top }}px {{ section.settings.padding_horizontal }}px {{ section.settings.padding_bottom }}px;
     box-sizing: border-box;
   }
+  @media (max-width: 767px) {
+    & {
+      padding-top: {{ section.settings.padding_top_mobile }}px;
+      padding-bottom: {{ section.settings.padding_bottom_mobile }}px;
+    }
+  }
 
   & .ic__inner {
     max-width: {{ section.settings.max_width }}px;
@@ -42,9 +48,10 @@
 
   & .ic__heading {
     font-size: {{ section.settings.heading_size_mobile }}px;
-    font-weight: 700;
+    font-weight: 400;
     line-height: 1.15;
     margin: 0;
+    text-align: center;
     {% if section.settings.heading_color != blank and section.settings.heading_color.alpha != 0 %}color: {{ section.settings.heading_color }};{% endif %}
   }
   & .ic__heading h1,
@@ -142,6 +149,7 @@
   @media (min-width: 768px) {
     & .ic__heading {
       font-size: {{ section.settings.heading_size_desktop }}px;
+      text-align: left;
     }
 
     /* Swiper reset → CSS grid on desktop */
@@ -448,7 +456,7 @@
     {
       "type": "range",
       "id": "padding_top",
-      "label": "Padding top (px)",
+      "label": "Padding top — Desktop (px)",
       "default": 60,
       "min": 0,
       "max": 120,
@@ -458,8 +466,28 @@
     {
       "type": "range",
       "id": "padding_bottom",
-      "label": "Padding bottom (px)",
+      "label": "Padding bottom — Desktop (px)",
       "default": 60,
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "label": "Padding top — Mobile (px)",
+      "default": 40,
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "label": "Padding bottom — Mobile (px)",
+      "default": 40,
       "min": 0,
       "max": 120,
       "step": 4,

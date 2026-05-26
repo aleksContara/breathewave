@@ -86,6 +86,14 @@
     display: block;
   }
 
+  & .hero-banner__overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: none;
+    pointer-events: none;
+  }
+
   & .hero-banner__content {
     position: relative;
     z-index: 10;
@@ -93,7 +101,7 @@
     flex-grow: 1;
     width: 100%;
     box-sizing: border-box;
-    padding: 32px 24px;
+    padding: 32px 24px 48px 24px;
   }
 
   & .hero-banner__content-inner {
@@ -104,7 +112,7 @@
   }
 
   & .hero-banner__headline {
-    font-weight: 300;
+    font-weight: 400;
     line-height: 1.1;
     margin: 0;
   }
@@ -180,7 +188,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 14px 32px;
+    padding: 12px 32px;
     font-weight: 400;
     border-radius: 24px;
     text-decoration: none;
@@ -236,6 +244,11 @@
     transform: translateX(0);
     z-index: 20;
     width: auto;
+
+    @media (max-width: 767px) {
+      bottom: 16px;
+      left: 20px;
+    }
   }
   & .hero-banner__pagination .swiper-pagination-bullet {
     width: 10px;
@@ -386,6 +399,7 @@
       assign cta_size_desktop = block.settings.cta_size_desktop
       assign cta_size_mobile = block.settings.cta_size_mobile
       assign cta_full_width = block.settings.cta_full_width
+      assign cta_full_width_mobile = block.settings.cta_full_width_mobile
       assign badges_color = block.settings.badges_color
       assign badges_size = block.settings.badges_size
       assign custom_badge_styles = block.settings.custom_badge_styles
@@ -501,14 +515,9 @@
         {% if cta_text_color != blank and cta_text_color.alpha != 0 %}color: {{ cta_text_color }};{% endif %}
         font-size: {{ cta_size_mobile }}px;
       }
-      {% if cta_full_width %}
-        & .hero-banner__cta-wrap {
-          width: 100%;
-        }
-        & .hero-banner__cta {
-          display: flex;
-          width: 100%;
-        }
+      {% if cta_full_width_mobile %}
+        & .hero-banner__cta-wrap { width: 100%; }
+        & .hero-banner__cta { display: flex; width: 100%; }
       {% endif %}
       & .hero-banner__badges {
         {% if badges_color != blank and badges_color.alpha != 0 %}color: {{ badges_color }};{% endif %}
@@ -540,6 +549,7 @@
         }
         & .hero-banner__cta {
           font-size: {{ cta_size_desktop }}px;
+          padding: 16px 32px;
         }
         & .hero-banner__rating {
           justify-content: {{ flex_align_desktop }};
@@ -547,7 +557,21 @@
         & .hero-banner__badges {
           justify-content: {{ flex_align_desktop }};
         }
+        {% if cta_full_width %}
+          & .hero-banner__cta-wrap { width: 100%; }
+          & .hero-banner__cta { display: flex; width: 100%; }
+        {% elsif cta_full_width_mobile %}
+          & .hero-banner__cta-wrap { width: auto; }
+          & .hero-banner__cta { display: inline-flex; width: max-content; }
+        {% endif %}
       }
+      {% if block.settings.overlay_enabled %}
+        & .hero-banner__overlay {
+          display: block;
+          background-color: {{ block.settings.overlay_color | default: '#000000' }};
+          opacity: {{ block.settings.overlay_opacity | times: 0.01 }};
+        }
+      {% endif %}
     {% endcapture %}
 
     <style>
@@ -636,12 +660,15 @@
               >
             {% endif %}
 
+            {%- comment -%} Overlay {%- endcomment -%}
+            <div class="hero-banner__overlay"></div>
+
             {%- comment -%} Content {%- endcomment -%}
             <div class="hero-banner__content">
               <div class="hero-banner__content-inner">
 
                 {% if rating_text != blank %}
-                  <div class="hero-banner__rating hero-banner__rating--desktop">
+                  <div class="hero-banner__rating">
                     {% if block.settings.show_rating_star %}
                       <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" style="color: #ffffff;">
                         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
@@ -687,15 +714,6 @@
                         </span>
                       {% endif %}
                     </a>
-                  </div>
-                {% endif %}
-
-                {% if rating_text != blank %}
-                  <div class="hero-banner__rating hero-banner__rating--mobile">
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" style="color: #ffffff;">
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                    </svg>
-                    <span>{{ rating_text }}</span>
                   </div>
                 {% endif %}
 
@@ -1115,6 +1133,38 @@
         },
         {
           "type": "header",
+          "content": "Overlay"
+        },
+        {
+          "type": "checkbox",
+          "id": "overlay_enabled",
+          "label": "Enable overlay",
+          "default": false
+        },
+        {
+          "type": "color",
+          "id": "overlay_color",
+          "label": "Overlay color",
+          "default": "#000000",
+          "visible_if": "{{ block.settings.overlay_enabled }}"
+        },
+        {
+          "type": "range",
+          "id": "overlay_opacity",
+          "label": "Overlay opacity (%)",
+          "default": 40,
+          "min": 0,
+          "max": 100,
+          "step": 5,
+          "unit": "%",
+          "visible_if": "{{ block.settings.overlay_enabled }}"
+        },
+        {
+          "type": "paragraph",
+          "content": "t:all.empty_char"
+        },
+        {
+          "type": "header",
           "content": "Content Container"
         },
         {
@@ -1452,7 +1502,13 @@
         {
           "type": "checkbox",
           "id": "cta_full_width",
-          "label": "Full width button",
+          "label": "Full width — Desktop",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "cta_full_width_mobile",
+          "label": "Full width — Mobile",
           "default": false
         },
         {

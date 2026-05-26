@@ -38,7 +38,7 @@
     margin: 0 0 8px;
     color: {{ section.settings.eyebrow_color }};
     font-size: {{ section.settings.eyebrow_size }}px;
-    font-weight: 700;
+    font-weight: 400;
     line-height: 1.2;
     text-transform: uppercase;
   }
@@ -47,7 +47,7 @@
     margin: 0;
     color: {{ section.settings.text_color }};
     font-size: {{ section.settings.heading_size_desktop }}px;
-    font-weight: 500;
+    font-weight: 400;
     line-height: 1.04;
   }
 
@@ -57,7 +57,7 @@
     align-items: center;
     gap: 12px;
     color: {{ section.settings.text_color }};
-    font-weight: 700;
+    font-weight: 400;
     line-height: 1;
     text-decoration: none;
     border-bottom: 2px solid currentColor;
@@ -192,8 +192,8 @@
 
   & .al__list {
     display: grid;
+    grid-template-rows: 1fr 1fr;
     gap: {{ section.settings.list_gap }}px;
-    align-content: stretch;
   }
 
   & .al__article {
@@ -217,13 +217,14 @@
     border-radius: {{ section.settings.list_image_radius }}px;
     overflow: hidden;
     background: #d8dde8;
-  }
+    align-self: flex-start;
+  } 
 
   & .al__article-title {
     margin: 0 0 24px;
     color: {{ section.settings.text_color }};
     font-size: {{ section.settings.list_title_size }}px;
-    font-weight: 700;
+    font-weight: 400;
     line-height: 1.16;
   }
 
@@ -769,7 +770,7 @@
       "type": "range",
       "id": "list_title_size_mobile",
       "label": "Mobile list title size",
-      "min": 20,
+      "min": 14,
       "max": 36,
       "step": 1,
       "unit": "px",

@@ -84,20 +84,25 @@
     position: absolute;
     inset: 0;
     z-index: 1;
-    opacity: {{ section.settings.overlay_opacity | times: 0.01 }};
-    {% if section.settings.overlay_direction == 'none' %}
+    pointer-events: none;
+    {% unless section.settings.overlay_enabled %}
       display: none;
-    {% elsif section.settings.overlay_direction == 'fill' %}
-      background: {{ section.settings.overlay_color }};
-    {% elsif section.settings.overlay_direction == 'left' %}
-      background: linear-gradient(to right, {{ section.settings.overlay_color }}, transparent 70%);
-    {% elsif section.settings.overlay_direction == 'right' %}
-      background: linear-gradient(to left, {{ section.settings.overlay_color }}, transparent 70%);
-    {% elsif section.settings.overlay_direction == 'top' %}
-      background: linear-gradient(to bottom, {{ section.settings.overlay_color }}, transparent 70%);
-    {% elsif section.settings.overlay_direction == 'bottom' %}
-      background: linear-gradient(to top, {{ section.settings.overlay_color }}, transparent 70%);
-    {% endif %}
+    {% else %}
+      opacity: {{ section.settings.overlay_opacity | times: 0.01 }};
+      {% if section.settings.overlay_direction == 'none' %}
+        display: none;
+      {% elsif section.settings.overlay_direction == 'fill' %}
+        background: {{ section.settings.overlay_color }};
+      {% elsif section.settings.overlay_direction == 'left' %}
+        background: linear-gradient(to right, {{ section.settings.overlay_color }}, transparent 70%);
+      {% elsif section.settings.overlay_direction == 'right' %}
+        background: linear-gradient(to left, {{ section.settings.overlay_color }}, transparent 70%);
+      {% elsif section.settings.overlay_direction == 'top' %}
+        background: linear-gradient(to bottom, {{ section.settings.overlay_color }}, transparent 70%);
+      {% elsif section.settings.overlay_direction == 'bottom' %}
+        background: linear-gradient(to top, {{ section.settings.overlay_color }}, transparent 70%);
+      {% endif %}
+    {% endunless %}
   }
 
   /* ── Content positioning ── */
@@ -185,6 +190,10 @@
     width: max-content;
     transition: opacity 0.2s;
     margin-top: 4px;
+
+    @media (max-width: 767px) {
+      width: 100%;
+    }
   }
   & .icc__cta:hover { opacity: 0.88; }
 
@@ -287,10 +296,8 @@
         >
       {%- endif -%}
 
-      {%- comment -%} Gradient overlay {%- endcomment -%}
-      {%- if section.settings.overlay_direction != 'none' -%}
-        <div class="icc__overlay"></div>
-      {%- endif -%}
+      {%- comment -%} Overlay {%- endcomment -%}
+      <div class="icc__overlay"></div>
 
       {%- comment -%} Content {%- endcomment -%}
       <div class="icc__content">
@@ -398,24 +405,31 @@
       "content": "Overlay"
     },
     {
+      "type": "checkbox",
+      "id": "overlay_enabled",
+      "label": "Enable overlay",
+      "default": false
+    },
+    {
       "type": "select",
       "id": "overlay_direction",
       "label": "Gradient direction",
-      "default": "left",
+      "default": "fill",
       "options": [
-        { "value": "none",   "label": "None" },
         { "value": "fill",   "label": "Solid fill" },
         { "value": "left",   "label": "From left" },
         { "value": "right",  "label": "From right" },
         { "value": "top",    "label": "From top" },
         { "value": "bottom", "label": "From bottom" }
-      ]
+      ],
+      "visible_if": "{{ section.settings.overlay_enabled }}"
     },
     {
       "type": "color",
       "id": "overlay_color",
       "label": "Overlay color",
-      "default": "#000000"
+      "default": "#000000",
+      "visible_if": "{{ section.settings.overlay_enabled }}"
     },
     {
       "type": "range",
@@ -425,7 +439,8 @@
       "min": 0,
       "max": 100,
       "step": 5,
-      "unit": "%"
+      "unit": "%",
+      "visible_if": "{{ section.settings.overlay_enabled }}"
     },
     {
       "type": "paragraph",

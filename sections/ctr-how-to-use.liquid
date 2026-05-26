@@ -24,7 +24,7 @@
     {% if section.settings.card_bg != blank and section.settings.card_bg.alpha != 0 %}
       background-color: {{ section.settings.card_bg }};
     {% endif %}
-    border-radius: {{ section.settings.card_radius }}px;
+    border-radius: 32px;
     padding: {{ section.settings.card_padding_v }}px {{ section.settings.card_padding_h }}px;
     box-sizing: border-box;
   }
@@ -48,7 +48,7 @@
 
   & .htu__heading {
     font-size: {{ section.settings.heading_size_mobile }}px;
-    font-weight: 700;
+    font-weight: 400;
     line-height: 1.15;
     margin: 0;
     {% if section.settings.heading_color != blank and section.settings.heading_color.alpha != 0 %}
@@ -83,17 +83,24 @@
 
   & .htu__step-image-wrap {
     width: 100%;
-    border-radius: {{ section.settings.step_card_radius }}px;
     overflow: hidden;
-    border: 1px solid {{ section.settings.step_card_border | default: 'rgba(255,255,255,0.15)' }};
+    {% comment %} border: 1px solid {{ section.settings.step_card_border }}; {% endcomment %}
     line-height: 0;
-    background: {{ section.settings.step_card_bg | default: 'rgba(255,255,255,0.04)' }};
+    background: {{ section.settings.step_card_bg }};
   }
+
   & .htu__step-image-wrap img {
     display: block;
     width: 100%;
     height: auto;
     object-fit: cover;
+  }
+
+  & .htu__step-text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
   }
 
   & .htu__step-label {
@@ -115,6 +122,26 @@
     {% endif %}
   }
   & .htu__step-desc p { margin: 0; }
+
+  @media (max-width: 767px) {
+    & .htu__step {
+      flex-direction: row;
+      align-items: flex-start;
+      text-align: left;
+    }
+    & .htu__step-image-wrap {
+      width: 135px;
+      flex-shrink: 0;
+    }
+    & .htu__step-text {
+      flex: 1;
+      min-width: 0;
+      align-items: flex-start;
+    }
+    & .htu__step-desc {
+      max-width: none;
+    }
+  }
 
   & .htu__note {
     text-align: center;
@@ -178,13 +205,15 @@
                 </div>
               {%- endif -%}
 
-              {%- if block.settings.step_label != blank -%}
-                <div class="htu__step-label">{{ block.settings.step_label }}</div>
-              {%- endif -%}
+              <div class="htu__step-text">
+                {%- if block.settings.step_label != blank -%}
+                  <div class="htu__step-label">{{ block.settings.step_label }}</div>
+                {%- endif -%}
 
-              {%- if block.settings.description != blank -%}
-                <div class="htu__step-desc">{{ block.settings.description }}</div>
-              {%- endif -%}
+                {%- if block.settings.description != blank -%}
+                  <div class="htu__step-desc">{{ block.settings.description }}</div>
+                {%- endif -%}
+              </div>
 
             </div>
           {%- endfor -%}
@@ -395,22 +424,6 @@
       "alpha": true,
       "id": "step_card_bg",
       "label": "Step image card background"
-    },
-    {
-      "type": "color",
-      "alpha": true,
-      "id": "step_card_border",
-      "label": "Step image card border color"
-    },
-    {
-      "type": "range",
-      "id": "step_card_radius",
-      "label": "Step image card radius (px)",
-      "default": 16,
-      "min": 0,
-      "max": 32,
-      "step": 2,
-      "unit": "px"
     },
     {
       "type": "paragraph",

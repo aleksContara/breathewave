@@ -34,16 +34,24 @@
     {% if section.settings.eyebrow_color != blank and section.settings.eyebrow_color.alpha != 0 %}
       color: {{ section.settings.eyebrow_color }};
     {% endif %}
+
+    @media (max-width: 767px) {
+      text-align: center;
+    }
   }
 
   & .cc__heading {
     font-size: {{ section.settings.heading_size_mobile }}px;
-    font-weight: 700;
+    font-weight: 400;
     line-height: 1.2;
     margin: 0;
     {% if section.settings.heading_color != blank and section.settings.heading_color.alpha != 0 %}
       color: {{ section.settings.heading_color }};
     {% endif %}
+
+    @media (max-width: 767px) {
+      text-align: center;
+    }
   }
   & .cc__heading h1, & .cc__heading h2, & .cc__heading h3, & .cc__heading p {
     font-size: inherit; font-weight: inherit; line-height: inherit; color: inherit; margin: 0;
@@ -118,7 +126,7 @@
 
   & .cc__card-title {
     font-size: {{ section.settings.title_size }}px;
-    font-weight: 700;
+    font-weight: 400;
     line-height: 1.2;
     margin: 0;
     {% if section.settings.title_color != blank and section.settings.title_color.alpha != 0 %}
@@ -133,6 +141,10 @@
     display: flex;
     flex-direction: column;
     gap: 6px;
+
+    @media (max-width: 767px) {
+      gap: 2px;
+    }
   }
   & .cc__card-bullets li {
     display: flex;

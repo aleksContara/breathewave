@@ -55,7 +55,7 @@
 
   & .rv__heading {
     font-size: {{ section.settings.heading_size_mobile }}px;
-    font-weight: 700;
+    font-weight: 300;
     line-height: 1.1;
     margin: 0;
     {% if section.settings.heading_color != blank and section.settings.heading_color.alpha != 0 %}
@@ -76,17 +76,33 @@
   & .rv__cta-wrap {
     display: flex;
   }
+  & .rv__cta-mobile {
+    display: none;
+  }
+  @media (max-width: 767px) {
+    & .rv__left .rv__cta-wrap {
+      display: none;
+    }
+    & .rv__cta-mobile {
+      display: flex;
+    }
+  }
   & .rv__cta {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     padding: 14px 32px;
     border-radius: 100px;
-    font-weight: 600;
+    font-weight: 400;
     text-decoration: none;
     transition: opacity 0.2s;
     font-size: {{ section.settings.cta_size }}px;
     white-space: nowrap;
+
+    @media (max-width: 767px) {
+      padding: 12px 32px;
+      width: 100%;
+    }
   }
   & .rv__cta:hover { opacity: 0.85; }
 
@@ -97,6 +113,7 @@
 
   & .rv__slider {
     position: relative;
+    padding-bottom: {{ section.settings.dots_spacing }}px;
   }
   & .rv__slider .swiper-wrapper {
     align-items: flex-start;
@@ -111,7 +128,7 @@
 
   & .rv__quote-headline {
     font-size: {{ section.settings.quote_headline_size_mobile }}px;
-    font-weight: 700;
+    font-weight: 400;
     line-height: 1.2;
     margin: 0;
     {% if section.settings.quote_headline_color != blank and section.settings.quote_headline_color.alpha != 0 %}
@@ -139,10 +156,14 @@
   }
 
   & .rv__pagination {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: {{ section.settings.dots_spacing }}px;
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-top: 24px;
   }
   & .rv__pagination .swiper-pagination-bullet {
     width: 10px;
@@ -254,6 +275,22 @@
           {%- endif -%}
         </div>
       </div>
+
+      {%- comment -%} CTA — mobile only, rendered below the slider {%- endcomment -%}
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'cta' -%}
+          <div class="rv__cta-mobile rv__cta-wrap" {{ block.shopify_attributes }}>
+            <a
+              href="{{ block.settings.cta_url }}"
+              class="rv__cta"
+              style="
+                {% if block.settings.cta_bg != blank and block.settings.cta_bg.alpha != 0 %}background-color: {{ block.settings.cta_bg }};{% endif %}
+                {% if block.settings.cta_color != blank and block.settings.cta_color.alpha != 0 %}color: {{ block.settings.cta_color }};{% endif %}
+              "
+            >{{ block.settings.cta_label }}</a>
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
 
     </div>
   </div>
@@ -405,6 +442,17 @@
       "id": "show_dots",
       "label": "Show pagination dots",
       "default": true
+    },
+    {
+      "type": "range",
+      "id": "dots_spacing",
+      "label": "Pagination dots spacing (px)",
+      "info": "Bottom padding added to the slider to make room for the dots.",
+      "default": 44,
+      "min": 20,
+      "max": 80,
+      "step": 4,
+      "unit": "px"
     },
     {
       "type": "paragraph",
