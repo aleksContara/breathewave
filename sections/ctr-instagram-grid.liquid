@@ -1,9 +1,11 @@
 {%- comment -%} Instagram Feed - ctr-instagram-grid.liquid {%- endcomment -%}
+{% assign ctr_swiper_needed = true %}
 {%- liquid
   assign section_id_attr = section.settings.section_id
   assign custom_css = section.settings.custom_css
   assign app_blocks = section.blocks | where: 'type', '@app'
   assign image_blocks = section.blocks | where: 'type', 'image'
+  assign swiper_id = 'ig-swiper-' | append: section.id
 -%}
 
 {% capture selector %}[data-style-id="{{ section.id }}"]{% endcapture %}
@@ -40,9 +42,28 @@
   }
 
   & .ig__grid {
-    display: grid;
-    grid-template-columns: repeat({{ section.settings.columns_desktop }}, minmax(0, 1fr));
-    gap: {{ section.settings.gap }}px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Desktop: override Swiper → CSS grid */
+  @media (min-width: 750px) {
+    & .ig__grid {
+      overflow: visible;
+    }
+    & .ig__grid .swiper-wrapper {
+      display: grid !important;
+      grid-template-columns: repeat({{ section.settings.columns_desktop }}, minmax(0, 1fr));
+      gap: {{ section.settings.gap }}px;
+      transform: none !important;
+      transition: none !important;
+      will-change: auto !important;
+    }
+    & .ig__grid .swiper-slide {
+      width: auto !important;
+      height: auto !important;
+      margin-right: 0 !important;
+    }
   }
 
   & .ig__item {
@@ -86,10 +107,7 @@
       font-size: {{ section.settings.heading_size_mobile }}px;
     }
 
-    & .ig__grid {
-      grid-template-columns: repeat({{ section.settings.columns_mobile }}, minmax(0, 1fr));
-      gap: {{ section.settings.gap_mobile }}px;
-    }
+    /* mobile layout handled by Swiper */
   }
 {% endcapture %}
 
@@ -118,57 +136,116 @@
         {%- content_for 'blocks' -%}
       </div>
     {%- else -%}
-      <div class="ig__grid">
-        {%- if image_blocks.size > 0 -%}
-          {%- for block in image_blocks -%}
-            {%- liquid
-              assign image_url = block.settings.link
-              if image_url == blank
-                assign image_url = section.settings.handle_link
-              endif
-            -%}
+      <div class="ig__grid swiper" id="{{ swiper_id }}">
+        <div class="swiper-wrapper">
+          {%- if image_blocks.size > 0 -%}
+            {%- for block in image_blocks -%}
+              {%- liquid
+                assign image_url = block.settings.link
+                if image_url == blank
+                  assign image_url = section.settings.handle_link
+                endif
+              -%}
 
-            {%- if image_url != blank -%}
-              <a class="ig__item" href="{{ image_url }}" {{ block.shopify_attributes }}>
-            {%- else -%}
-              <div class="ig__item" {{ block.shopify_attributes }}>
-            {%- endif -%}
-
-              {%- if block.settings.image != blank -%}
-                {{
-                  block.settings.image
-                  | image_url: width: 900
-                  | image_tag:
-                    loading: 'lazy',
-                    widths: '320, 480, 640, 800, 900',
-                    sizes: '(min-width: 990px) 20vw, 50vw',
-                    class: 'ig__image'
-                }}
+              {%- if image_url != blank -%}
+                <a class="ig__item swiper-slide" href="{{ image_url }}" {{ block.shopify_attributes }}>
               {%- else -%}
+                <div class="ig__item swiper-slide" {{ block.shopify_attributes }}>
+              {%- endif -%}
+
+                {%- if block.settings.image != blank -%}
+                  {{
+                    block.settings.image
+                    | image_url: width: 900
+                    | image_tag:
+                      loading: 'lazy',
+                      widths: '320, 480, 640, 800, 900',
+                      sizes: '(min-width: 990px) 20vw, 50vw',
+                      class: 'ig__image'
+                  }}
+                {%- else -%}
+                  <div class="ig__placeholder">
+                    {{ 'lifestyle-1' | placeholder_svg_tag }}
+                  </div>
+                {%- endif -%}
+
+              {%- if image_url != blank -%}
+                </a>
+              {%- else -%}
+                </div>
+              {%- endif -%}
+            {%- endfor -%}
+          {%- else -%}
+            {%- for i in (1..section.settings.placeholder_count) -%}
+              <div class="ig__item swiper-slide">
                 <div class="ig__placeholder">
                   {{ 'lifestyle-1' | placeholder_svg_tag }}
                 </div>
-              {%- endif -%}
-
-            {%- if image_url != blank -%}
-              </a>
-            {%- else -%}
               </div>
-            {%- endif -%}
-          {%- endfor -%}
-        {%- else -%}
-          {%- for i in (1..section.settings.placeholder_count) -%}
-            <div class="ig__item">
-              <div class="ig__placeholder">
-                {{ 'lifestyle-1' | placeholder_svg_tag }}
-              </div>
-            </div>
-          {%- endfor -%}
-        {%- endif -%}
+            {%- endfor -%}
+          {%- endif -%}
+        </div>
       </div>
     {%- endif -%}
   </div>
 </div>
+
+<script>
+  (function () {
+    var SWIPER_JS  = {{ 'swiper-bundle.min.js'  | asset_url | json }};
+    var SWIPER_CSS = {{ 'swiper-bundle.min.css' | asset_url | json }};
+    var SWIPER_ID  = {{ swiper_id | json }};
+    var GAP        = {{ section.settings.gap_mobile }};
+
+    function initSwiper() {
+      var el = document.getElementById(SWIPER_ID);
+      if (!el) return;
+
+      var mql = window.matchMedia('(max-width: 749px)');
+
+      function update(e) {
+        if (e.matches) {
+          if (!el._sw) {
+            el._sw = new Swiper(el, {
+              slidesPerView: 2.5,
+              spaceBetween: GAP,
+              grabCursor: true,
+            });
+          }
+        } else {
+          if (el._sw) {
+            el._sw.destroy(true, true);
+            el._sw = null;
+          }
+        }
+      }
+
+      mql.addEventListener('change', update);
+      update(mql);
+    }
+
+    if (window.Swiper) { initSwiper(); return; }
+
+    window._ctrSwiperCBs = window._ctrSwiperCBs || [];
+    window._ctrSwiperCBs.push(initSwiper);
+
+    if (document.getElementById('ctr-swiper-js')) return;
+
+    if (!document.getElementById('ctr-swiper-css')) {
+      var l = document.createElement('link');
+      l.id = 'ctr-swiper-css'; l.rel = 'stylesheet'; l.href = SWIPER_CSS;
+      document.head.appendChild(l);
+    }
+
+    var s = document.createElement('script');
+    s.id  = 'ctr-swiper-js';
+    s.src = SWIPER_JS;
+    s.onload = function () {
+      (window._ctrSwiperCBs || []).forEach(function (fn) { fn(); });
+    };
+    document.head.appendChild(s);
+  })();
+</script>
 
 {% schema %}
 {
@@ -217,9 +294,10 @@
       "default": "@breathewave"
     },
     {
-      "type": "url",
+      "type": "text",
       "id": "handle_link",
-      "label": "Default image link"
+      "label": "Default image link",
+      "default": "https://www.instagram.com/breathewave/"
     },
     {
       "type": "range",
