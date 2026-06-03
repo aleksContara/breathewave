@@ -103,6 +103,8 @@
           assign ctr_shop_product_count = 0
 
           if block_settings.ctr_shop_enable and ctr_menu_role == 'shop'
+            assign render_ctr_shop_mega = true
+
             for child_block in section.blocks
               if child_block.type == 'ctr-shop-intro'
                 assign ctr_shop_intro_block = child_block
@@ -110,10 +112,6 @@
                 assign ctr_shop_product_count = ctr_shop_product_count | plus: 1
               endif
             endfor
-
-            if ctr_shop_intro_block != blank or ctr_shop_product_count > 0
-              assign render_ctr_shop_mega = true
-            endif
           endif
         %}
         <li
@@ -247,6 +245,12 @@
                           </a>
                         {% endif %}
                       {% endfor %}
+
+                      {% if ctr_shop_intro_block == blank and ctr_shop_product_count == 0 and request.design_mode %}
+                        <div class="ctr-shop-mega__empty">
+                          Add CTR Shop intro and CTR Shop product blocks to this header.
+                        </div>
+                      {% endif %}
                     </div>
                   </div>
                 {% else %}
@@ -917,6 +921,16 @@
     font-weight: 700;
     line-height: 1.2;
     text-align: center;
+    white-space: normal;
+  }
+
+  #header-component .ctr-shop-mega__empty {
+    grid-column: 1 / -1;
+    padding: var(--padding-xl);
+    border: 1px dashed rgb(var(--color-foreground-rgb) / 0.3);
+    border-radius: var(--ctr-shop-card-radius);
+    color: rgb(var(--color-foreground-rgb) / 0.7);
+    font-size: 14px;
     white-space: normal;
   }
 
