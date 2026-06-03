@@ -64,6 +64,12 @@
             "ctr_science_menu_handle": "science",
             "ctr_shop_menu_handle": "shop",
             "ctr_explore_menu_handle": "explore",
+            "ctr_shop_enable": true,
+            "ctr_shop_color_scheme": "scheme-1",
+            "ctr_shop_columns": 5,
+            "ctr_shop_padding": 18,
+            "ctr_shop_border_radius": 24,
+            "ctr_shop_card_radius": 18,
             "color_scheme": "",
             "type_font_primary_size": "0.875rem",
             "menu_font_style": "inverse",
@@ -80,8 +86,66 @@
             "drawer_dividers": false
           },
           "blocks": {}
+        },
+        "ctr-shop-intro": {
+          "type": "ctr-shop-intro",
+          "settings": {
+            "rating_count": 5,
+            "rating_color": "#000000",
+            "heading": "world's most comfortable nasal dilator",
+            "cta_label": "Shop all",
+            "cta_link": "/collections/all"
+          },
+          "blocks": {}
+        },
+        "ctr-shop-product-starter": {
+          "type": "ctr-shop-product",
+          "settings": {
+            "product": "",
+            "image": "",
+            "label": "Starter Pack",
+            "link": "/products/starter-pack"
+          },
+          "blocks": {}
+        },
+        "ctr-shop-product-three": {
+          "type": "ctr-shop-product",
+          "settings": {
+            "product": "",
+            "image": "",
+            "label": "Three Pack",
+            "link": "/products/three-pack"
+          },
+          "blocks": {}
+        },
+        "ctr-shop-product-mouthtape": {
+          "type": "ctr-shop-product",
+          "settings": {
+            "product": "",
+            "image": "",
+            "label": "Mouthtape",
+            "link": "/products/mouth-tape"
+          },
+          "blocks": {}
+        },
+        "ctr-shop-product-sensory": {
+          "type": "ctr-shop-product",
+          "settings": {
+            "product": "",
+            "image": "",
+            "label": "Sensory Mask",
+            "link": "/products/sensory-mask"
+          },
+          "blocks": {}
         }
       },
+      "block_order": [
+        "ctr-shop-intro",
+        "ctr-shop-product-starter",
+        "ctr-shop-product-three",
+        "ctr-shop-product-mouthtape",
+        "ctr-shop-product-sensory"
+      ],
       "settings": {
         "logo_position": "left",
         "menu_position": "center",

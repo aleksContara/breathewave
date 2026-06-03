@@ -97,6 +97,24 @@
           elsif ctr_science_handle != blank and link.handle == ctr_science_handle
             assign ctr_menu_role = 'science'
           endif
+
+          assign render_ctr_shop_mega = false
+          assign ctr_shop_intro_block = blank
+          assign ctr_shop_product_count = 0
+
+          if block_settings.ctr_shop_enable and ctr_menu_role == 'shop'
+            for child_block in section.blocks
+              if child_block.type == 'ctr-shop-intro'
+                assign ctr_shop_intro_block = child_block
+              elsif child_block.type == 'ctr-shop-product'
+                assign ctr_shop_product_count = ctr_shop_product_count | plus: 1
+              endif
+            endfor
+
+            if ctr_shop_intro_block != blank or ctr_shop_product_count > 0
+              assign render_ctr_shop_mega = true
+            endif
+          endif
         %}
         <li
           role="presentation"
@@ -114,7 +132,7 @@
             class="menu-list__link{% if link.active %} menu-list__link--active{% endif %}"
             data-ctr-menu-role="{{ ctr_menu_role }}"
             data-ctr-menu-handle="{{ link.handle }}"
-            {%- if link.links != blank -%}
+            {%- if link.links != blank or render_ctr_shop_mega -%}
               aria-controls="submenu-{{ forloop.index }}"
               aria-haspopup="true"
               aria-expanded="false"
@@ -126,32 +144,132 @@
           >
             <span class="menu-list__link-title">{{- link.title -}}</span>
           </a>
-          {%- if link.links != blank -%}
+          {%- if link.links != blank or render_ctr_shop_mega -%}
             <div class="menu-list__submenu{{ color_scheme_classes }}" ref="submenu[]">
               <div
                 id="submenu-{{ forloop.index }}"
                 class="menu-list__submenu-inner"
                 style="{% render 'submenu-font-styles', settings: block_settings %}"
               >
-                {% assign list_id = 'MegaMenuList-' | append: forloop.index %}
-                <div class="mega-menu section section--full-width-margin section--{{ section.settings.section_width }}">
+                {% if render_ctr_shop_mega %}
                   <div
-                    class="mega-menu__grid"
-                    data-menu-grid-id="{{ list_id }}"
+                    class="ctr-shop-mega section section--full-width-margin section--{{ section.settings.section_width }} color-{{ block_settings.ctr_shop_color_scheme }}"
+                    style="
+                      --ctr-shop-mega-columns: {{ block_settings.ctr_shop_columns }};
+                      --ctr-shop-product-columns: {{ block_settings.ctr_shop_columns | minus: 1 }};
+                      --ctr-shop-mega-padding: {{ block_settings.ctr_shop_padding }}px;
+                      --ctr-shop-mega-radius: {{ block_settings.ctr_shop_border_radius }}px;
+                      --ctr-shop-card-radius: {{ block_settings.ctr_shop_card_radius }}px;
+                    "
                   >
-                    {% render 'mega-menu-list',
-                      parent_link: link,
-                      id: list_id,
-                      section: section,
-                      grid_columns_count: 6,
-                      grid_columns_count_tablet: 4,
-                      grid_columns_count_collection_images: 8,
-                      menu_content_type: menu_content_type,
-                      content_aspect_ratio: ratio,
-                      image_border_radius: image_border_radius
-                    %}
+                    <div class="ctr-shop-mega__grid">
+                      {% if ctr_shop_intro_block != blank %}
+                        <div class="ctr-shop-mega__intro" {{ ctr_shop_intro_block.shopify_attributes }}>
+                          {% if ctr_shop_intro_block.settings.rating_count > 0 %}
+                            <div
+                              class="ctr-shop-mega__rating"
+                              aria-label="{{ ctr_shop_intro_block.settings.rating_count }} star rating"
+                              style="--ctr-shop-rating-color: {{ ctr_shop_intro_block.settings.rating_color }};"
+                            >
+                              {% for rating_index in (1..ctr_shop_intro_block.settings.rating_count) %}
+                                <span aria-hidden="true">&#9733;</span>
+                              {% endfor %}
+                            </div>
+                          {% endif %}
+
+                          {% if ctr_shop_intro_block.settings.heading != blank %}
+                            <div class="ctr-shop-mega__intro-heading">
+                              {{ ctr_shop_intro_block.settings.heading }}
+                            </div>
+                          {% endif %}
+
+                          {% if ctr_shop_intro_block.settings.cta_label != blank and ctr_shop_intro_block.settings.cta_link != blank %}
+                            <a
+                              class="ctr-shop-mega__intro-cta"
+                              href="{{ ctr_shop_intro_block.settings.cta_link }}"
+                            >
+                              {{ ctr_shop_intro_block.settings.cta_label }}
+                              <span aria-hidden="true">&rarr;</span>
+                            </a>
+                          {% endif %}
+                        </div>
+                      {% endif %}
+
+                      {% for child_block in section.blocks %}
+                        {% if child_block.type == 'ctr-shop-product' %}
+                          {% liquid
+                            assign ctr_product = child_block.settings.product
+                            assign ctr_product_image = child_block.settings.image
+                            assign ctr_product_label = child_block.settings.label
+                            assign ctr_product_link = child_block.settings.link
+
+                            if ctr_product_image == blank and ctr_product != blank
+                              assign ctr_product_image = ctr_product.featured_image
+                            endif
+
+                            if ctr_product_label == blank and ctr_product != blank
+                              assign ctr_product_label = ctr_product.title
+                            endif
+
+                            if ctr_product_link == blank and ctr_product != blank
+                              assign ctr_product_link = ctr_product.url
+                            endif
+                          %}
+                          <a
+                            class="ctr-shop-mega__product"
+                            {% if ctr_product_link != blank %}
+                              href="{{ ctr_product_link }}"
+                            {% else %}
+                              role="link"
+                              aria-disabled="true"
+                            {% endif %}
+                            {{ child_block.shopify_attributes }}
+                          >
+                            <span class="ctr-shop-mega__product-media">
+                              {% if ctr_product_image != blank %}
+                                {{
+                                  ctr_product_image
+                                  | image_url: width: 700
+                                  | image_tag:
+                                    loading: 'lazy',
+                                    widths: '220, 320, 440, 600, 700',
+                                    sizes: '(min-width: 990px) 18vw, 45vw',
+                                    class: 'ctr-shop-mega__product-image'
+                                }}
+                              {% else %}
+                                {{ 'product-1' | placeholder_svg_tag: 'ctr-shop-mega__product-placeholder' }}
+                              {% endif %}
+                            </span>
+
+                            {% if ctr_product_label != blank %}
+                              <span class="ctr-shop-mega__product-label">{{ ctr_product_label }}</span>
+                            {% endif %}
+                          </a>
+                        {% endif %}
+                      {% endfor %}
+                    </div>
                   </div>
-                </div>
+                {% else %}
+                  {% assign list_id = 'MegaMenuList-' | append: forloop.index %}
+                  <div class="mega-menu section section--full-width-margin section--{{ section.settings.section_width }}">
+                    <div
+                      class="mega-menu__grid"
+                      data-menu-grid-id="{{ list_id }}"
+                    >
+                      {% render 'mega-menu-list',
+                        parent_link: link,
+                        id: list_id,
+                        section: section,
+                        grid_columns_count: 6,
+                        grid_columns_count_tablet: 4,
+                        grid_columns_count_collection_images: 8,
+                        menu_content_type: menu_content_type,
+                        content_aspect_ratio: ratio,
+                        image_border_radius: image_border_radius
+                      %}
+                    </div>
+                  </div>
+                {% endif %}
               </div>
             </div>
           {%- endif -%}
@@ -700,6 +818,113 @@
     /* preserves the inherited grid layout when this submenu wrapper is used */
     display: contents;
   }
+
+  #header-component .ctr-shop-mega {
+    width: 100%;
+    color: var(--color-foreground);
+  }
+
+  #header-component .ctr-shop-mega__grid {
+    display: grid;
+    grid-template-columns: minmax(220px, 0.9fr) repeat(var(--ctr-shop-product-columns), minmax(0, 1fr));
+    gap: var(--gap-lg);
+    width: 100%;
+    padding: var(--ctr-shop-mega-padding);
+    background: var(--color-background);
+    border-radius: var(--ctr-shop-mega-radius);
+  }
+
+  #header-component .ctr-shop-mega__intro,
+  #header-component .ctr-shop-mega__product {
+    min-height: 220px;
+    border-radius: var(--ctr-shop-card-radius);
+    overflow: hidden;
+  }
+
+  #header-component .ctr-shop-mega__intro {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: var(--gap-lg);
+    padding: var(--padding-xl);
+    background: rgb(var(--color-foreground-rgb) / 0.04);
+  }
+
+  #header-component .ctr-shop-mega__rating {
+    display: flex;
+    gap: 2px;
+    color: var(--ctr-shop-rating-color, var(--color-foreground));
+    font-size: 14px;
+    line-height: 1;
+  }
+
+  #header-component .ctr-shop-mega__intro-heading {
+    font-family: var(--font-heading--family);
+    font-size: clamp(1.4rem, 2.2vw, 2.4rem);
+    line-height: 1;
+    white-space: normal;
+  }
+
+  #header-component .ctr-shop-mega__intro-cta {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    gap: var(--gap-xs);
+    color: var(--color-foreground);
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 6px;
+  }
+
+  #header-component .ctr-shop-mega__product {
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    justify-content: flex-end;
+    min-width: 0;
+    color: var(--color-foreground);
+    background: rgb(var(--color-foreground-rgb) / 0.04);
+    text-decoration: none;
+  }
+
+  #header-component .ctr-shop-mega__product-media {
+    display: block;
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+
+  #header-component .ctr-shop-mega__product-image,
+  #header-component .ctr-shop-mega__product-placeholder {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 168px;
+    object-fit: cover;
+  }
+
+  #header-component .ctr-shop-mega__product-placeholder {
+    background: rgb(var(--color-foreground-rgb) / 0.08);
+  }
+
+  #header-component .ctr-shop-mega__product-label {
+    display: flex;
+    min-height: 52px;
+    align-items: center;
+    justify-content: center;
+    padding: var(--padding-sm);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.2;
+    text-align: center;
+    white-space: normal;
+  }
+
+  @media screen and (max-width: 989px) {
+    #header-component .ctr-shop-mega {
+      display: none;
+    }
+  }
 {% endstylesheet %}
 
 {% schema %}
@@ -737,6 +962,66 @@
       "label": "Explore menu item handle",
       "default": "explore",
       "info": "Top-level Shopify Navigation item handle that will receive the custom Explore mega menu."
+    },
+    {
+      "type": "header",
+      "content": "CTR Shop mega menu"
+    },
+    {
+      "type": "checkbox",
+      "id": "ctr_shop_enable",
+      "label": "Enable custom Shop mega menu",
+      "default": true
+    },
+    {
+      "type": "color_scheme",
+      "id": "ctr_shop_color_scheme",
+      "label": "Shop mega menu color scheme",
+      "default": "scheme-1",
+      "visible_if": "{{ block.settings.ctr_shop_enable }}"
+    },
+    {
+      "type": "range",
+      "id": "ctr_shop_columns",
+      "label": "Desktop columns",
+      "min": 3,
+      "max": 6,
+      "step": 1,
+      "default": 5,
+      "visible_if": "{{ block.settings.ctr_shop_enable }}"
+    },
+    {
+      "type": "range",
+      "id": "ctr_shop_padding",
+      "label": "Padding",
+      "min": 0,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 18,
+      "visible_if": "{{ block.settings.ctr_shop_enable }}"
+    },
+    {
+      "type": "range",
+      "id": "ctr_shop_border_radius",
+      "label": "Container border radius",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 24,
+      "visible_if": "{{ block.settings.ctr_shop_enable }}"
+    },
+    {
+      "type": "range",
+      "id": "ctr_shop_card_radius",
+      "label": "Card border radius",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 18,
+      "visible_if": "{{ block.settings.ctr_shop_enable }}"
     },
     {
       "type": "color_scheme",
