@@ -99,16 +99,18 @@
           endif
 
           assign render_ctr_shop_mega = false
-          assign ctr_shop_intro_block = blank
           assign ctr_shop_product_count = 0
 
           if block_settings.ctr_shop_enable and ctr_menu_role == 'shop'
             assign render_ctr_shop_mega = true
 
-            for child_block in section.blocks
-              if child_block.type == 'ctr-shop-intro'
-                assign ctr_shop_intro_block = child_block
-              elsif child_block.type == 'ctr-shop-product'
+            for product_index in (1..6)
+              assign ctr_product_key = 'ctr_shop_product_' | append: product_index
+              assign ctr_label_key = 'ctr_shop_product_' | append: product_index | append: '_label'
+              assign ctr_image_key = 'ctr_shop_product_' | append: product_index | append: '_image'
+              assign ctr_link_key = 'ctr_shop_product_' | append: product_index | append: '_link'
+
+              if block_settings[ctr_product_key] != blank or block_settings[ctr_label_key] != blank or block_settings[ctr_image_key] != blank or block_settings[ctr_link_key] != blank
                 assign ctr_shop_product_count = ctr_shop_product_count | plus: 1
               endif
             endfor
@@ -161,58 +163,63 @@
                     "
                   >
                     <div class="ctr-shop-mega__grid">
-                      {% if ctr_shop_intro_block != blank %}
-                        <div class="ctr-shop-mega__intro" {{ ctr_shop_intro_block.shopify_attributes }}>
-                          {% if ctr_shop_intro_block.settings.rating_count > 0 %}
+                      {% if block_settings.ctr_shop_intro_heading != blank or block_settings.ctr_shop_intro_cta_label != blank %}
+                        <div class="ctr-shop-mega__intro">
+                          {% if block_settings.ctr_shop_intro_rating_count > 0 %}
                             <div
                               class="ctr-shop-mega__rating"
-                              aria-label="{{ ctr_shop_intro_block.settings.rating_count }} star rating"
-                              style="--ctr-shop-rating-color: {{ ctr_shop_intro_block.settings.rating_color }};"
+                              aria-label="{{ block_settings.ctr_shop_intro_rating_count }} star rating"
+                              style="--ctr-shop-rating-color: {{ block_settings.ctr_shop_intro_rating_color }};"
                             >
-                              {% for rating_index in (1..ctr_shop_intro_block.settings.rating_count) %}
+                              {% for rating_index in (1..block_settings.ctr_shop_intro_rating_count) %}
                                 <span aria-hidden="true">&#9733;</span>
                               {% endfor %}
                             </div>
                           {% endif %}
 
-                          {% if ctr_shop_intro_block.settings.heading != blank %}
+                          {% if block_settings.ctr_shop_intro_heading != blank %}
                             <div class="ctr-shop-mega__intro-heading">
-                              {{ ctr_shop_intro_block.settings.heading }}
+                              {{ block_settings.ctr_shop_intro_heading }}
                             </div>
                           {% endif %}
 
-                          {% if ctr_shop_intro_block.settings.cta_label != blank and ctr_shop_intro_block.settings.cta_link != blank %}
+                          {% if block_settings.ctr_shop_intro_cta_label != blank and block_settings.ctr_shop_intro_cta_link != blank %}
                             <a
                               class="ctr-shop-mega__intro-cta"
-                              href="{{ ctr_shop_intro_block.settings.cta_link }}"
+                              href="{{ block_settings.ctr_shop_intro_cta_link }}"
                             >
-                              {{ ctr_shop_intro_block.settings.cta_label }}
+                              {{ block_settings.ctr_shop_intro_cta_label }}
                               <span aria-hidden="true">&rarr;</span>
                             </a>
                           {% endif %}
                         </div>
                       {% endif %}
 
-                      {% for child_block in section.blocks %}
-                        {% if child_block.type == 'ctr-shop-product' %}
-                          {% liquid
-                            assign ctr_product = child_block.settings.product
-                            assign ctr_product_image = child_block.settings.image
-                            assign ctr_product_label = child_block.settings.label
-                            assign ctr_product_link = child_block.settings.link
+                      {% for product_index in (1..6) %}
+                        {% liquid
+                          assign ctr_product_key = 'ctr_shop_product_' | append: product_index
+                          assign ctr_image_key = 'ctr_shop_product_' | append: product_index | append: '_image'
+                          assign ctr_label_key = 'ctr_shop_product_' | append: product_index | append: '_label'
+                          assign ctr_link_key = 'ctr_shop_product_' | append: product_index | append: '_link'
+                          assign ctr_product = block_settings[ctr_product_key]
+                          assign ctr_product_image = block_settings[ctr_image_key]
+                          assign ctr_product_label = block_settings[ctr_label_key]
+                          assign ctr_product_link = block_settings[ctr_link_key]
 
-                            if ctr_product_image == blank and ctr_product != blank
-                              assign ctr_product_image = ctr_product.featured_image
-                            endif
+                          if ctr_product_image == blank and ctr_product != blank
+                            assign ctr_product_image = ctr_product.featured_image
+                          endif
 
-                            if ctr_product_label == blank and ctr_product != blank
-                              assign ctr_product_label = ctr_product.title
-                            endif
+                          if ctr_product_label == blank and ctr_product != blank
+                            assign ctr_product_label = ctr_product.title
+                          endif
 
-                            if ctr_product_link == blank and ctr_product != blank
-                              assign ctr_product_link = ctr_product.url
-                            endif
-                          %}
+                          if ctr_product_link == blank and ctr_product != blank
+                            assign ctr_product_link = ctr_product.url
+                          endif
+                        %}
+
+                        {% if ctr_product != blank or ctr_product_image != blank or ctr_product_label != blank or ctr_product_link != blank %}
                           <a
                             class="ctr-shop-mega__product"
                             {% if ctr_product_link != blank %}
@@ -221,7 +228,6 @@
                               role="link"
                               aria-disabled="true"
                             {% endif %}
-                            {{ child_block.shopify_attributes }}
                           >
                             <span class="ctr-shop-mega__product-media">
                               {% if ctr_product_image != blank %}
@@ -246,9 +252,9 @@
                         {% endif %}
                       {% endfor %}
 
-                      {% if ctr_shop_intro_block == blank and ctr_shop_product_count == 0 and request.design_mode %}
+                      {% if block_settings.ctr_shop_intro_heading == blank and ctr_shop_product_count == 0 and request.design_mode %}
                         <div class="ctr-shop-mega__empty">
-                          Add CTR Shop intro and CTR Shop product blocks to this header.
+                          Add Shop intro text and products in the Menu block settings.
                         </div>
                       {% endif %}
                     </div>
@@ -1036,6 +1042,195 @@
       "unit": "px",
       "default": 18,
       "visible_if": "{{ block.settings.ctr_shop_enable }}"
+    },
+    {
+      "type": "header",
+      "content": "CTR Shop intro card"
+    },
+    {
+      "type": "range",
+      "id": "ctr_shop_intro_rating_count",
+      "label": "Star rating",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "default": 5,
+      "visible_if": "{{ block.settings.ctr_shop_enable }}"
+    },
+    {
+      "type": "color",
+      "id": "ctr_shop_intro_rating_color",
+      "label": "Star color",
+      "default": "#000000",
+      "visible_if": "{{ block.settings.ctr_shop_enable }}"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "ctr_shop_intro_heading",
+      "label": "Heading",
+      "default": "world's most comfortable nasal dilator",
+      "visible_if": "{{ block.settings.ctr_shop_enable }}"
+    },
+    {
+      "type": "text",
+      "id": "ctr_shop_intro_cta_label",
+      "label": "CTA label",
+      "default": "Shop all",
+      "visible_if": "{{ block.settings.ctr_shop_enable }}"
+    },
+    {
+      "type": "url",
+      "id": "ctr_shop_intro_cta_link",
+      "label": "CTA link",
+      "visible_if": "{{ block.settings.ctr_shop_enable }}"
+    },
+    {
+      "type": "header",
+      "content": "CTR Shop product 1"
+    },
+    {
+      "type": "product",
+      "id": "ctr_shop_product_1",
+      "label": "Product"
+    },
+    {
+      "type": "image_picker",
+      "id": "ctr_shop_product_1_image",
+      "label": "Image override"
+    },
+    {
+      "type": "text",
+      "id": "ctr_shop_product_1_label",
+      "label": "Label override",
+      "default": "Starter Pack"
+    },
+    {
+      "type": "url",
+      "id": "ctr_shop_product_1_link",
+      "label": "Link override"
+    },
+    {
+      "type": "header",
+      "content": "CTR Shop product 2"
+    },
+    {
+      "type": "product",
+      "id": "ctr_shop_product_2",
+      "label": "Product"
+    },
+    {
+      "type": "image_picker",
+      "id": "ctr_shop_product_2_image",
+      "label": "Image override"
+    },
+    {
+      "type": "text",
+      "id": "ctr_shop_product_2_label",
+      "label": "Label override",
+      "default": "Three Pack"
+    },
+    {
+      "type": "url",
+      "id": "ctr_shop_product_2_link",
+      "label": "Link override"
+    },
+    {
+      "type": "header",
+      "content": "CTR Shop product 3"
+    },
+    {
+      "type": "product",
+      "id": "ctr_shop_product_3",
+      "label": "Product"
+    },
+    {
+      "type": "image_picker",
+      "id": "ctr_shop_product_3_image",
+      "label": "Image override"
+    },
+    {
+      "type": "text",
+      "id": "ctr_shop_product_3_label",
+      "label": "Label override",
+      "default": "Mouthtape"
+    },
+    {
+      "type": "url",
+      "id": "ctr_shop_product_3_link",
+      "label": "Link override"
+    },
+    {
+      "type": "header",
+      "content": "CTR Shop product 4"
+    },
+    {
+      "type": "product",
+      "id": "ctr_shop_product_4",
+      "label": "Product"
+    },
+    {
+      "type": "image_picker",
+      "id": "ctr_shop_product_4_image",
+      "label": "Image override"
+    },
+    {
+      "type": "text",
+      "id": "ctr_shop_product_4_label",
+      "label": "Label override",
+      "default": "Sensory Mask"
+    },
+    {
+      "type": "url",
+      "id": "ctr_shop_product_4_link",
+      "label": "Link override"
+    },
+    {
+      "type": "header",
+      "content": "CTR Shop product 5"
+    },
+    {
+      "type": "product",
+      "id": "ctr_shop_product_5",
+      "label": "Product"
+    },
+    {
+      "type": "image_picker",
+      "id": "ctr_shop_product_5_image",
+      "label": "Image override"
+    },
+    {
+      "type": "text",
+      "id": "ctr_shop_product_5_label",
+      "label": "Label override"
+    },
+    {
+      "type": "url",
+      "id": "ctr_shop_product_5_link",
+      "label": "Link override"
+    },
+    {
+      "type": "header",
+      "content": "CTR Shop product 6"
+    },
+    {
+      "type": "product",
+      "id": "ctr_shop_product_6",
+      "label": "Product"
+    },
+    {
+      "type": "image_picker",
+      "id": "ctr_shop_product_6_image",
+      "label": "Image override"
+    },
+    {
+      "type": "text",
+      "id": "ctr_shop_product_6_label",
+      "label": "Label override"
+    },
+    {
+      "type": "url",
+      "id": "ctr_shop_product_6_link",
+      "label": "Link override"
     },
     {
       "type": "color_scheme",
