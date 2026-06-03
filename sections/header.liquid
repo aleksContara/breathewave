@@ -317,6 +317,8 @@
   style="
     --color-scheme-top-row: rgba({{ section.settings.color_scheme_top.settings.background.rgba }});
     --color-scheme-bottom-row: rgba({{ section.settings.color_scheme_bottom.settings.background.rgba }});
+    --ctr-sticky-background-opacity: {{ section.settings.sticky_background_opacity | divided_by: 100.0 }};
+    --ctr-sticky-backdrop-blur: {{ section.settings.sticky_backdrop_blur }}px;
     {% if section.settings.actions_display_style == 'text' %}
       --header-actions-font-size: {{ section.settings.actions_font_size | default: '1rem' }};
       --header-actions-font-family: var(--font-{{ section.settings.actions_font | default: 'heading' }}--family);
@@ -568,6 +570,12 @@
 
   .header[data-sticky-state='active'] {
     view-transition-name: sticky-header;
+  }
+
+  #header-component[sticky][data-sticky-state='active'] .header__row {
+    background-color: rgb(var(--color-background-rgb) / var(--ctr-sticky-background-opacity, 1));
+    backdrop-filter: blur(var(--ctr-sticky-backdrop-blur, 0px));
+    -webkit-backdrop-filter: blur(var(--ctr-sticky-backdrop-blur, 0px));
   }
 
   :active-view-transition-type(empty-cart-drawer) {
@@ -902,8 +910,8 @@
   }
 
   .header__columns {
-    --padding-block-start: var(--header-padding);
-    --padding-block-end: var(--header-padding);
+    --padding-block-start: 12px;
+    --padding-block-end: 12px;
   }
 
   .header:not(.header--compact) .header__row--bottom {
@@ -1418,6 +1426,28 @@
         }
       ],
       "default": "always"
+    },
+    {
+      "type": "range",
+      "id": "sticky_background_opacity",
+      "label": "Sticky background opacity",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 95,
+      "visible_if": "{{ section.settings.enable_sticky_header != 'never' }}"
+    },
+    {
+      "type": "range",
+      "id": "sticky_backdrop_blur",
+      "label": "Sticky backdrop blur",
+      "min": 0,
+      "max": 24,
+      "step": 2,
+      "unit": "px",
+      "default": 8,
+      "visible_if": "{{ section.settings.enable_sticky_header != 'never' }}"
     },
     {
       "type": "range",

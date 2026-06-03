@@ -280,8 +280,8 @@
     font-family: var(--menu-top-level-font-family);
     font-style: var(--menu-top-level-font-style);
     font-weight: var(--menu-top-level-font-weight);
-    font-size: var(--menu-top-level-font-size);
-    line-height: var(--menu-top-level-font-line-height);
+    font-size: 14px;
+    line-height: 1.4;
     text-transform: var(--menu-top-level-font-case);
     color: var(--menu-top-level-font-color);
     text-decoration: none;
@@ -309,10 +309,6 @@
     &:hover,
     &:focus {
       color: var(--menu-top-level-font-color);
-    }
-
-    @media screen and (min-width: 750px) {
-      font-size: var(--menu-top-level-font-size-desktop);
     }
   }
 
@@ -450,7 +446,8 @@
       grid-area: left;
       grid-row: auto;
       height: min-content;
-      font-size: var(--font-size--xl);
+      font-size: 14px;
+      line-height: 1.4;
       transition: var(--submenu-content-animation);
     }
 

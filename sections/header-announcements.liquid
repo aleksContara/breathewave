@@ -10,7 +10,15 @@
 
 <div class="section-background color-{{ section.settings.color_scheme }}"></div>
 <aside
-  class="announcement-bar spacing-style section section--{{ section.settings.section_width }} color-{{ section.settings.color_scheme }}"
+  class="
+    announcement-bar
+    spacing-style
+    section
+    section--{{ section.settings.section_width }}
+    color-{{ section.settings.color_scheme }}
+    {% unless section.settings.show_on_mobile %}announcement-bar--hidden-mobile{% endunless %}
+    {% if section.settings.show_arrow_indicator %}announcement-bar--show-arrow{% endif %}
+  "
   style="{% render 'spacing-padding', settings: section.settings %}; --border-bottom-width: {{ section.settings.divider_width }}px;"
 >
   {% liquid
@@ -121,6 +129,16 @@
     position: absolute;
     inset: 0;
   }
+
+  .announcement-bar--show-arrow .announcement-bar__text::after {
+    content: ' \2192';
+  }
+
+  @media screen and (max-width: 749px) {
+    .announcement-bar--hidden-mobile {
+      display: none;
+    }
+  }
 {% endstylesheet %}
 
 {% schema %}
@@ -179,6 +197,18 @@
       "step": 0.5,
       "unit": "px",
       "default": 0
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrow_indicator",
+      "label": "Show arrow indicator",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_on_mobile",
+      "label": "Show on mobile",
+      "default": true
     },
     {
       "type": "header",
