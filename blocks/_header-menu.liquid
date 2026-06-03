@@ -84,9 +84,25 @@
 
     {% capture children %}
       {% for link in block_settings.menu.links %}
+        {% liquid
+          assign ctr_menu_role = 'link'
+          assign ctr_shop_handle = block_settings.ctr_shop_menu_handle | handleize
+          assign ctr_explore_handle = block_settings.ctr_explore_menu_handle | handleize
+          assign ctr_science_handle = block_settings.ctr_science_menu_handle | handleize
+
+          if ctr_shop_handle != blank and link.handle == ctr_shop_handle
+            assign ctr_menu_role = 'shop'
+          elsif ctr_explore_handle != blank and link.handle == ctr_explore_handle
+            assign ctr_menu_role = 'explore'
+          elsif ctr_science_handle != blank and link.handle == ctr_science_handle
+            assign ctr_menu_role = 'science'
+          endif
+        %}
         <li
           role="presentation"
           class="menu-list__list-item"
+          data-ctr-menu-role="{{ ctr_menu_role }}"
+          data-ctr-menu-handle="{{ link.handle }}"
           on:focus="/activate"
           on:blur="/deactivate"
           on:pointerenter="/activate"
@@ -96,6 +112,8 @@
             href="{{ link.url }}"
             data-skip-node-update="true"
             class="menu-list__link{% if link.active %} menu-list__link--active{% endif %}"
+            data-ctr-menu-role="{{ ctr_menu_role }}"
+            data-ctr-menu-handle="{{ link.handle }}"
             {%- if link.links != blank -%}
               aria-controls="submenu-{{ forloop.index }}"
               aria-haspopup="true"
@@ -694,6 +712,31 @@
       "id": "menu",
       "label": "t:settings.menu",
       "default": "main-menu"
+    },
+    {
+      "type": "header",
+      "content": "CTR menu mapping"
+    },
+    {
+      "type": "text",
+      "id": "ctr_science_menu_handle",
+      "label": "Science menu item handle",
+      "default": "science",
+      "info": "Top-level Shopify Navigation item handle used for the plain Science link."
+    },
+    {
+      "type": "text",
+      "id": "ctr_shop_menu_handle",
+      "label": "Shop menu item handle",
+      "default": "shop",
+      "info": "Top-level Shopify Navigation item handle that will receive the custom Shop mega menu."
+    },
+    {
+      "type": "text",
+      "id": "ctr_explore_menu_handle",
+      "label": "Explore menu item handle",
+      "default": "explore",
+      "info": "Top-level Shopify Navigation item handle that will receive the custom Explore mega menu."
     },
     {
       "type": "color_scheme",

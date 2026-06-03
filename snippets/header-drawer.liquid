@@ -103,9 +103,25 @@
             {% assign animation_index = 0 %}
             {%- for link in linklist.links -%}
               {% assign animation_index = animation_index | plus: 1 %}
+              {% liquid
+                assign ctr_menu_role = 'link'
+                assign ctr_shop_handle = block_settings.ctr_shop_menu_handle | handleize
+                assign ctr_explore_handle = block_settings.ctr_explore_menu_handle | handleize
+                assign ctr_science_handle = block_settings.ctr_science_menu_handle | handleize
+
+                if ctr_shop_handle != blank and link.handle == ctr_shop_handle
+                  assign ctr_menu_role = 'shop'
+                elsif ctr_explore_handle != blank and link.handle == ctr_explore_handle
+                  assign ctr_menu_role = 'explore'
+                elsif ctr_science_handle != blank and link.handle == ctr_science_handle
+                  assign ctr_menu_role = 'science'
+                endif
+              %}
               <li
                 style="--menu-drawer-animation-index: {{ animation_index }};"
                 class="{%- if block_settings.drawer_accordion -%}menu-drawer__list-item--deep{%- else -%}menu-drawer__list-item--flat{%- endif -%}{% if block_settings.drawer_dividers %} menu-drawer__list-item--divider{% endif %}"
+                data-ctr-menu-role="{{ ctr_menu_role }}"
+                data-ctr-menu-handle="{{ link.handle }}"
               >
                 {% if block_settings.drawer_accordion and link.links != blank %}
                   {%- comment -%}
@@ -125,6 +141,8 @@
                       <summary
                         id="HeaderDrawer-{{ link.handle }}"
                         class="menu-drawer__menu-item menu-drawer__menu-item--mainlist menu-drawer__animated-element focus-inset"
+                        data-ctr-menu-role="{{ ctr_menu_role }}"
+                        data-ctr-menu-handle="{{ link.handle }}"
                       >
                         <span class="menu-drawer__menu-item-text wrap-text">{{ link.title | escape }}</span>
                         <span class="svg-wrapper icon-plus">
@@ -186,6 +204,8 @@
                     id="HeaderDrawer-{{ link.handle }}"
                     href="{{ link.url }}"
                     class="menu-drawer__menu-item menu-drawer__menu-item--mainlist menu-drawer__animated-element focus-inset"
+                    data-ctr-menu-role="{{ ctr_menu_role }}"
+                    data-ctr-menu-handle="{{ link.handle }}"
                     {% if link.current %}
                       aria-current="page"
                     {% endif %}
@@ -240,6 +260,8 @@
                     id="HeaderDrawer-{{ link.handle }}"
                     href="{{ link.url }}"
                     class="menu-drawer__menu-item menu-drawer__menu-item--mainlist menu-drawer__animated-element focus-inset"
+                    data-ctr-menu-role="{{ ctr_menu_role }}"
+                    data-ctr-menu-handle="{{ link.handle }}"
                     {% if link.current %}
                       aria-current="page"
                     {% endif %}
@@ -256,9 +278,25 @@
             {% assign animation_index = 0 %}
             {%- for link in linklist.links -%}
               {% assign animation_index = animation_index | plus: 1 %}
+              {% liquid
+                assign ctr_menu_role = 'link'
+                assign ctr_shop_handle = block_settings.ctr_shop_menu_handle | handleize
+                assign ctr_explore_handle = block_settings.ctr_explore_menu_handle | handleize
+                assign ctr_science_handle = block_settings.ctr_science_menu_handle | handleize
+
+                if ctr_shop_handle != blank and link.handle == ctr_shop_handle
+                  assign ctr_menu_role = 'shop'
+                elsif ctr_explore_handle != blank and link.handle == ctr_explore_handle
+                  assign ctr_menu_role = 'explore'
+                elsif ctr_science_handle != blank and link.handle == ctr_science_handle
+                  assign ctr_menu_role = 'science'
+                endif
+              %}
               <li
                 class="menu-drawer__list-item"
                 style="--menu-drawer-animation-index: {{ animation_index }};"
+                data-ctr-menu-role="{{ ctr_menu_role }}"
+                data-ctr-menu-handle="{{ link.handle }}"
               >
                 {%- if link.links != blank -%}
                   {%- comment -%}
@@ -272,6 +310,8 @@
                       id="HeaderDrawer-{{ link.handle }}"
                       class="menu-drawer__menu-item menu-drawer__menu-item--mainlist menu-drawer__animated-element focus-inset{% if link.child_active %} menu-drawer__menu-item--active{% endif %}"
                       on:click="header-drawer/open/submenu"
+                      data-ctr-menu-role="{{ ctr_menu_role }}"
+                      data-ctr-menu-handle="{{ link.handle }}"
                     >
                       <span class="menu-drawer__menu-item-text wrap-text">{{ link.title | escape }}</span>
                       <span class="svg-wrapper icon-caret icon-caret--forward">
@@ -560,6 +600,8 @@
                     id="HeaderDrawer-{{ link.handle }}"
                     href="{{ link.url }}"
                     class="menu-drawer__menu-item menu-drawer__menu-item--mainlist menu-drawer__animated-element focus-inset"
+                    data-ctr-menu-role="{{ ctr_menu_role }}"
+                    data-ctr-menu-handle="{{ link.handle }}"
                     {% if link.current %}
                       aria-current="page"
                     {% endif %}
