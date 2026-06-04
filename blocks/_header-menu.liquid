@@ -99,7 +99,9 @@
           endif
 
           assign render_ctr_shop_mega = false
+          assign render_ctr_explore_mega = false
           assign ctr_shop_product_count = 0
+          assign ctr_explore_card_count = 0
 
           if block_settings.ctr_shop_enable and ctr_menu_role == 'shop'
             assign render_ctr_shop_mega = true
@@ -112,6 +114,20 @@
 
               if block_settings[ctr_product_key] != blank or block_settings[ctr_label_key] != blank or block_settings[ctr_image_key] != blank or block_settings[ctr_link_key] != blank
                 assign ctr_shop_product_count = ctr_shop_product_count | plus: 1
+              endif
+            endfor
+          endif
+
+          if block_settings.ctr_explore_enable and ctr_menu_role == 'explore'
+            assign render_ctr_explore_mega = true
+
+            for card_index in (1..8)
+              assign ctr_label_key = 'ctr_explore_card_' | append: card_index | append: '_label'
+              assign ctr_image_key = 'ctr_explore_card_' | append: card_index | append: '_image'
+              assign ctr_link_key = 'ctr_explore_card_' | append: card_index | append: '_link'
+
+              if block_settings[ctr_label_key] != blank or block_settings[ctr_image_key] != blank or block_settings[ctr_link_key] != blank
+                assign ctr_explore_card_count = ctr_explore_card_count | plus: 1
               endif
             endfor
           endif
@@ -132,7 +148,7 @@
             class="menu-list__link{% if link.active %} menu-list__link--active{% endif %}"
             data-ctr-menu-role="{{ ctr_menu_role }}"
             data-ctr-menu-handle="{{ link.handle }}"
-            {%- if link.links != blank or render_ctr_shop_mega -%}
+            {%- if link.links != blank or render_ctr_shop_mega or render_ctr_explore_mega -%}
               aria-controls="submenu-{{ forloop.index }}"
               aria-haspopup="true"
               aria-expanded="false"
@@ -144,7 +160,7 @@
           >
             <span class="menu-list__link-title">{{- link.title -}}</span>
           </a>
-          {%- if link.links != blank or render_ctr_shop_mega -%}
+          {%- if link.links != blank or render_ctr_shop_mega or render_ctr_explore_mega -%}
             <div class="menu-list__submenu{{ color_scheme_classes }}" ref="submenu[]">
               <div
                 id="submenu-{{ forloop.index }}"
@@ -255,6 +271,69 @@
                       {% if block_settings.ctr_shop_intro_heading == blank and ctr_shop_product_count == 0 and request.design_mode %}
                         <div class="ctr-shop-mega__empty">
                           Add Shop intro text and products in the Menu block settings.
+                        </div>
+                      {% endif %}
+                    </div>
+                  </div>
+                {% elsif render_ctr_explore_mega %}
+                  <div
+                    class="ctr-explore-mega section section--full-width-margin section--{{ section.settings.section_width }} color-{{ block_settings.ctr_explore_color_scheme }}"
+                    style="
+                      --ctr-explore-columns: {{ block_settings.ctr_explore_columns }};
+                      --ctr-explore-padding: {{ block_settings.ctr_explore_padding }}px;
+                      --ctr-explore-card-radius: {{ block_settings.ctr_explore_card_radius }}px;
+                      --ctr-explore-card-aspect-ratio: {{ block_settings.ctr_explore_card_aspect_ratio }};
+                    "
+                  >
+                    <div class="ctr-explore-mega__grid">
+                      {% for card_index in (1..8) %}
+                        {% liquid
+                          assign ctr_image_key = 'ctr_explore_card_' | append: card_index | append: '_image'
+                          assign ctr_label_key = 'ctr_explore_card_' | append: card_index | append: '_label'
+                          assign ctr_link_key = 'ctr_explore_card_' | append: card_index | append: '_link'
+                          assign ctr_image = block_settings[ctr_image_key]
+                          assign ctr_label = block_settings[ctr_label_key]
+                          assign ctr_link = block_settings[ctr_link_key]
+                        %}
+
+                        {% if ctr_image != blank or ctr_label != blank or ctr_link != blank %}
+                          <a
+                            class="ctr-explore-mega__card"
+                            {% if ctr_link != blank %}
+                              href="{{ ctr_link }}"
+                            {% else %}
+                              role="link"
+                              aria-disabled="true"
+                            {% endif %}
+                          >
+                            {% if ctr_image != blank %}
+                              {{
+                                ctr_image
+                                | image_url: width: 900
+                                | image_tag:
+                                  loading: 'lazy',
+                                  widths: '260, 360, 520, 720, 900',
+                                  sizes: '(min-width: 990px) 16vw, 45vw',
+                                  class: 'ctr-explore-mega__image'
+                              }}
+                            {% else %}
+                              {{ 'collection-1' | placeholder_svg_tag: 'ctr-explore-mega__placeholder' }}
+                            {% endif %}
+
+                            {% if ctr_label != blank %}
+                              <span class="ctr-explore-mega__label">{{ ctr_label }}</span>
+                            {% endif %}
+
+                            {% if block_settings.ctr_explore_show_arrow %}
+                              <span class="ctr-explore-mega__arrow" aria-hidden="true">&rarr;</span>
+                            {% endif %}
+                          </a>
+                        {% endif %}
+                      {% endfor %}
+
+                      {% if ctr_explore_card_count == 0 and request.design_mode %}
+                        <div class="ctr-explore-mega__empty">
+                          Add Explore image cards in the Menu block settings.
                         </div>
                       {% endif %}
                     </div>
@@ -940,8 +1019,100 @@
     white-space: normal;
   }
 
+  #header-component .ctr-explore-mega {
+    width: 100%;
+    color: var(--color-foreground);
+  }
+
+  #header-component .ctr-explore-mega__grid {
+    display: grid;
+    grid-template-columns: repeat(var(--ctr-explore-columns), minmax(0, 1fr));
+    gap: var(--gap-lg);
+    width: 100%;
+    padding: var(--ctr-explore-padding);
+    background: var(--color-background);
+  }
+
+  #header-component .ctr-explore-mega__card {
+    position: relative;
+    display: block;
+    min-width: 0;
+    aspect-ratio: var(--ctr-explore-card-aspect-ratio);
+    overflow: hidden;
+    border-radius: var(--ctr-explore-card-radius);
+    background: rgb(var(--color-foreground-rgb) / 0.08);
+    color: var(--color-background);
+    text-decoration: none;
+  }
+
+  #header-component .ctr-explore-mega__image,
+  #header-component .ctr-explore-mega__placeholder {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: scale var(--animation-speed-slow) var(--animation-easing);
+  }
+
+  #header-component .ctr-explore-mega__placeholder {
+    background: rgb(var(--color-foreground-rgb) / 0.12);
+  }
+
+  #header-component .ctr-explore-mega__card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgb(0 0 0 / 0.38), rgb(0 0 0 / 0.02) 65%);
+    pointer-events: none;
+  }
+
+  #header-component .ctr-explore-mega__card:hover .ctr-explore-mega__image,
+  #header-component .ctr-explore-mega__card:focus-visible .ctr-explore-mega__image {
+    scale: 1.04;
+  }
+
+  #header-component .ctr-explore-mega__label {
+    position: absolute;
+    left: var(--padding-md);
+    right: 56px;
+    bottom: var(--padding-md);
+    z-index: 1;
+    color: currentColor;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.15;
+    white-space: normal;
+  }
+
+  #header-component .ctr-explore-mega__arrow {
+    position: absolute;
+    right: var(--padding-md);
+    bottom: var(--padding-md);
+    z-index: 1;
+    display: grid;
+    width: 34px;
+    height: 34px;
+    place-items: center;
+    border-radius: 999px;
+    background: var(--color-background);
+    color: var(--color-foreground);
+    font-size: 18px;
+    line-height: 1;
+  }
+
+  #header-component .ctr-explore-mega__empty {
+    grid-column: 1 / -1;
+    padding: var(--padding-xl);
+    border: 1px dashed rgb(var(--color-foreground-rgb) / 0.3);
+    border-radius: var(--ctr-explore-card-radius);
+    color: rgb(var(--color-foreground-rgb) / 0.7);
+    font-size: 14px;
+    white-space: normal;
+  }
+
   @media screen and (max-width: 989px) {
-    #header-component .ctr-shop-mega {
+    #header-component .ctr-shop-mega,
+    #header-component .ctr-explore-mega {
       display: none;
     }
   }
@@ -1231,6 +1402,241 @@
       "type": "url",
       "id": "ctr_shop_product_6_link",
       "label": "Link override"
+    },
+    {
+      "type": "header",
+      "content": "CTR Explore mega menu"
+    },
+    {
+      "type": "checkbox",
+      "id": "ctr_explore_enable",
+      "label": "Enable custom Explore mega menu",
+      "default": true
+    },
+    {
+      "type": "color_scheme",
+      "id": "ctr_explore_color_scheme",
+      "label": "Explore mega menu color scheme",
+      "default": "scheme-1",
+      "visible_if": "{{ block.settings.ctr_explore_enable }}"
+    },
+    {
+      "type": "range",
+      "id": "ctr_explore_columns",
+      "label": "Desktop columns",
+      "min": 3,
+      "max": 8,
+      "step": 1,
+      "default": 6,
+      "visible_if": "{{ block.settings.ctr_explore_enable }}"
+    },
+    {
+      "type": "select",
+      "id": "ctr_explore_card_aspect_ratio",
+      "label": "Card aspect ratio",
+      "options": [
+        {
+          "value": "1 / 1",
+          "label": "Square"
+        },
+        {
+          "value": "4 / 5",
+          "label": "Portrait"
+        },
+        {
+          "value": "16 / 9",
+          "label": "Landscape"
+        }
+      ],
+      "default": "1 / 1",
+      "visible_if": "{{ block.settings.ctr_explore_enable }}"
+    },
+    {
+      "type": "range",
+      "id": "ctr_explore_padding",
+      "label": "Padding",
+      "min": 0,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 18,
+      "visible_if": "{{ block.settings.ctr_explore_enable }}"
+    },
+    {
+      "type": "range",
+      "id": "ctr_explore_card_radius",
+      "label": "Card border radius",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 18,
+      "visible_if": "{{ block.settings.ctr_explore_enable }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "ctr_explore_show_arrow",
+      "label": "Show arrow icon",
+      "default": true,
+      "visible_if": "{{ block.settings.ctr_explore_enable }}"
+    },
+    {
+      "type": "header",
+      "content": "CTR Explore card 1"
+    },
+    {
+      "type": "image_picker",
+      "id": "ctr_explore_card_1_image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "ctr_explore_card_1_label",
+      "label": "Label",
+      "default": "Science"
+    },
+    {
+      "type": "url",
+      "id": "ctr_explore_card_1_link",
+      "label": "Link"
+    },
+    {
+      "type": "header",
+      "content": "CTR Explore card 2"
+    },
+    {
+      "type": "image_picker",
+      "id": "ctr_explore_card_2_image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "ctr_explore_card_2_label",
+      "label": "Label",
+      "default": "Protocols"
+    },
+    {
+      "type": "url",
+      "id": "ctr_explore_card_2_link",
+      "label": "Link"
+    },
+    {
+      "type": "header",
+      "content": "CTR Explore card 3"
+    },
+    {
+      "type": "image_picker",
+      "id": "ctr_explore_card_3_image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "ctr_explore_card_3_label",
+      "label": "Label",
+      "default": "About us"
+    },
+    {
+      "type": "url",
+      "id": "ctr_explore_card_3_link",
+      "label": "Link"
+    },
+    {
+      "type": "header",
+      "content": "CTR Explore card 4"
+    },
+    {
+      "type": "image_picker",
+      "id": "ctr_explore_card_4_image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "ctr_explore_card_4_label",
+      "label": "Label",
+      "default": "How to use"
+    },
+    {
+      "type": "url",
+      "id": "ctr_explore_card_4_link",
+      "label": "Link"
+    },
+    {
+      "type": "header",
+      "content": "CTR Explore card 5"
+    },
+    {
+      "type": "image_picker",
+      "id": "ctr_explore_card_5_image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "ctr_explore_card_5_label",
+      "label": "Label",
+      "default": "Research"
+    },
+    {
+      "type": "url",
+      "id": "ctr_explore_card_5_link",
+      "label": "Link"
+    },
+    {
+      "type": "header",
+      "content": "CTR Explore card 6"
+    },
+    {
+      "type": "image_picker",
+      "id": "ctr_explore_card_6_image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "ctr_explore_card_6_label",
+      "label": "Label",
+      "default": "Blog"
+    },
+    {
+      "type": "url",
+      "id": "ctr_explore_card_6_link",
+      "label": "Link"
+    },
+    {
+      "type": "header",
+      "content": "CTR Explore card 7"
+    },
+    {
+      "type": "image_picker",
+      "id": "ctr_explore_card_7_image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "ctr_explore_card_7_label",
+      "label": "Label"
+    },
+    {
+      "type": "url",
+      "id": "ctr_explore_card_7_link",
+      "label": "Link"
+    },
+    {
+      "type": "header",
+      "content": "CTR Explore card 8"
+    },
+    {
+      "type": "image_picker",
+      "id": "ctr_explore_card_8_image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "ctr_explore_card_8_label",
+      "label": "Label"
+    },
+    {
+      "type": "url",
+      "id": "ctr_explore_card_8_link",
+      "label": "Link"
     },
     {
       "type": "color_scheme",
