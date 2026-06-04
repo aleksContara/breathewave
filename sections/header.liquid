@@ -74,6 +74,8 @@
     assign search_class = 'search-action--hidden-on-drawer'
   endif
 
+  assign search_class = search_class | default: 'search-action--hidden-on-drawer'
+
   # Handle localization positioning
   if section.settings.localization_position == 'left'
     if section.settings.search_position == 'left'
@@ -110,11 +112,15 @@
     assign skip_drawer_search = true
   endif
 
-  if section.settings.search_row == 'bottom' or search_style != 'none' and skip_drawer_search == false
-    # Mobile search duplicate for when search is not in the right order for mobile layout
-    capture drawer_search
-      render 'search', class: 'search-action--hidden-on-menu', style: search_style, display_style: section.settings.actions_display_style
-    endcapture
+  assign ctr_hide_mobile_search = true
+
+  if ctr_hide_mobile_search == false
+    if section.settings.search_row == 'bottom' or search_style != 'none' and skip_drawer_search == false
+      # Mobile search duplicate for when search is not in the right order for mobile layout
+      capture drawer_search
+        render 'search', class: 'search-action--hidden-on-menu', style: search_style, display_style: section.settings.actions_display_style
+      endcapture
+    endif
   endif
 
   assign show_language = section.settings.show_language

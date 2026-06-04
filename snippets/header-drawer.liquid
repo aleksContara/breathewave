@@ -83,6 +83,35 @@
           {{- 'icon-close.svg' | inline_asset_content -}}
         </span>
       </button>
+      <a
+        class="ctr-mobile-menu__logo"
+        href="{{ routes.root_url }}"
+        aria-label="{{ 'accessibility.home_logo_alt' | t: store_name: shop.name }}"
+      >
+        {% if block_settings.ctr_mobile_logo != blank %}
+          {{
+            block_settings.ctr_mobile_logo
+            | image_url: width: 360
+            | image_tag:
+              loading: 'lazy',
+              widths: '180, 260, 360',
+              sizes: '220px',
+              class: 'ctr-mobile-menu__logo-image'
+          }}
+        {% elsif settings.logo != blank %}
+          {{
+            settings.logo
+            | image_url: width: 360
+            | image_tag:
+              loading: 'lazy',
+              widths: '180, 260, 360',
+              sizes: '220px',
+              class: 'ctr-mobile-menu__logo-image'
+          }}
+        {% else %}
+          <span class="ctr-mobile-menu__logo-text">{{ shop.name }}</span>
+        {% endif %}
+      </a>
       <nav
         class="menu-drawer__navigation"
         style="
@@ -123,7 +152,193 @@
                 data-ctr-menu-role="{{ ctr_menu_role }}"
                 data-ctr-menu-handle="{{ link.handle }}"
               >
-                {% if block_settings.drawer_accordion and link.links != blank %}
+                {% if block_settings.ctr_mobile_custom_drawer and ctr_menu_role == 'shop' and block_settings.ctr_shop_enable %}
+                  <details
+                    id="Details-menu-drawer-menu-item-{{ forloop.index }}"
+                    class="menu-drawer__menu-container ctr-mobile-menu__container"
+                  >
+                    <summary
+                      id="HeaderDrawer-{{ link.handle }}"
+                      class="menu-drawer__menu-item menu-drawer__menu-item--mainlist menu-drawer__animated-element focus-inset ctr-mobile-menu__root-link"
+                      on:click="header-drawer/open/submenu"
+                      data-ctr-menu-role="{{ ctr_menu_role }}"
+                      data-ctr-menu-handle="{{ link.handle }}"
+                    >
+                      <span class="menu-drawer__menu-item-text wrap-text">{{ link.title | escape }}</span>
+                      <span class="svg-wrapper icon-caret icon-caret--forward">
+                        {{- 'icon-caret.svg' | inline_asset_content -}}
+                      </span>
+                    </summary>
+                    <div
+                      id="link-{{ link.handle | escape }}"
+                      class="menu-drawer__submenu has-submenu color-{{ block_settings.color_scheme }}"
+                      tabindex="-1"
+                      style="--menu-drawer-animation-index: {{ animation_index }};"
+                    >
+                      <div class="menu-drawer__inner-submenu ctr-mobile-menu__panel">
+                        <div class="menu-drawer__nav-buttons ctr-mobile-menu__nav">
+                          <button
+                            class="button menu-drawer__back-button focus-inset ctr-mobile-menu__back"
+                            on:click="header-drawer/back"
+                            aria-label="{{ 'actions.back_to' | t: title: link.title }}"
+                          >
+                            <span class="svg-wrapper icon-caret icon-caret--backward">
+                              {{- 'icon-caret.svg' | inline_asset_content -}}
+                            </span>
+                            <span class="menu-drawer__menu-item-text wrap-text">{{ link.title | escape }}</span>
+                          </button>
+                        </div>
+
+                        <div class="ctr-mobile-menu__shop-grid">
+                          {% for product_index in (1..6) %}
+                            {% liquid
+                              assign ctr_product_key = 'ctr_shop_product_' | append: product_index
+                              assign ctr_image_key = 'ctr_shop_product_' | append: product_index | append: '_image'
+                              assign ctr_label_key = 'ctr_shop_product_' | append: product_index | append: '_label'
+                              assign ctr_link_key = 'ctr_shop_product_' | append: product_index | append: '_link'
+                              assign ctr_product = block_settings[ctr_product_key]
+                              assign ctr_product_image = block_settings[ctr_image_key]
+                              assign ctr_product_label = block_settings[ctr_label_key]
+                              assign ctr_product_link = block_settings[ctr_link_key]
+
+                              if ctr_product_image == blank and ctr_product != blank
+                                assign ctr_product_image = ctr_product.featured_image
+                              endif
+
+                              if ctr_product_label == blank and ctr_product != blank
+                                assign ctr_product_label = ctr_product.title
+                              endif
+
+                              if ctr_product_link == blank and ctr_product != blank
+                                assign ctr_product_link = ctr_product.url
+                              endif
+                            %}
+
+                            {% if ctr_product != blank or ctr_product_image != blank or ctr_product_label != blank or ctr_product_link != blank %}
+                              <a
+                                class="ctr-mobile-menu__product-card"
+                                {% if ctr_product_link != blank %}
+                                  href="{{ ctr_product_link }}"
+                                {% else %}
+                                  role="link"
+                                  aria-disabled="true"
+                                {% endif %}
+                              >
+                                <span class="ctr-mobile-menu__product-media">
+                                  {% if ctr_product_image != blank %}
+                                    {{
+                                      ctr_product_image
+                                      | image_url: width: 520
+                                      | image_tag:
+                                        loading: 'lazy',
+                                        widths: '240, 360, 520',
+                                        sizes: '45vw',
+                                        class: 'ctr-mobile-menu__product-image'
+                                    }}
+                                  {% else %}
+                                    {{ 'product-1' | placeholder_svg_tag: 'ctr-mobile-menu__product-placeholder' }}
+                                  {% endif %}
+                                </span>
+                                {% if ctr_product_label != blank %}
+                                  <span class="ctr-mobile-menu__product-label">{{ ctr_product_label }}</span>
+                                {% endif %}
+                              </a>
+                            {% endif %}
+                          {% endfor %}
+                        </div>
+
+                        {% if block_settings.ctr_mobile_shop_all_label != blank and block_settings.ctr_mobile_shop_all_link != blank %}
+                          <a class="ctr-mobile-menu__shop-all" href="{{ block_settings.ctr_mobile_shop_all_link }}">
+                            {{ block_settings.ctr_mobile_shop_all_label }}
+                            <span aria-hidden="true">&rarr;</span>
+                          </a>
+                        {% endif %}
+                      </div>
+                    </div>
+                  </details>
+                {% elsif block_settings.ctr_mobile_custom_drawer and ctr_menu_role == 'explore' and block_settings.ctr_explore_enable %}
+                  <details
+                    id="Details-menu-drawer-menu-item-{{ forloop.index }}"
+                    class="menu-drawer__menu-container ctr-mobile-menu__container"
+                  >
+                    <summary
+                      id="HeaderDrawer-{{ link.handle }}"
+                      class="menu-drawer__menu-item menu-drawer__menu-item--mainlist menu-drawer__animated-element focus-inset ctr-mobile-menu__root-link"
+                      on:click="header-drawer/open/submenu"
+                      data-ctr-menu-role="{{ ctr_menu_role }}"
+                      data-ctr-menu-handle="{{ link.handle }}"
+                    >
+                      <span class="menu-drawer__menu-item-text wrap-text">{{ link.title | escape }}</span>
+                      <span class="svg-wrapper icon-caret icon-caret--forward">
+                        {{- 'icon-caret.svg' | inline_asset_content -}}
+                      </span>
+                    </summary>
+                    <div
+                      id="link-{{ link.handle | escape }}"
+                      class="menu-drawer__submenu has-submenu color-{{ block_settings.color_scheme }}"
+                      tabindex="-1"
+                      style="--menu-drawer-animation-index: {{ animation_index }};"
+                    >
+                      <div class="menu-drawer__inner-submenu ctr-mobile-menu__panel">
+                        <div class="menu-drawer__nav-buttons ctr-mobile-menu__nav">
+                          <button
+                            class="button menu-drawer__back-button focus-inset ctr-mobile-menu__back"
+                            on:click="header-drawer/back"
+                            aria-label="{{ 'actions.back_to' | t: title: link.title }}"
+                          >
+                            <span class="svg-wrapper icon-caret icon-caret--backward">
+                              {{- 'icon-caret.svg' | inline_asset_content -}}
+                            </span>
+                            <span class="menu-drawer__menu-item-text wrap-text">{{ link.title | escape }}</span>
+                          </button>
+                        </div>
+
+                        <div class="ctr-mobile-menu__explore-grid">
+                          {% for card_index in (1..8) %}
+                            {% liquid
+                              assign ctr_image_key = 'ctr_explore_card_' | append: card_index | append: '_image'
+                              assign ctr_label_key = 'ctr_explore_card_' | append: card_index | append: '_label'
+                              assign ctr_link_key = 'ctr_explore_card_' | append: card_index | append: '_link'
+                              assign ctr_image = block_settings[ctr_image_key]
+                              assign ctr_label = block_settings[ctr_label_key]
+                              assign ctr_link = block_settings[ctr_link_key]
+                            %}
+
+                            {% if ctr_image != blank or ctr_label != blank or ctr_link != blank %}
+                              <a
+                                class="ctr-mobile-menu__explore-card"
+                                {% if ctr_link != blank %}
+                                  href="{{ ctr_link }}"
+                                {% else %}
+                                  role="link"
+                                  aria-disabled="true"
+                                {% endif %}
+                              >
+                                {% if ctr_image != blank %}
+                                  {{
+                                    ctr_image
+                                    | image_url: width: 620
+                                    | image_tag:
+                                      loading: 'lazy',
+                                      widths: '260, 420, 620',
+                                      sizes: '45vw',
+                                      class: 'ctr-mobile-menu__explore-image'
+                                  }}
+                                {% else %}
+                                  {{ 'collection-1' | placeholder_svg_tag: 'ctr-mobile-menu__explore-placeholder' }}
+                                {% endif %}
+                                {% if ctr_label != blank %}
+                                  <span class="ctr-mobile-menu__explore-label">{{ ctr_label }}</span>
+                                {% endif %}
+                                <span class="ctr-mobile-menu__explore-arrow" aria-hidden="true">&rarr;</span>
+                              </a>
+                            {% endif %}
+                          {% endfor %}
+                        </div>
+                      </div>
+                    </div>
+                  </details>
+                {% elsif block_settings.drawer_accordion and link.links != blank %}
                   {%- comment -%}
                     Accordion for links with children, in menus with fewer than 3 levels of links
                   {%- endcomment -%}
@@ -271,6 +486,51 @@
                 {% endif %}
               </li>
             {%- endfor -%}
+            {% if block_settings.ctr_mobile_custom_drawer %}
+              {% if block_settings.ctr_mobile_show_promo and block_settings.ctr_mobile_promo_heading != blank %}
+                <li
+                  class="ctr-mobile-menu__promo-item menu-drawer__animated-element"
+                  style="--menu-drawer-animation-index: {{ animation_index | plus: 1 }};"
+                >
+                  <a
+                    class="ctr-mobile-menu__promo"
+                    {% if block_settings.ctr_mobile_promo_link != blank %}
+                      href="{{ block_settings.ctr_mobile_promo_link }}"
+                    {% else %}
+                      role="link"
+                      aria-disabled="true"
+                    {% endif %}
+                  >
+                    {% if block_settings.ctr_mobile_promo_image != blank %}
+                      {{
+                        block_settings.ctr_mobile_promo_image
+                        | image_url: width: 900
+                        | image_tag:
+                          loading: 'lazy',
+                          widths: '360, 560, 760, 900',
+                          sizes: '90vw',
+                          class: 'ctr-mobile-menu__promo-image'
+                      }}
+                    {% else %}
+                      {{ 'product-1' | placeholder_svg_tag: 'ctr-mobile-menu__promo-placeholder' }}
+                    {% endif %}
+                    <span class="ctr-mobile-menu__promo-heading">{{ block_settings.ctr_mobile_promo_heading }}</span>
+                    <span class="ctr-mobile-menu__promo-arrow" aria-hidden="true">&rarr;</span>
+                  </a>
+                </li>
+              {% endif %}
+
+              {% if block_settings.ctr_mobile_show_cta and block_settings.ctr_mobile_cta_label != blank and block_settings.ctr_mobile_cta_link != blank %}
+                <li
+                  class="ctr-mobile-menu__cta-item menu-drawer__animated-element"
+                  style="--menu-drawer-animation-index: {{ animation_index | plus: 2 }};"
+                >
+                  <a class="ctr-mobile-menu__cta" href="{{ block_settings.ctr_mobile_cta_link }}">
+                    {{ block_settings.ctr_mobile_cta_label }}
+                  </a>
+                </li>
+              {% endif %}
+            {% endif %}
           {% else %}
             {%- comment -%}
               Handle menus with 3 levels of links
@@ -1451,5 +1711,292 @@
 
   .drawer-localization .language-selector .svg-wrapper.icon-caret svg {
     transform: none;
+  }
+
+  @media screen and (max-width: 749px) {
+    .menu-drawer {
+      width: 100vw;
+      max-width: none;
+      border-right: 0;
+      box-shadow: none;
+    }
+
+    .menu-drawer__close-button {
+      padding: 36px var(--padding-xl) 22px;
+    }
+
+    .ctr-mobile-menu__logo {
+      position: absolute;
+      top: 36px;
+      left: 88px;
+      z-index: 1;
+      display: flex;
+      max-width: calc(100vw - 130px);
+      min-height: 32px;
+      align-items: center;
+      color: var(--color-foreground);
+      text-decoration: none;
+    }
+
+    .ctr-mobile-menu__logo-image {
+      display: block;
+      width: auto;
+      max-width: 230px;
+      height: 36px;
+      object-fit: contain;
+      object-position: left center;
+    }
+
+    .ctr-mobile-menu__logo-text {
+      font-size: 40px;
+      line-height: 1;
+    }
+
+    .menu-drawer__close-button .header-drawer-icon {
+      width: 28px;
+      height: 28px;
+    }
+
+    .menu-drawer__menu {
+      padding-inline: 24px;
+    }
+
+    .menu-drawer__menu > .menu-drawer__list-item {
+      min-height: 72px;
+    }
+
+    .ctr-mobile-menu__container {
+      width: 100%;
+    }
+
+    .ctr-mobile-menu__root-link.menu-drawer__menu-item--mainlist {
+      min-height: 72px;
+      padding: 0;
+      font-size: 32px;
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    .ctr-mobile-menu__root-link .icon-caret {
+      padding: 0;
+    }
+
+    .ctr-mobile-menu__root-link .icon-caret svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    .ctr-mobile-menu__promo-item,
+    .ctr-mobile-menu__cta-item {
+      display: block;
+      width: 100%;
+      min-height: 0;
+    }
+
+    .ctr-mobile-menu__promo {
+      position: relative;
+      display: block;
+      aspect-ratio: 1.02;
+      margin-block: 30px 22px;
+      overflow: hidden;
+      border-radius: 24px;
+      color: var(--color-background);
+      text-decoration: none;
+      background: rgb(var(--color-foreground-rgb) / 0.08);
+    }
+
+    .ctr-mobile-menu__promo::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgb(0 0 0 / 0.18), rgb(0 0 0 / 0.02) 65%);
+      pointer-events: none;
+    }
+
+    .ctr-mobile-menu__promo-image,
+    .ctr-mobile-menu__promo-placeholder {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .ctr-mobile-menu__promo-heading {
+      position: absolute;
+      top: 30px;
+      left: 30px;
+      right: 24px;
+      z-index: 1;
+      font-size: clamp(42px, 13vw, 62px);
+      font-weight: 500;
+      line-height: 1.12;
+      letter-spacing: 0;
+      white-space: normal;
+    }
+
+    .ctr-mobile-menu__promo-arrow,
+    .ctr-mobile-menu__explore-arrow {
+      position: absolute;
+      z-index: 1;
+      display: grid;
+      width: 48px;
+      height: 48px;
+      place-items: center;
+      border-radius: 999px;
+      background: var(--color-background);
+      color: var(--color-foreground);
+      font-size: 28px;
+      line-height: 1;
+    }
+
+    .ctr-mobile-menu__promo-arrow {
+      left: 30px;
+      bottom: 30px;
+    }
+
+    .ctr-mobile-menu__cta {
+      display: flex;
+      min-height: 94px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      color: var(--color-primary-button-text);
+      background: var(--color-primary-button-background);
+      font-size: 28px;
+      line-height: 1;
+      text-decoration: none;
+    }
+
+    .ctr-mobile-menu__panel {
+      padding: 0 24px 28px;
+      background: var(--color-background);
+    }
+
+    .ctr-mobile-menu__nav {
+      padding-block: 18px 24px;
+    }
+
+    .ctr-mobile-menu__back.menu-drawer__back-button {
+      width: fit-content;
+      min-height: 40px;
+      padding: 0;
+      font-size: 32px;
+      font-weight: 400;
+      line-height: 1;
+    }
+
+    .ctr-mobile-menu__back .svg-wrapper {
+      margin-right: 10px;
+      width: 22px;
+      height: 22px;
+    }
+
+    .ctr-mobile-menu__shop-grid,
+    .ctr-mobile-menu__explore-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 32px 16px;
+    }
+
+    .ctr-mobile-menu__product-card {
+      display: flex;
+      min-width: 0;
+      min-height: 0;
+      flex-direction: column;
+      overflow: hidden;
+      border-radius: 22px;
+      color: var(--color-foreground);
+      background: rgb(var(--color-foreground-rgb) / 0.04);
+      text-align: center;
+      text-decoration: none;
+    }
+
+    .ctr-mobile-menu__product-media {
+      display: block;
+      aspect-ratio: 1 / 1.08;
+      padding: 26px 18px 8px;
+    }
+
+    .ctr-mobile-menu__product-image,
+    .ctr-mobile-menu__product-placeholder {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .ctr-mobile-menu__product-label {
+      display: flex;
+      min-height: 86px;
+      align-items: center;
+      justify-content: center;
+      padding: 0 12px 22px;
+      font-size: clamp(24px, 7vw, 36px);
+      font-weight: 700;
+      line-height: 1.1;
+      white-space: normal;
+    }
+
+    .ctr-mobile-menu__shop-all {
+      display: flex;
+      min-height: 94px;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      margin-top: 42px;
+      border: 4px solid var(--color-foreground);
+      border-radius: 999px;
+      color: var(--color-foreground);
+      font-size: 32px;
+      line-height: 1;
+      text-decoration: none;
+    }
+
+    .ctr-mobile-menu__explore-card {
+      position: relative;
+      display: block;
+      min-width: 0;
+      aspect-ratio: 1 / 1;
+      overflow: hidden;
+      border-radius: 22px;
+      color: var(--color-background);
+      background: rgb(var(--color-foreground-rgb) / 0.08);
+      text-decoration: none;
+    }
+
+    .ctr-mobile-menu__explore-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgb(0 0 0 / 0.2), rgb(0 0 0 / 0.04) 60%);
+      pointer-events: none;
+    }
+
+    .ctr-mobile-menu__explore-image,
+    .ctr-mobile-menu__explore-placeholder {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .ctr-mobile-menu__explore-label {
+      position: absolute;
+      top: 28px;
+      left: 28px;
+      right: 16px;
+      z-index: 1;
+      font-size: clamp(31px, 8vw, 44px);
+      font-weight: 500;
+      line-height: 1.1;
+      letter-spacing: 0;
+      white-space: normal;
+    }
+
+    .ctr-mobile-menu__explore-arrow {
+      left: 28px;
+      bottom: 28px;
+    }
   }
 {% endstylesheet %}
