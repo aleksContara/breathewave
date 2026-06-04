@@ -1,92 +1,462 @@
-
-
-<div class="section-background color-{{ section.settings.color_scheme }}"></div>
-<div
-  class="section section--{{ section.settings.section_width }} color-{{ section.settings.color_scheme }}"
+<footer
+  class="ctr-footer color-{{ section.settings.color_scheme }}"
+  style="
+    --ctr-footer-submit-background: {{ section.settings.submit_background }};
+    --ctr-footer-submit-text: {{ section.settings.submit_text_color }};
+  "
 >
-  {% liquid
-    assign total_blocks = section.blocks.size
+  {% if section.settings.top_image != blank %}
+    <div class="ctr-footer__top-media">
+      {{
+        section.settings.top_image
+        | image_url: width: 3200
+        | image_tag:
+          loading: 'lazy',
+          widths: '750, 1100, 1600, 2200, 3200',
+          sizes: '100vw',
+          class: 'ctr-footer__top-image'
+      }}
+    </div>
+  {% endif %}
 
-    # Grid layout calculations
-    assign grid_columns = total_blocks | at_most: 4
+  <div class="ctr-footer__inner section section--{{ section.settings.section_width }}">
+    <div class="ctr-footer__main">
+      <div class="ctr-footer__brand">
+        {% if section.settings.footer_logo != blank %}
+          <a class="ctr-footer__logo" href="{{ routes.root_url }}" aria-label="{{ 'accessibility.home_logo_alt' | t: store_name: shop.name }}">
+            {{
+              section.settings.footer_logo
+              | image_url: width: 760
+              | image_tag:
+                loading: 'lazy',
+                widths: '260, 420, 600, 760',
+                sizes: '(min-width: 990px) 330px, 72vw',
+                class: 'ctr-footer__logo-image'
+            }}
+          </a>
+        {% endif %}
 
-    # Calculate last row counts using modulo arithmetic
-    # last_row_count = (total_blocks - 1) % N + 1
-    assign last_row_count = total_blocks | minus: 1 | modulo: 4 | plus: 1
-    assign tablet_last_row_count = total_blocks | minus: 1 | modulo: 2 | plus: 1
+        {% if section.settings.show_instagram and section.settings.instagram_handle != blank %}
+          <a
+            class="ctr-footer__social"
+            {% if section.settings.instagram_link != blank %}
+              href="{{ section.settings.instagram_link }}"
+            {% else %}
+              role="link"
+              aria-disabled="true"
+            {% endif %}
+          >
+            <span class="ctr-footer__instagram-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <rect x="3" y="3" width="18" height="18" rx="5"></rect>
+                <circle cx="12" cy="12" r="4"></circle>
+                <circle cx="17.5" cy="6.5" r="1.2"></circle>
+              </svg>
+            </span>
+            <span>{{ section.settings.instagram_handle }}</span>
+          </a>
+        {% endif %}
+      </div>
 
-    # Check if there are orphaned elements (single item in last row)
-    assign has_isolated_grid_item_desktop = false
-    assign has_isolated_grid_item_tablet = false
+      <div class="ctr-footer__newsletter">
+        {% if section.settings.newsletter_heading != blank %}
+          <h2 class="ctr-footer__newsletter-heading">{{ section.settings.newsletter_heading }}</h2>
+        {% endif %}
+        {% if section.settings.newsletter_text != blank %}
+          <div class="ctr-footer__newsletter-text">{{ section.settings.newsletter_text }}</div>
+        {% endif %}
 
-    if total_blocks > 4 and last_row_count == 1
-      assign has_isolated_grid_item_desktop = true
-    endif
+        {%- form 'customer', class: 'ctr-footer__form' -%}
+          <input type="hidden" name="contact[tags]" value="newsletter">
+          <label class="visually-hidden" for="CtrFooterEmail-{{ section.id }}">{{ 'blocks.email_signup.label' | t }}</label>
+          <input
+            id="CtrFooterEmail-{{ section.id }}"
+            class="ctr-footer__input"
+            type="email"
+            name="contact[email]"
+            autocorrect="off"
+            autocapitalize="off"
+            autocomplete="email"
+            placeholder="{{ section.settings.newsletter_placeholder }}"
+            required
+            {% if form.errors %}
+              aria-invalid="true"
+              aria-describedby="CtrFooterMessage-{{ section.id }}"
+            {% elsif form.posted_successfully? %}
+              aria-describedby="CtrFooterMessage-{{ section.id }}"
+            {% endif %}
+          >
+          <button class="ctr-footer__submit" type="submit">{{ section.settings.newsletter_button_label }}</button>
 
-    if total_blocks == 5
-      assign has_isolated_grid_item_tablet = true
-    endif
-  %}
-  <div
-    class="
-      footer-content
-      spacing-style
-      {% if has_isolated_grid_item_desktop %}footer-content--isolated-grid-item-desktop{% endif %}
-      {% if has_isolated_grid_item_tablet %}footer-content--isolated-grid-item-tablet{% endif %}
-    "
-    style="
-      {%  render 'spacing-style', settings: section.settings %}
-      --footer-gap: {{ section.settings.gap }}px;
-      --grid-columns: {{ grid_columns }};
-      --last-row-count: {{ last_row_count }};
-      --tablet-last-row-count: {{ tablet_last_row_count }};
-    "
-  >
-    {% content_for 'blocks' %}
+          {% if form.errors %}
+            <p id="CtrFooterMessage-{{ section.id }}" class="ctr-footer__message">
+              {{ form.errors.translated_fields.email | capitalize }}
+              {{ form.errors.messages.email }}
+            </p>
+          {% elsif form.posted_successfully? %}
+            <p id="CtrFooterMessage-{{ section.id }}" class="ctr-footer__message">
+              {{ 'blocks.email_signup.success' | t }}
+            </p>
+          {% endif %}
+        {%- endform -%}
+      </div>
+
+      <div class="ctr-footer__menus">
+        {% if section.settings.shop_menu != blank %}
+          <nav class="ctr-footer__menu" aria-label="{{ section.settings.shop_menu_heading | escape }}">
+            {% if section.settings.shop_menu_heading != blank %}
+              <h3 class="ctr-footer__menu-heading">{{ section.settings.shop_menu_heading }}</h3>
+            {% endif %}
+            <ul class="ctr-footer__menu-list">
+              {% for link in section.settings.shop_menu.links %}
+                <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+              {% endfor %}
+            </ul>
+          </nav>
+        {% endif %}
+
+        {% if section.settings.learn_menu != blank %}
+          <nav class="ctr-footer__menu" aria-label="{{ section.settings.learn_menu_heading | escape }}">
+            {% if section.settings.learn_menu_heading != blank %}
+              <h3 class="ctr-footer__menu-heading">{{ section.settings.learn_menu_heading }}</h3>
+            {% endif %}
+            <ul class="ctr-footer__menu-list">
+              {% for link in section.settings.learn_menu.links %}
+                <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+              {% endfor %}
+            </ul>
+          </nav>
+        {% endif %}
+      </div>
+    </div>
+
+    {% if section.settings.show_legal_row %}
+      <div class="ctr-footer__bottom">
+        {% if section.settings.legal_menu != blank %}
+          <nav class="ctr-footer__legal" aria-label="Legal">
+            {% for link in section.settings.legal_menu.links %}
+              <a href="{{ link.url }}">{{ link.title }}</a>
+            {% endfor %}
+          </nav>
+        {% endif %}
+
+        {% if section.settings.copyright_text != blank %}
+          <div class="ctr-footer__copyright">{{ section.settings.copyright_text }}</div>
+        {% endif %}
+      </div>
+    {% endif %}
   </div>
-</div>
+</footer>
 
 {% stylesheet %}
-  .footer-content {
-    contain: content;
-    content-visibility: auto;
+  .ctr-footer {
+    background: var(--color-background);
+    color: var(--color-foreground);
+  }
+
+  .ctr-footer__top-media {
+    width: 100%;
+    height: clamp(82px, 15vw, 250px);
+    overflow: hidden;
+    background: var(--color-background);
+  }
+
+  .ctr-footer__top-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center bottom;
+  }
+
+  .ctr-footer__inner {
+    padding-block: 0 var(--padding-3xl);
+  }
+
+  .ctr-footer__main {
     display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--footer-gap);
-    align-items: start;
+    grid-template-columns: minmax(220px, 0.9fr) minmax(420px, 1.35fr) minmax(260px, 0.9fr);
+    gap: clamp(48px, 6vw, 112px);
+    align-items: center;
+    padding-block: clamp(56px, 7vw, 96px);
   }
 
-  .footer-content .menu__heading__default {
-    font-weight: var(--font-heading--weight);
+  .ctr-footer__brand {
+    display: flex;
+    flex-direction: column;
+    gap: 42px;
+    align-items: flex-start;
   }
 
-  @media screen and (min-width: 750px) and (max-width: 989px) {
-    .footer-content {
-      grid-template-columns: repeat(min(var(--grid-columns), 3), 1fr);
-      grid-auto-flow: row;
-    }
-
-    .footer-content[style*='--grid-columns: 4'] {
-      grid-template-columns: repeat(2, 1fr);
-    }
-
-    .footer-content--isolated-grid-item-tablet > :last-child {
-      grid-column: 1 / -1;
-    }
+  .ctr-footer__logo {
+    display: block;
+    color: inherit;
+    text-decoration: none;
   }
 
-  @media screen and (min-width: 990px) {
-    .footer-content {
-      grid-template-columns: repeat(var(--grid-columns), 1fr);
+  .ctr-footer__logo-image {
+    display: block;
+    width: min(330px, 100%);
+    height: auto;
+  }
+
+  .ctr-footer__social {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    color: var(--color-foreground);
+    font-size: clamp(18px, 1.5vw, 25px);
+    font-weight: 700;
+    line-height: 1;
+    text-decoration: none;
+  }
+
+  .ctr-footer__instagram-icon {
+    display: inline-grid;
+    width: 31px;
+    height: 31px;
+    place-items: center;
+    flex: 0 0 auto;
+  }
+
+  .ctr-footer__instagram-icon svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+  }
+
+  .ctr-footer__newsletter {
+    text-align: center;
+  }
+
+  .ctr-footer__newsletter-heading {
+    margin: 0;
+    color: var(--color-foreground);
+    font-family: var(--font-heading--family);
+    font-size: clamp(30px, 2.4vw, 42px);
+    font-weight: 500;
+    line-height: 1.05;
+    letter-spacing: 0;
+  }
+
+  .ctr-footer__newsletter-text {
+    margin-top: 22px;
+    color: rgb(var(--color-foreground-rgb) / 0.7);
+    font-size: clamp(17px, 1.2vw, 22px);
+    line-height: 1.35;
+  }
+
+  .ctr-footer__form {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 210px;
+    gap: 16px;
+    margin-top: 36px;
+  }
+
+  .ctr-footer__input {
+    width: 100%;
+    min-height: 84px;
+    padding: 0 28px;
+    border: 2px solid rgb(var(--color-foreground-rgb) / 0.65);
+    border-radius: 999px;
+    color: var(--color-foreground);
+    background: transparent;
+    font: inherit;
+    font-size: 21px;
+  }
+
+  .ctr-footer__input::placeholder {
+    color: rgb(var(--color-foreground-rgb) / 0.62);
+    opacity: 1;
+  }
+
+  .ctr-footer__submit {
+    min-height: 84px;
+    padding: 0 34px;
+    border: 0;
+    border-radius: 999px;
+    color: var(--ctr-footer-submit-text);
+    background: var(--ctr-footer-submit-background);
+    font: inherit;
+    font-size: 22px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .ctr-footer__message {
+    grid-column: 1 / -1;
+    margin: 12px 0 0;
+    color: rgb(var(--color-foreground-rgb) / 0.72);
+    font-size: 14px;
+  }
+
+  .ctr-footer__menus {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(42px, 5vw, 86px);
+    align-self: start;
+    justify-self: end;
+  }
+
+  .ctr-footer__menu-heading {
+    margin: 0 0 18px;
+    color: var(--color-foreground);
+    font-size: clamp(22px, 1.5vw, 30px);
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .ctr-footer__menu-list {
+    display: grid;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .ctr-footer__menu-list a,
+  .ctr-footer__legal a,
+  .ctr-footer__copyright a {
+    color: rgb(var(--color-foreground-rgb) / 0.72);
+    text-decoration: none;
+  }
+
+  .ctr-footer__menu-list a {
+    font-size: clamp(19px, 1.35vw, 26px);
+    line-height: 1.2;
+  }
+
+  .ctr-footer__menu-list a:hover,
+  .ctr-footer__legal a:hover,
+  .ctr-footer__copyright a:hover {
+    color: var(--color-foreground);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  .ctr-footer__bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 32px;
+    padding-top: 76px;
+    border-top: 1px solid rgb(var(--color-foreground-rgb) / 0.28);
+  }
+
+  .ctr-footer__legal {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 26px 38px;
+  }
+
+  .ctr-footer__legal a,
+  .ctr-footer__copyright {
+    color: rgb(var(--color-foreground-rgb) / 0.72);
+    font-size: clamp(15px, 1.1vw, 20px);
+    line-height: 1.3;
+  }
+
+  @media screen and (max-width: 989px) {
+    .ctr-footer__main {
+      grid-template-columns: 1fr;
+      gap: 72px;
+      padding-block: 40px 54px;
     }
 
-    /* Single item centered */
-    .footer-content[style*='--grid-columns: 1'] {
+    .ctr-footer__newsletter {
+      order: 1;
+    }
+
+    .ctr-footer__menus {
+      order: 2;
+      width: min(390px, 100%);
+      justify-self: center;
+      gap: 68px;
+    }
+
+    .ctr-footer__brand {
+      order: 3;
+      align-items: center;
+      gap: 36px;
+    }
+
+    .ctr-footer__logo-image {
+      width: min(310px, 70vw);
+    }
+
+    .ctr-footer__form {
+      grid-template-columns: 1fr;
+      gap: 18px;
+      margin-top: 34px;
+    }
+
+    .ctr-footer__input,
+    .ctr-footer__submit {
+      min-height: 74px;
+      font-size: 20px;
+    }
+
+    .ctr-footer__bottom {
+      display: grid;
+      gap: 34px;
       justify-items: center;
+      padding-top: 40px;
     }
 
-    .footer-content--isolated-grid-item-desktop > :last-child {
-      grid-column: 1 / -1;
+    .ctr-footer__legal {
+      justify-content: flex-start;
+      justify-self: stretch;
+      gap: 18px 26px;
+    }
+
+    .ctr-footer__copyright {
+      text-align: center;
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .ctr-footer__inner {
+      padding-inline: 32px;
+      padding-block-end: 46px;
+    }
+
+    .ctr-footer__top-media {
+      height: 150px;
+    }
+
+    .ctr-footer__newsletter-heading {
+      font-size: 36px;
+    }
+
+    .ctr-footer__newsletter-text {
+      margin-top: 18px;
+      font-size: 18px;
+    }
+
+    .ctr-footer__menus {
+      width: 100%;
+      max-width: 350px;
+      gap: 58px;
+    }
+
+    .ctr-footer__menu-heading {
+      font-size: 26px;
+    }
+
+    .ctr-footer__menu-list a {
+      font-size: 22px;
+    }
+
+    .ctr-footer__social {
+      font-size: 22px;
+    }
+
+    .ctr-footer__legal a,
+    .ctr-footer__copyright {
+      font-size: 18px;
     }
   }
 {% endstylesheet %}
@@ -95,50 +465,6 @@
 {
   "name": "t:names.footer",
   "class": "section-wrapper",
-  "blocks": [
-    {
-      "type": "_divider"
-    },
-    {
-      "type": "@app"
-    },
-    {
-      "type": "button"
-    },
-    {
-      "type": "follow-on-shop"
-    },
-    {
-      "type": "group"
-    },
-    {
-      "type": "icon"
-    },
-    {
-      "type": "image"
-    },
-    {
-      "type": "menu"
-    },
-    {
-      "type": "payment-icons"
-    },
-    {
-      "type": "text"
-    },
-    {
-      "type": "logo"
-    },
-    {
-      "type": "jumbo-text"
-    },
-    {
-      "type": "social-links"
-    },
-    {
-      "type": "email-signup"
-    }
-  ],
   "enabled_on": {
     "groups": ["footer"]
   },
@@ -160,98 +486,134 @@
       "default": "page-width"
     },
     {
-      "type": "range",
-      "id": "gap",
-      "label": "t:settings.gap",
-      "min": 0,
-      "max": 100,
-      "step": 1,
-      "unit": "px",
-      "default": 0
-    },
-    {
       "type": "color_scheme",
       "id": "color_scheme",
       "label": "t:settings.color_scheme",
-      "default": "scheme-1"
+      "default": "scheme-2"
+    },
+    {
+      "type": "image_picker",
+      "id": "top_image",
+      "label": "Top wave image"
+    },
+    {
+      "type": "image_picker",
+      "id": "footer_logo",
+      "label": "Footer logo"
     },
     {
       "type": "header",
-      "content": "t:content.padding"
+      "content": "Newsletter"
     },
     {
-      "type": "range",
-      "id": "padding-block-start",
-      "label": "t:settings.top",
-      "min": 0,
-      "max": 100,
-      "step": 1,
-      "unit": "px",
-      "default": 20
+      "type": "text",
+      "id": "newsletter_heading",
+      "label": "Heading",
+      "default": "join our community"
     },
     {
-      "type": "range",
-      "id": "padding-block-end",
-      "label": "t:settings.bottom",
-      "min": 0,
-      "max": 100,
-      "step": 1,
-      "unit": "px",
-      "default": 20
+      "type": "text",
+      "id": "newsletter_text",
+      "label": "Text",
+      "default": "Let's grow stronger, together."
+    },
+    {
+      "type": "text",
+      "id": "newsletter_placeholder",
+      "label": "Placeholder",
+      "default": "Email"
+    },
+    {
+      "type": "text",
+      "id": "newsletter_button_label",
+      "label": "Button label",
+      "default": "Submit"
+    },
+    {
+      "type": "color",
+      "id": "submit_background",
+      "label": "Submit background",
+      "default": "#6cfff5"
+    },
+    {
+      "type": "color",
+      "id": "submit_text_color",
+      "label": "Submit text color",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Menus"
+    },
+    {
+      "type": "text",
+      "id": "shop_menu_heading",
+      "label": "Shop menu heading",
+      "default": "shop"
+    },
+    {
+      "type": "link_list",
+      "id": "shop_menu",
+      "label": "Shop menu"
+    },
+    {
+      "type": "text",
+      "id": "learn_menu_heading",
+      "label": "Learn menu heading",
+      "default": "learn"
+    },
+    {
+      "type": "link_list",
+      "id": "learn_menu",
+      "label": "Learn menu"
+    },
+    {
+      "type": "header",
+      "content": "Social"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_instagram",
+      "label": "Show Instagram",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "instagram_handle",
+      "label": "Instagram handle",
+      "default": "@breathewave"
+    },
+    {
+      "type": "url",
+      "id": "instagram_link",
+      "label": "Instagram link"
+    },
+    {
+      "type": "header",
+      "content": "Legal"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_legal_row",
+      "label": "Show legal row",
+      "default": true
+    },
+    {
+      "type": "link_list",
+      "id": "legal_menu",
+      "label": "Legal menu"
+    },
+    {
+      "type": "richtext",
+      "id": "copyright_text",
+      "label": "Copyright text",
+      "default": "<p>© 2026 breathewave.</p>"
     }
   ],
   "presets": [
     {
       "name": "t:names.footer",
-      "category": "t:categories.footer",
-      "settings": {
-        "gap": 20,
-        "color_scheme": "scheme-1",
-        "padding-block-start": 36,
-        "padding-block-end": 36
-      },
-      "blocks": {
-        "newsletter-group": {
-          "type": "group",
-          "settings": {
-            "content_direction": "column",
-            "vertical_on_mobile": true,
-            "horizontal_alignment": "flex-start",
-            "vertical_alignment": "center",
-            "gap": 6,
-            "width": "fill",
-            "inherit_color_scheme": true
-          },
-          "blocks": {
-            "newsletter-heading": {
-              "type": "text",
-              "settings": {
-                "text": "t:html_defaults.join_our_email_list",
-                "width": "100%",
-                "alignment": "left",
-                "type_preset": "h3"
-              }
-            },
-            "newsletter-text": {
-              "type": "text",
-              "settings": {
-                "text": "t:html_defaults.get_exclusive_deals_and_early_access_to_new_products",
-                "width": "100%",
-                "alignment": "left",
-                "type_preset": "rte"
-              }
-            }
-          },
-          "block_order": ["newsletter-heading", "newsletter-text"]
-        },
-        "newsletter-form": {
-          "type": "email-signup",
-          "settings": {
-            "width": "fill"
-          }
-        }
-      },
-      "block_order": ["newsletter-group", "newsletter-form"]
+      "category": "t:categories.footer"
     }
   ]
 }
