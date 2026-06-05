@@ -100,6 +100,7 @@
 
           assign render_ctr_shop_mega = false
           assign render_ctr_explore_mega = false
+          assign has_ctr_submenu = false
           assign ctr_shop_product_count = 0
           assign ctr_explore_card_count = 0
 
@@ -131,6 +132,10 @@
               endif
             endfor
           endif
+
+          if link.links != blank or render_ctr_shop_mega or render_ctr_explore_mega
+            assign has_ctr_submenu = true
+          endif
         %}
         <li
           role="presentation"
@@ -148,7 +153,7 @@
             class="menu-list__link{% if link.active %} menu-list__link--active{% endif %}"
             data-ctr-menu-role="{{ ctr_menu_role }}"
             data-ctr-menu-handle="{{ link.handle }}"
-            {%- if link.links != blank or render_ctr_shop_mega or render_ctr_explore_mega -%}
+            {%- if has_ctr_submenu -%}
               aria-controls="submenu-{{ forloop.index }}"
               aria-haspopup="true"
               aria-expanded="false"
@@ -159,8 +164,13 @@
             ref="menuitem"
           >
             <span class="menu-list__link-title">{{- link.title -}}</span>
+            {% if has_ctr_submenu %}
+              <span class="menu-list__link-caret svg-wrapper" aria-hidden="true">
+                {{- 'icon-caret.svg' | inline_asset_content -}}
+              </span>
+            {% endif %}
           </a>
-          {%- if link.links != blank or render_ctr_shop_mega or render_ctr_explore_mega -%}
+          {%- if has_ctr_submenu -%}
             <div class="menu-list__submenu{{ color_scheme_classes }}" ref="submenu[]">
               <div
                 id="submenu-{{ forloop.index }}"
@@ -477,7 +487,7 @@
   }
 
   .menu-list {
-    --menu-horizontal-gap: var(--gap-xl);
+    --menu-horizontal-gap: 44px;
     --menu-vertical-gap: var(--gap-xl);
 
     display: flex;
@@ -511,7 +521,8 @@
     color: var(--menu-top-level-font-color);
     text-decoration: none;
     display: flex;
-    flex-direction: column;
+    align-items: center;
+    gap: 6px;
     justify-content: center;
     cursor: pointer;
     height: 100%;
@@ -537,21 +548,42 @@
     }
   }
 
+  .menu-list__link-caret {
+    display: inline-flex;
+    width: 10px;
+    height: 10px;
+    align-items: center;
+    justify-content: center;
+    transition: transform var(--animation-speed) var(--animation-easing);
+  }
+
+  .menu-list__link-caret svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .menu-list__link[aria-expanded='true'] .menu-list__link-caret,
+  .menu-list__list-item:where(:hover, :focus-within) > .menu-list__link[aria-haspopup='true'] .menu-list__link-caret {
+    transform: rotate(180deg);
+  }
+
   .menu-list__link-title {
-    padding-inline: calc(var(--gap-xl) / 2);
+    padding-inline: 0;
   }
   [slot='overflow'] .menu-list__link-title {
     padding-inline: 0;
   }
 
   .menu-list__list-item:not([slot='overflow']) {
+    --ctr-menu-hover-bridge-height: max(var(--header-padding), 36px);
+
     flex-direction: column;
   }
   .menu-list__list-item:not([slot='overflow'])::after {
     content: '';
     width: 100%;
-    height: var(--header-padding);
-    margin-bottom: calc(-1 * var(--header-padding));
+    height: var(--ctr-menu-hover-bridge-height);
+    margin-bottom: calc(-1 * var(--ctr-menu-hover-bridge-height));
   }
 
   [slot='overflow'] > .menu-list__link::after {
@@ -581,8 +613,8 @@
     /* Make sure focus outline is not cut off by overflow hidden */
     --focus-outline-size: calc(var(--focus-outline-offset) + var(--focus-outline-width));
 
-    gap: 0;
-    margin-inline: calc(-1 * var(--menu-horizontal-gap) / 2);
+    gap: var(--menu-horizontal-gap);
+    margin-inline: 0;
   }
 
   .overflow-menu {
@@ -958,12 +990,16 @@
     display: inline-flex;
     align-items: center;
     width: fit-content;
-    gap: var(--gap-xs);
+    gap: var(--gap-xs); 
     color: var(--color-foreground);
     font-size: 14px;
     font-weight: 700;
     text-decoration: underline;
     text-underline-offset: 6px;
+  }
+
+  #header-component .ctr-shop-mega__intro-cta span {
+    text-decoration: none;
   }
 
   #header-component .ctr-shop-mega__product {

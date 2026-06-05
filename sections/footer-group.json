@@ -16,8 +16,8 @@
       "settings": {
         "section_width": "full-width",
         "color_scheme": "scheme-2",
-        "top_image": "",
-        "footer_logo": "",
+        "top_image": "shopify://shop_images/bg.png",
+        "footer_logo": "shopify://shop_images/Layer_1.svg",
         "newsletter_heading": "join our community",
         "newsletter_text": "Let's grow stronger, together.",
         "newsletter_placeholder": "Email",
@@ -25,14 +25,14 @@
         "submit_background": "#6cfff5",
         "submit_text_color": "#000000",
         "shop_menu_heading": "shop",
-        "shop_menu": "",
+        "shop_menu": "footer-shop",
         "learn_menu_heading": "learn",
-        "learn_menu": "",
+        "learn_menu": "footer-learn",
         "show_instagram": true,
         "instagram_handle": "@breathewave",
         "instagram_link": "https://www.instagram.com/breathewave",
         "show_legal_row": true,
-        "legal_menu": "",
+        "legal_menu": "main-menu",
         "copyright_text": "<p>© 2026 <a href=\"/\">breathewave</a>.</p>"
       }
     }

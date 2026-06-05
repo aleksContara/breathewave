@@ -37,6 +37,7 @@ class HeaderMenu extends Component {
     if (this.#state.activeItem) {
       this.#stopPointerTracking(this.#state.activeItem);
     }
+    clearTimeout(this.#deactivateTimer);
     this.overflowMenu?.removeEventListener('pointerleave', this.#overflowSubmenuListener);
     this.#cleanupMutationObserver();
   }
@@ -49,7 +50,7 @@ class HeaderMenu extends Component {
   }, 100);
 
   #overflowSubmenuListener = () => {
-    this.#deactivate();
+    this.#scheduleDeactivate();
   };
 
   /**
@@ -63,6 +64,13 @@ class HeaderMenu extends Component {
    * @type {ReturnType<typeof setTimeout> | undefined}
    */
   #pointerIdleTimer;
+
+  /**
+   * @type {ReturnType<typeof setTimeout> | undefined}
+   */
+  #deactivateTimer;
+
+  #deactivateDelay = 240;
 
   /**
    * Last known pointer position for Safari hit-test reconciliation.
@@ -180,6 +188,9 @@ class HeaderMenu extends Component {
 
     const previouslyActiveItem = this.#state.activeItem;
 
+    clearTimeout(this.#deactivateTimer);
+    this.#deactivateTimer = undefined;
+
     if (previouslyActiveItem) {
       previouslyActiveItem.ariaExpanded = 'false';
     }
@@ -269,7 +280,14 @@ class HeaderMenu extends Component {
       return;
     }
 
-    this.#deactivate();
+    this.#scheduleDeactivate();
+  }
+
+  #scheduleDeactivate() {
+    clearTimeout(this.#deactivateTimer);
+    this.#deactivateTimer = setTimeout(() => {
+      this.#deactivate();
+    }, this.#deactivateDelay);
   }
 
   /**
@@ -277,17 +295,22 @@ class HeaderMenu extends Component {
    * @param {HTMLElement | null} [item]
    */
   #deactivate = (item = this.#state.activeItem) => {
+    clearTimeout(this.#deactivateTimer);
+    this.#deactivateTimer = undefined;
+
     if (!item || item != this.#state.activeItem) return;
 
-    // Don't deactivate if the overflow menu or overflow list is still being hovered
-    if (this.overflowListHovered || this.overflowMenu?.matches(':hover')) return;
+    const submenu = findSubmenu(item);
+
+    // Don't deactivate if the active item or submenu is still being hovered.
+    if (item.matches(':hover') || submenu?.matches(':hover') || this.overflowListHovered || this.overflowMenu?.matches(':hover')) {
+      return;
+    }
 
     this.headerComponent?.style.setProperty('--submenu-height', '0px');
     this.#setFullOpenHeaderHeight(0);
     this.style.setProperty('--submenu-opacity', '0');
     this.dataset.overflowExpanded = 'false';
-
-    const submenu = findSubmenu(item);
 
     document.body.removeEventListener('pointermove', this.#onPointerMove);
     this.#stopPointerTracking(item);

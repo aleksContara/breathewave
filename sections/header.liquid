@@ -325,6 +325,14 @@
     --color-scheme-bottom-row: rgba({{ section.settings.color_scheme_bottom.settings.background.rgba }});
     --ctr-sticky-background-opacity: {{ section.settings.sticky_background_opacity | divided_by: 100.0 }};
     --ctr-sticky-backdrop-blur: {{ section.settings.sticky_backdrop_blur }}px;
+    {% if section.settings.background_color.alpha > 0 %}
+      --ctr-header-background-color: {{ section.settings.background_color }};
+    {% endif %}
+    {% if section.settings.background_image != blank %}
+      --ctr-header-background-image: url({{ section.settings.background_image | image_url: width: 2400 }});
+      --ctr-header-background-size: {{ section.settings.background_size }};
+      --ctr-header-background-position: {{ section.settings.background_position }};
+    {% endif %}
     {% if section.settings.actions_display_style == 'text' %}
       --header-actions-font-size: {{ section.settings.actions_font_size | default: '1rem' }};
       --header-actions-font-family: var(--font-{{ section.settings.actions_font | default: 'heading' }}--family);
@@ -674,7 +682,11 @@
     position: relative;
 
     /* Overwrite color from color scheme, background is controlled by the underlays */
-    background-color: transparent;
+    background-color: var(--ctr-header-background-color, transparent);
+    background-image: var(--ctr-header-background-image, none);
+    background-size: var(--ctr-header-background-size, cover);
+    background-position: var(--ctr-header-background-position, center center);
+    background-repeat: no-repeat;
 
     &:has(.mega-menu__list:hover),
     &:has(.menu-list__link[aria-haspopup]:is(:hover, [aria-expanded='true'])),
@@ -1207,6 +1219,69 @@
         }
       ],
       "default": "top"
+    },
+    {
+      "type": "header",
+      "content": "Header background"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "rgba(0,0,0,0)"
+    },
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "Background image"
+    },
+    {
+      "type": "select",
+      "id": "background_size",
+      "label": "Background size",
+      "options": [
+        {
+          "value": "cover",
+          "label": "Cover"
+        },
+        {
+          "value": "contain",
+          "label": "Contain"
+        },
+        {
+          "value": "auto",
+          "label": "Original"
+        }
+      ],
+      "default": "cover"
+    },
+    {
+      "type": "select",
+      "id": "background_position",
+      "label": "Background position",
+      "options": [
+        {
+          "value": "center center",
+          "label": "Center"
+        },
+        {
+          "value": "center top",
+          "label": "Top"
+        },
+        {
+          "value": "center bottom",
+          "label": "Bottom"
+        },
+        {
+          "value": "left center",
+          "label": "Left"
+        },
+        {
+          "value": "right center",
+          "label": "Right"
+        }
+      ],
+      "default": "center center"
     },
     {
       "type": "header",
