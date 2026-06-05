@@ -16,6 +16,8 @@
       "settings": {
         "section_width": "full-width",
         "color_scheme": "scheme-2",
+        "background_color": "#030706",
+        "top_background_color": "#ffffff",
         "top_image": "shopify://shop_images/bg.png",
         "footer_logo": "shopify://shop_images/Layer_1.svg",
         "newsletter_heading": "join our community",
