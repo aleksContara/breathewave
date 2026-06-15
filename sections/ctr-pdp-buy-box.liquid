@@ -1,0 +1,636 @@
+{%- comment -%} CTR PDP Buy Box — OTP variant-aware {%- endcomment -%}
+{%- liquid
+  assign pdp_product = product
+  if pdp_product == blank and closest.product != blank
+    assign pdp_product = closest.product
+  endif
+  if pdp_product == blank and section.settings.product != blank
+    assign pdp_product = section.settings.product
+  endif
+  assign selected_variant = pdp_product.selected_or_first_available_variant
+  assign custom_css = section.settings.custom_css
+  assign section_id_attr = section.settings.section_id
+  assign detailed_option_name = section.settings.detailed_option_name | downcase
+-%}
+
+{% capture selector %}[data-style-id="{{ section.id }}"]{% endcapture %}
+
+{% capture css %}
+  & {
+    padding: {{ section.settings.padding_top }}px {{ section.settings.padding_horizontal }}px {{ section.settings.padding_bottom }}px;
+    box-sizing: border-box;
+    {% if section.settings.bg_color != blank and section.settings.bg_color.alpha != 0 %}background-color: {{ section.settings.bg_color }};{% endif %}
+  }
+  & .pdp-bb__inner { max-width: {{ section.settings.max_width }}px; margin: 0 auto; }
+  & .pdp-bb__grid { display: grid; grid-template-columns: 1fr; gap: 24px; }
+  @media (min-width: 990px) {
+    & .pdp-bb__grid { grid-template-columns: 5.7fr 4.3fr; gap: 48px; align-items: start; }
+  }
+  & .pdp-bb__gallery-col { width: 100%; max-width: 708px; }
+  @media (min-width: 768px) { & .pdp-bb__gallery-col { padding-top: 66px; } }
+  @media (max-width: 767px) {
+    & .pdp-bb__gallery-col { margin-left: -24px; margin-right: -24px; margin-bottom: 12px; order: -1; }
+  }
+  & .pdp-bb__gallery-wrap { display: grid; grid-template-columns: 1fr; gap: 24px; }
+  @media (min-width: 768px) {
+    & .pdp-bb__gallery-wrap { grid-template-columns: 130px 1fr; }
+  }
+  & .pdp-bb__thumbs {
+    display: none; flex-direction: column; gap: 16px; overflow-y: auto; width: 136px; max-height: 80vh;
+  }
+  @media (min-width: 768px) { & .pdp-bb__thumbs { display: flex; } }
+  & .pdp-bb__thumb {
+    width: 100%; aspect-ratio: 1; border-radius: 16px; overflow: hidden; border: 2px solid transparent;
+    cursor: pointer; padding: 0; background: #f4f8fd; flex-shrink: 0;
+  }
+  & .pdp-bb__thumb--active { border-color: currentColor; }
+  & .pdp-bb__thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  & .pdp-bb__gallery-stack {
+    display: flex; flex-direction: column; gap: 24px; overflow: visible; scroll-snap-type: none;
+  }
+  @media (max-width: 767px) {
+    & .pdp-bb__gallery-stack {
+      flex-direction: row; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory;
+      padding: 24px 24px 24px 24px; -webkit-overflow-scrolling: touch; scrollbar-width: none;
+    }
+    & .pdp-bb__gallery-stack::-webkit-scrollbar { display: none; }
+  }
+  & .pdp-bb__gallery-figure {
+    margin: 0; border-radius: 64px; overflow: hidden; background: #f4f8fd; aspect-ratio: 1; flex-shrink: 0;
+    scroll-snap-align: start;
+  }
+  @media (max-width: 767px) {
+    & .pdp-bb__gallery-figure { border-radius: 24px; width: calc((100% - 12px) / 1.2); min-width: calc((100% - 12px) / 1.2); }
+  }
+  & .pdp-bb__gallery-figure img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  & .pdp-bb__sidebar {
+    display: flex; flex-direction: column; justify-content: flex-start;
+  }
+  @media (min-width: 768px) {
+    & .pdp-bb__sidebar {
+      position: sticky; top: 56px; max-width: min(100%, 525px); padding-top: 66px; height: min-content;
+    }
+  }
+  & .pdp-bb__breadcrumb { font-size: 13px; color: #5f6078; margin-bottom: 16px; }
+  & .pdp-bb__breadcrumb a { color: inherit; text-decoration: none; }
+  & .pdp-bb__title { margin: 0 0 8px; }
+  & .pdp-bb__subtitle { color: #46475c; margin: 0 0 12px; }
+  & .pdp-bb__rating { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+  & .pdp-bb__rating-link { display: flex; align-items: center; gap: 8px; text-decoration: none; color: inherit; }
+  & .pdp-bb__stars { display: flex; gap: 4px; color: #e4e5f0; }
+  & .pdp-bb__star--filled { color: #0a0b0c; }
+  & .pdp-bb__rating-count { font-size: 14px; text-decoration: underline; }
+  & .pdp-bb__price-row { display: flex; align-items: center; gap: 12px; margin: 12px 0; }
+  & .pdp-bb__price { font-size: 20px; font-weight: 500; color: #0a0b0c; }
+  & .pdp-bb__compare { font-size: 18px; color: #767a94; text-decoration: line-through; font-weight: 300; }
+  & .pdp-bb__short-desc { margin: 12px 0; padding-bottom: 12px; border-bottom: 0; color: #0a0b0c; }
+  & .pdp-bb__dynamic-banner { padding: 8px 24px; background: #faffeb; border-radius: 16px; margin: 12px 0; font-size: 14px; }
+  & .pdp-bb__option { margin: 16px 0; }
+  & .pdp-bb__option-legend { font-size: 14px; font-weight: 600; margin-bottom: 12px; display: block; }
+  & .pdp-bb__option-radios { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; border: 0; padding: 0; margin: 0; }
+  & .pdp-bb__option-radios--detailed { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  & .pdp-bb__option-label { cursor: pointer; }
+  & .pdp-bb__option-label input { position: absolute; opacity: 0; pointer-events: none; }
+  & .pdp-bb__option-pill { display: block; width: 100%; text-transform: capitalize; }
+  & .pdp-bb__option-label input:checked + .pdp-bb__option-pill { background: #000; color: #fff; border-color: #000; }
+  & .pdp-bb__option-detailed-card { border: 1.5px solid #000; border-radius: 8px; padding: 12px 0 9px; background: #f4f8fd; text-align: center; display: flex; flex-direction: column; align-items: center; }
+  & .pdp-bb__option-label input:checked + .pdp-bb__option-detailed-card { background: #000; color: #fff; }
+  & .pdp-bb__option-label input:checked + .pdp-bb__option-detailed-card img { filter: brightness(0) invert(1); }
+  & .pdp-bb__option-detailed-img { width: 60px; margin: 0 auto 10px; display: block; border-radius: 4px; }
+  & .pdp-bb__otp-card { padding: 16px; border-radius: 16px; background: #fff; border: 1px solid #c7cfdc; margin: 12px 0; }
+  & .pdp-bb__otp-title { margin: 0 0 12px; }
+  & .pdp-bb__otp-bullets { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 12px; }
+  & .pdp-bb__otp-bullets li { font-size: 14px; display: flex; align-items: center; gap: 6px; }
+  & .pdp-bb__otp-bullets svg { width: 16px; height: 16px; flex-shrink: 0; }
+  & .pdp-bb__first-timer { padding: 16px; border-radius: 16px; border: 1px solid #c7cfdc; margin-bottom: 15px; }
+  & .pdp-bb__first-timer-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #c7cfdc; }
+  & .pdp-bb__first-timer-price { display: flex; gap: 6px; align-items: center; }
+  & .pdp-bb__first-timer-price s { color: #767a94; font-weight: 300; }
+  & .pdp-bb__first-timer-price strong { color: #de011b; font-weight: 500; }
+  & .pdp-bb__first-timer-note { font-size: 14px; color: #5f6078; margin: 0; }
+  & .pdp-bb__atc-row { display: grid; grid-template-columns: 105px 1fr; gap: 12px; align-items: center; margin-top: 16px; }
+  @media (max-width: 767px) { & .pdp-bb__atc-row { grid-template-columns: 1fr; } }
+  & .pdp-bb__qty { display: flex; align-items: center; border: 1px solid #c7cfdc; border-radius: 14px; overflow: hidden; height: 48px; }
+  & .pdp-bb__qty button { width: 40px; height: 100%; border: 0; background: transparent; cursor: pointer; font-size: 18px; }
+  & .pdp-bb__qty input { width: 100%; text-align: center; border: 0; background: transparent; font-size: 16px; -moz-appearance: textfield; }
+  & .pdp-bb__qty input::-webkit-outer-spin-button, & .pdp-bb__qty input::-webkit-inner-spin-button { -webkit-appearance: none; }
+  & .pdp-bb__trust { display: flex; gap: 36px; padding: 8px 14px; margin-top: 36px; background: #f4f8fd; border-radius: 16px; align-items: center; }
+  @media (max-width: 767px) { & .pdp-bb__trust { gap: 32px; justify-content: center; padding: 16px; } }
+  & .pdp-bb__trust-item { display: flex; align-items: center; gap: 8px; }
+  @media (max-width: 767px) {
+    & .pdp-bb__trust-item { flex-direction: column; text-align: center; max-width: 70px; }
+    & .pdp-bb__trust-item .richtext-md.h5 { flex-direction: column; gap: 5px; text-align: center; }
+  }
+  & .pdp-bb__trust-icon { width: 24px; height: 24px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+  & .pdp-bb__trust-icon--svg svg { width: 24px; height: 24px; }
+  & .pdp-bb__ugc { margin-top: 36px; }
+  & .pdp-bb__ugc-title { margin: 0 0 16px; }
+  & .pdp-bb__ugc-track {
+    display: grid; grid-auto-flow: column; grid-auto-columns: calc((100% - (13px * 6)) / 7);
+    gap: 13px; overflow-x: auto; scrollbar-width: none;
+  }
+  & .pdp-bb__ugc-track::-webkit-scrollbar { display: none; }
+  @media (max-width: 767px) {
+    & .pdp-bb__ugc-track { grid-auto-columns: calc((100% - (10px * 4)) / 5); gap: 10px; }
+  }
+  & .pdp-bb__ugc-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; position: relative; }
+  & .pdp-bb__ugc-thumb {
+    width: 100%; aspect-ratio: 1; border-radius: 999px; overflow: hidden; padding: 3px;
+    border: 1px solid #767a94; background: #f4f8fd;
+  }
+  & .pdp-bb__ugc-thumb img, & .pdp-bb__ugc-thumb video { width: 100%; height: 100%; object-fit: cover; border-radius: 999px; display: block; }
+  & .pdp-bb__ugc-thumb video { display: none; }
+  & .pdp-bb__ugc-item--playing .pdp-bb__ugc-poster { display: none; }
+  & .pdp-bb__ugc-item--playing .pdp-bb__ugc-thumb video { display: block; }
+  & .pdp-bb__upsell { margin-top: 36px; border: 1px solid #c7cfdc; padding: 24px; border-radius: 24px; }
+  @media (max-width: 767px) { & .pdp-bb__upsell { padding: 16px; border-radius: 16px; margin-top: 20px; } }
+  & .pdp-bb__upsell-title { font-size: 16px; font-weight: 600; margin: 0 0 16px; }
+  & .pdp-bb__upsell-list { display: flex; flex-direction: column; gap: 0; }
+  & .pdp-bb__upsell-list .pdp-card { padding: 16px 0; border-bottom: 1px solid #c7cfdc; }
+  & .pdp-bb__upsell-list .pdp-card:last-child { border-bottom: 0; padding-bottom: 0; }
+  & .pdp-bb__accordions { margin-top: 36px; }
+  & .pdp-bb__accordion { border-bottom: 1px solid #e4e5f0; }
+  & .pdp-bb__accordion-btn { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border: 0; background: transparent; cursor: pointer; font-size: 15px; font-weight: 500; text-align: left; }
+  & .pdp-bb__accordion-panel { overflow: hidden; }
+  & .pdp-bb__accordion-body { padding-bottom: 16px; font-size: 14px; color: #5f6078; line-height: 1.5; }
+  & .pdp-bb__nav { display: none; gap: 24px; margin-top: 24px; padding-top: 12px; border-top: 1px solid #e4e5f0; }
+  @media (min-width: 990px) { & .pdp-bb__nav { display: flex; } }
+  & .pdp-bb__nav a { text-decoration: none; }
+  & .pdp-card { display: flex; gap: 16px; align-items: center; }
+  & .pdp-card__media { flex-shrink: 0; width: 80px; height: 80px; border-radius: 8px; overflow: hidden; }
+  & .pdp-card__media img { width: 100%; height: 100%; object-fit: cover; }
+  & .pdp-card__title { font-weight: 500; color: #0a0b0c; text-decoration: none; display: block; margin-bottom: 4px; }
+  & .pdp-card__price { margin: 0 0 8px; font-size: 14px; }
+  & .pdp-card__compare { color: #767a94; margin-right: 6px; }
+  & .pdp-card__desc { font-size: 13px; color: #5f6078; margin: 0 0 8px; }
+  & .pdp-card__atc { font-size: 13px; padding: 8px 16px; min-height: auto; }
+  [x-cloak] { display: none !important; }
+{% endcapture %}
+
+<style>{{ css | append: custom_css | replace: '&', selector | strip_newlines }}</style>
+
+<div
+  data-style-id="{{ section.id }}"
+  {% if section_id_attr != blank %}id="{{ section_id_attr }}"{% endif %}
+  class="pdp-bb"
+  x-data="ctrPdpBuyBox"
+  x-init="init()"
+  data-ctr-pdp-buy-box
+  x-intersect:leave="hideBuyBox()"
+  x-intersect:enter="showBuyBox()"
+>
+{%- if pdp_product != blank -%}
+  <script type="application/json" data-ctr-pdp-json>
+    {
+      "title": {{ pdp_product.title | json }},
+      "featuredImage": {% if pdp_product.featured_media %}{{ pdp_product.featured_media | image_url: width: 1200 | json }}{% else %}null{% endif %},
+      "media": [
+        {%- assign media_first = true -%}
+        {%- for media in pdp_product.media -%}
+          {%- if media.media_type == 'image' -%}
+            {%- unless media_first -%},{%- endunless -%}
+            {
+              "id": {{ media.id }},
+              "url": {{ media | image_url: width: 1200 | json }},
+              "thumb": {{ media | image_url: width: 272 | json }},
+              "alt": {{ media.alt | json }}
+            }
+            {%- assign media_first = false -%}
+          {%- endif -%}
+        {%- endfor -%}
+      ],
+      "moneyFormat": {{ shop.money_format | json }},
+      "selectedVariantId": {{ selected_variant.id | json }},
+      "options": [
+        {%- for option in pdp_product.options_with_values -%}
+          {
+            "name": {{ option.name | json }},
+            "position": {{ option.position }},
+            "values": {{ option.values | json }}
+          }{%- unless forloop.last -%},{%- endunless -%}
+        {%- endfor -%}
+      ],
+      "variants": [
+        {%- for variant in pdp_product.variants -%}
+          {
+            "id": {{ variant.id }},
+            "available": {{ variant.available }},
+            "price": {{ variant.price }},
+            "compare_at_price": {{ variant.compare_at_price | default: 0 }},
+            "options": {{ variant.options | json }},
+            "featured_image": {% if variant.featured_image %}{{ variant.featured_image | image_url: width: 800 | json }}{% else %}null{% endif %},
+            "featured_media_id": {% if variant.featured_media %}{{ variant.featured_media.id }}{% else %}null{% endif %},
+            "smart_image": {% if variant.metafields.smart.image.value %}{{ variant.metafields.smart.image.value | image_url: width: 800 | json }}{% else %}null{% endif %},
+            "quantity_label": {{ variant.metafields.smart.quantity_label.value | json }},
+            "quantity_image": {% if variant.metafields.smart.quantity_image.value %}{{ variant.metafields.smart.quantity_image.value | image_url: width: 200 | json }}{% else %}null{% endif %}
+          }{%- unless forloop.last -%},{%- endunless -%}
+        {%- endfor -%}
+      ]
+    }
+  </script>
+{%- endif -%}
+  <div class="pdp-bb__inner">
+    {%- if pdp_product == blank -%}
+      <p>Select a product or view on a product page.</p>
+    {%- else -%}
+      <div class="pdp-bb__grid">
+        <div class="pdp-bb__gallery-col">
+          <div class="pdp-bb__gallery-wrap">
+            {%- if pdp_product.media.size > 1 -%}
+              <div class="pdp-bb__thumbs" aria-label="Product thumbnails">
+                {%- for media in pdp_product.media -%}
+                  {%- if media.media_type == 'image' -%}
+                    <button
+                      type="button"
+                      class="pdp-bb__thumb"
+                      :class="{ 'pdp-bb__thumb--active': selectedMediaId === {{ media.id }} }"
+                      data-media-id="{{ media.id }}"
+                      @click="pickThumb($event)"
+                      aria-label="{{ media.alt | default: pdp_product.title | escape }}"
+                    >
+                      <img src="{{ media | image_url: width: 272 }}" alt="" width="136" height="136" loading="lazy">
+                    </button>
+                  {%- endif -%}
+                {%- endfor -%}
+              </div>
+            {%- endif -%}
+            <div class="pdp-bb__gallery-stack" x-ref="galleryStack">
+              {%- for media in pdp_product.media -%}
+                {%- if media.media_type == 'image' -%}
+                  <figure class="pdp-bb__gallery-figure" data-media-id="{{ media.id }}">
+                    <img
+                      src="{{ media | image_url: width: 1200 }}"
+                      alt="{{ media.alt | default: pdp_product.title | escape }}"
+                      width="800"
+                      height="800"
+                      {% if forloop.first %}loading="eager"{% else %}loading="lazy"{% endif %}
+                    >
+                  </figure>
+                {%- endif -%}
+              {%- endfor -%}
+            </div>
+          </div>
+        </div>
+
+        <div class="pdp-bb__sidebar">
+          {%- if section.settings.show_breadcrumb -%}
+            <nav class="pdp-bb__breadcrumb" aria-label="Breadcrumb">
+              <a href="{{ routes.root_url }}">Home</a>
+              {%- if section.settings.breadcrumb_collection != blank -%}
+                <span> / </span>
+                <a href="{{ section.settings.breadcrumb_collection.url }}">{{ section.settings.breadcrumb_collection.title }}</a>
+              {%- endif -%}
+              <span> / </span>
+              <span>{{ pdp_product.title }}</span>
+            </nav>
+          {%- endif -%}
+
+          {% render 'ctr-pdp-star-rating', product: pdp_product, link_to_reviews: true %}
+
+          <h1 class="pdp-bb__title pdp-title-nohemi">{{ pdp_product.title }}</h1>
+
+          {%- if pdp_product.metafields.smart.subtitle != blank -%}
+            <p class="pdp-bb__subtitle richtext-md h5">{{ pdp_product.metafields.smart.subtitle.value }}</p>
+          {%- endif -%}
+
+          <div class="pdp-bb__price-row">
+            <span class="pdp-bb__price" x-text="$store.ctrPdp.formattedPrice"></span>
+            <s class="pdp-bb__compare" x-show="$store.ctrPdp.formattedComparePrice" x-text="$store.ctrPdp.formattedComparePrice" x-cloak></s>
+          </div>
+
+          {%- if pdp_product.metafields.smart.short_description != blank -%}
+            <div class="pdp-bb__short-desc richtext-md">{{ pdp_product.metafields.smart.short_description | metafield_tag }}</div>
+          {%- elsif request.design_mode -%}
+            <div class="pdp-bb__short-desc richtext-md"><p>{{ pdp_product.description | strip_html | truncate: 200 }}</p></div>
+          {%- endif -%}
+
+          {%- unless pdp_product.has_only_default_variant -%}
+            {%- for option in pdp_product.options_with_values -%}
+              {%- assign opt_name_down = option.name | downcase -%}
+              {%- assign is_detailed = false -%}
+              {%- if detailed_option_name != blank and opt_name_down == detailed_option_name -%}
+                {%- assign is_detailed = true -%}
+              {%- endif -%}
+              <fieldset class="pdp-bb__option">
+                <legend class="pdp-bb__option-legend richtext-md h6">{{ option.name }}</legend>
+                <div class="pdp-bb__option-radios{% if is_detailed %} pdp-bb__option-radios--detailed{% endif %}">
+                  {%- for value in option.values -%}
+                    {%- liquid
+                      assign option_img = nil
+                      assign option_label = value
+                      assign opt_idx = option.position | minus: 1
+                      for v in pdp_product.variants
+                        if v.options[opt_idx] == value
+                          if v.metafields.smart.quantity_image.value != blank
+                            assign option_img = v.metafields.smart.quantity_image.value
+                          endif
+                          if v.metafields.smart.quantity_label.value != blank
+                            assign option_label = v.metafields.smart.quantity_label.value
+                          endif
+                          break
+                        endif
+                      endfor
+                    -%}
+                    <label class="pdp-bb__option-label">
+                      <input
+                        type="radio"
+                        name="option-{{ section.id }}-{{ option.position }}"
+                        value="{{ value | escape }}"
+                        data-option-position="{{ option.position }}"
+                        data-option-value="{{ value | escape }}"
+                        @change="pickOption($event)"
+                        {% if selected_variant.options[opt_idx] == value %}checked{% endif %}
+                      >
+                      {%- if is_detailed -%}
+                        <span class="pdp-bb__option-detailed-card">
+                          {%- if option_img != blank -%}
+                            <img class="pdp-bb__option-detailed-img" src="{{ option_img | image_url: width: 120 }}" alt="" width="60" height="60" loading="lazy">
+                          {%- endif -%}
+                          <span>{{ option_label }}</span>
+                        </span>
+                      {%- else -%}
+                        <span class="pdp-bb__option-pill button-swatch-text">{{ value }}</span>
+                      {%- endif -%}
+                    </label>
+                  {%- endfor -%}
+                </div>
+              </fieldset>
+            {%- endfor -%}
+          {%- endunless -%}
+
+          {%- if section.settings.show_otp_card -%}
+            <div class="pdp-bb__otp-card">
+              <p class="pdp-bb__otp-title richtext-md h6">{{ section.settings.otp_card_title }}</p>
+              {%- if section.settings.otp_bullets != blank -%}
+                <ul class="pdp-bb__otp-bullets">
+                  {%- assign bullets = section.settings.otp_bullets | split: '|' -%}
+                  {%- for bullet in bullets -%}
+                    <li>
+                      <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8l3.5 3.5L13 5" stroke="currentColor" stroke-width="1.5"/></svg>
+                      {{ bullet | strip }}
+                    </li>
+                  {%- endfor -%}
+                </ul>
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+
+          {%- if pdp_product.metafields.smart.dynamic_product_text != blank -%}
+            <div class="pdp-bb__dynamic-banner">
+              {{ pdp_product.metafields.smart.dynamic_product_text | metafield_tag }}
+            </div>
+          {%- endif -%}
+
+          {%- if pdp_product.metafields.smart.custom_price != blank -%}
+            <div class="pdp-bb__first-timer">
+              <div class="pdp-bb__first-timer-head">
+                <strong>{{ section.settings.first_timer_title }}</strong>
+                <div class="pdp-bb__first-timer-price">
+                  <s x-text="$store.ctrPdp.formattedPrice"></s>
+                  <strong>{{ pdp_product.metafields.smart.custom_price.value | money }}</strong>
+                </div>
+              </div>
+              <p class="pdp-bb__first-timer-note">{{ section.settings.first_timer_note }}</p>
+            </div>
+          {%- endif -%}
+
+          <div class="pdp-bb__atc-row">
+            <div class="pdp-bb__qty">
+              <button type="button" aria-label="Decrease quantity" @click="decrementQty()">−</button>
+              <input type="number" min="1" x-model.number="$store.ctrPdp.quantity" aria-label="Quantity">
+              <button type="button" aria-label="Increase quantity" @click="incrementQty()">+</button>
+            </div>
+            <button
+              type="button"
+              class="pdp-bb__atc button-primary"
+              @click="addToCart()"
+              :disabled="!$store.ctrPdp.available || $store.ctrPdp.adding"
+            >
+              <span x-show="!$store.ctrPdp.adding && $store.ctrPdp.available && !$store.ctrPdp.added">{{ section.settings.atc_label }}</span>
+              <span x-show="$store.ctrPdp.adding" x-cloak>{{ section.settings.atc_adding_label }}</span>
+              <span x-show="$store.ctrPdp.added" x-cloak>{{ section.settings.atc_added_label }}</span>
+              <span x-show="!$store.ctrPdp.available && !$store.ctrPdp.adding" x-cloak>{{ section.settings.sold_out_label }}</span>
+            </button>
+          </div>
+
+          {%- assign ugc_blocks = section.blocks | where: 'type', 'ugc_video' -%}
+          {%- if section.settings.show_ugc and ugc_blocks.size > 0 -%}
+            <div class="pdp-bb__ugc">
+              <h2 class="pdp-bb__ugc-title richtext-md h5"><strong>{{ section.settings.ugc_heading }}</strong></h2>
+              <div class="pdp-bb__ugc-track">
+                {%- for block in ugc_blocks -%}
+                  <div class="pdp-bb__ugc-item" @click="playUgcVideo($event)" {{ block.shopify_attributes }}>
+                    <div class="pdp-bb__ugc-thumb">
+                      {%- if block.settings.preview_image != blank -%}
+                        <img class="pdp-bb__ugc-poster" src="{{ block.settings.preview_image | image_url: width: 256 }}" alt="" width="128" height="128" loading="lazy">
+                      {%- endif -%}
+                      {%- if block.settings.video != blank -%}
+                        {{ block.settings.video | video_tag: image_size: '256x', class: 'pdp-bb__ugc-video', controls: true, muted: false, playsinline: true, preload: 'none' }}
+                      {%- endif -%}
+                    </div>
+                  </div>
+                {%- endfor -%}
+              </div>
+            </div>
+          {%- endif -%}
+
+          <div class="pdp-bb__trust">
+            {%- for block in section.blocks -%}
+              {%- if block.type == 'trust_icon' -%}
+                <div {{ block.shopify_attributes }}>
+                  {% render 'ctr-pdp-trust-icon',
+                    icon_type: block.settings.icon_type,
+                    label: block.settings.label,
+                    icon_image: block.settings.icon
+                  %}
+                </div>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+
+          {%- if section.settings.upsell_heading != blank -%}
+            <div class="pdp-bb__upsell" x-data="ctrPdpUpsell">
+              <h2 class="pdp-bb__upsell-title">{{ section.settings.upsell_heading }}</h2>
+              <div class="pdp-bb__upsell-list">
+                {%- assign upsell_count = 0 -%}
+                {%- if section.settings.upsell_products != blank and section.settings.upsell_products.size > 0 -%}
+                  {%- for upsell in section.settings.upsell_products -%}
+                    {%- if upsell_count >= section.settings.upsell_limit -%}{% break %}{%- endif -%}
+                    {%- if upsell != blank -%}
+                      {%- unless section.settings.hide_upsell_oos and upsell.available == false -%}
+                        {% render 'ctr-pdp-product-card', card_product: upsell, card_style: 'flat', show_description: true %}
+                        {%- assign upsell_count = upsell_count | plus: 1 -%}
+                      {%- endunless -%}
+                    {%- endif -%}
+                  {%- endfor -%}
+                {%- else -%}
+                  {%- assign upsell_handle_list = section.settings.upsell_fallback_handles | replace: ' ', '' | split: ',' -%}
+                  {%- for handle in upsell_handle_list -%}
+                    {%- if upsell_count >= section.settings.upsell_limit -%}{% break %}{%- endif -%}
+                    {%- assign upsell = all_products[handle] -%}
+                    {%- if upsell != blank -%}
+                      {%- unless section.settings.hide_upsell_oos and upsell.available == false -%}
+                        {% render 'ctr-pdp-product-card', card_product: upsell, card_style: 'flat', show_description: true %}
+                        {%- assign upsell_count = upsell_count | plus: 1 -%}
+                      {%- endunless -%}
+                    {%- endif -%}
+                  {%- endfor -%}
+                {%- endif -%}
+              </div>
+            </div>
+          {%- endif -%}
+
+          <div class="pdp-bb__accordions">
+            <div class="pdp-bb__accordion" x-data="{ open: false }">
+              <button type="button" class="pdp-bb__accordion-btn accordion-btn" @click="open = !open" :aria-expanded="open">
+                {{ section.settings.accordion_details_label }}
+                <span x-text="open ? '−' : '+'"></span>
+              </button>
+              <div class="pdp-bb__accordion-panel" x-show="open" x-collapse>
+                <div class="pdp-bb__accordion-body richtext-md">{{ pdp_product.description }}</div>
+              </div>
+            </div>
+            {%- if pdp_product.metafields.smart.accordion_how_to_use != blank -%}
+              <div class="pdp-bb__accordion" x-data="{ open: false }">
+                <button type="button" class="pdp-bb__accordion-btn accordion-btn" @click="open = !open" :aria-expanded="open">
+                  {{ section.settings.accordion_how_to_use_label }}
+                  <span x-text="open ? '−' : '+'"></span>
+                </button>
+                <div class="pdp-bb__accordion-panel" x-show="open" x-collapse>
+                  <div class="pdp-bb__accordion-body richtext-md">{{ pdp_product.metafields.smart.accordion_how_to_use | metafield_tag }}</div>
+                </div>
+              </div>
+            {%- endif -%}
+            {%- if pdp_product.metafields.smart.accordion_after_care != blank -%}
+              <div class="pdp-bb__accordion" x-data="{ open: false }">
+                <button type="button" class="pdp-bb__accordion-btn accordion-btn" @click="open = !open" :aria-expanded="open">
+                  {{ section.settings.accordion_after_care_label }}
+                  <span x-text="open ? '−' : '+'"></span>
+                </button>
+                <div class="pdp-bb__accordion-panel" x-show="open" x-collapse>
+                  <div class="pdp-bb__accordion-body richtext-md">{{ pdp_product.metafields.smart.accordion_after_care | metafield_tag }}</div>
+                </div>
+              </div>
+            {%- endif -%}
+            {%- if pdp_product.metafields.smart.accordion_material != blank -%}
+              <div class="pdp-bb__accordion" x-data="{ open: false }">
+                <button type="button" class="pdp-bb__accordion-btn accordion-btn" @click="open = !open" :aria-expanded="open">
+                  {{ section.settings.accordion_material_label }}
+                  <span x-text="open ? '−' : '+'"></span>
+                </button>
+                <div class="pdp-bb__accordion-panel" x-show="open" x-collapse>
+                  <div class="pdp-bb__accordion-body richtext-md">{{ pdp_product.metafields.smart.accordion_material | metafield_tag }}</div>
+                </div>
+              </div>
+            {%- endif -%}
+          </div>
+
+          <nav class="pdp-bb__nav" aria-label="Page sections">
+            <a class="nav-link-pdp" href="#features">Features</a>
+            <a class="nav-link-pdp" href="#video">Video</a>
+            <a class="nav-link-pdp" href="#howtouse">How to use</a>
+            <a class="nav-link-pdp" href="#reviews">Reviews</a>
+            <a class="nav-link-pdp" href="#faq">FAQ</a>
+          </nav>
+        </div>
+      </div>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "CTR PDP Buy Box",
+  "tag": "section",
+  "class": "ctr-pdp-buy-box-section",
+  "settings": [
+    { "type": "product", "id": "product", "label": "Product override" },
+    { "type": "header", "content": "Layout" },
+    { "type": "range", "id": "max_width", "label": "Max width", "min": 960, "max": 1400, "step": 20, "unit": "px", "default": 1280 },
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 24 },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 48 },
+    { "type": "range", "id": "padding_horizontal", "label": "Padding horizontal", "min": 0, "max": 80, "step": 4, "unit": "px", "default": 24 },
+    { "type": "color", "id": "bg_color", "label": "Background" },
+    { "type": "text", "id": "section_id", "label": "Section ID" },
+    { "type": "header", "content": "Breadcrumb" },
+    { "type": "checkbox", "id": "show_breadcrumb", "label": "Show breadcrumb", "default": true },
+    { "type": "collection", "id": "breadcrumb_collection", "label": "Breadcrumb collection" },
+    { "type": "header", "content": "Variant options" },
+    { "type": "text", "id": "detailed_option_name", "label": "Detailed picker option name", "default": "supply", "info": "Option name (case-insensitive) that uses detailed card style with variant metafields." },
+    { "type": "header", "content": "OTP card" },
+    { "type": "checkbox", "id": "show_otp_card", "label": "Show OTP purchase card", "default": true },
+    { "type": "text", "id": "otp_card_title", "label": "OTP card title", "default": "One-time Purchase" },
+    { "type": "textarea", "id": "otp_bullets", "label": "OTP bullets (pipe-separated)", "default": "Exclusive discount limited to first-time customers|First-time customers only|30 day risk free trial" },
+    { "type": "header", "content": "First-timer pricing" },
+    { "type": "text", "id": "first_timer_title", "label": "First-timer title", "default": "First Time Purchase" },
+    { "type": "text", "id": "first_timer_note", "label": "First-timer note", "default": "Discount automatically applied at cart. first-time customers only. limit 1 per email." },
+    { "type": "header", "content": "UGC videos" },
+    { "type": "checkbox", "id": "show_ugc", "label": "Show See it in action", "default": true },
+    { "type": "text", "id": "ugc_heading", "label": "UGC heading", "default": "See it in action" },
+    { "type": "header", "content": "Add to cart" },
+    { "type": "text", "id": "atc_label", "label": "ATC label", "default": "Add to Cart" },
+    { "type": "text", "id": "atc_adding_label", "label": "Adding label", "default": "Adding…" },
+    { "type": "text", "id": "atc_added_label", "label": "Added label", "default": "Added!" },
+    { "type": "text", "id": "sold_out_label", "label": "Sold out label", "default": "Notify me" },
+    { "type": "header", "content": "Pair well with" },
+    { "type": "text", "id": "upsell_heading", "label": "Upsell heading", "default": "Pair wells with" },
+    { "type": "product_list", "id": "upsell_products", "label": "Upsell products" },
+    {
+      "type": "textarea",
+      "id": "upsell_fallback_handles",
+      "label": "Upsell fallback handles",
+      "default": "sensory-mask,mouth-tape",
+      "info": "Comma-separated product handles. Used when no products are picked above."
+    },
+    { "type": "range", "id": "upsell_limit", "label": "Display limit", "min": 1, "max": 4, "step": 1, "default": 2 },
+    { "type": "checkbox", "id": "hide_upsell_oos", "label": "Hide out of stock upsells", "default": true },
+    { "type": "header", "content": "Accordions" },
+    { "type": "text", "id": "accordion_details_label", "label": "Details label", "default": "Details" },
+    { "type": "text", "id": "accordion_how_to_use_label", "label": "How to use label", "default": "How to Use" },
+    { "type": "text", "id": "accordion_after_care_label", "label": "After care label", "default": "After Care" },
+    { "type": "text", "id": "accordion_material_label", "label": "Material label", "default": "Material" },
+    { "type": "header", "content": "Advanced" },
+    { "type": "textarea", "id": "custom_css", "label": "Custom CSS" }
+  ],
+  "blocks": [
+    {
+      "type": "trust_icon",
+      "name": "Trust icon",
+      "limit": 3,
+      "settings": [
+        { "type": "image_picker", "id": "icon", "label": "Icon image (optional)" },
+        {
+          "type": "select",
+          "id": "icon_type",
+          "label": "Icon fallback",
+          "options": [
+            { "value": "shield", "label": "Shield (Medical Grade)" },
+            { "value": "thumbs-up", "label": "Thumbs up (Trial)" },
+            { "value": "volume-min", "label": "Volume (Snoring)" }
+          ],
+          "default": "shield"
+        },
+        { "type": "text", "id": "label", "label": "Label", "default": "Medical Grade" }
+      ]
+    },
+    {
+      "type": "ugc_video",
+      "name": "UGC video",
+      "settings": [
+        { "type": "video", "id": "video", "label": "Video" },
+        { "type": "image_picker", "id": "preview_image", "label": "Preview image" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "CTR PDP Buy Box",
+      "blocks": [
+        { "type": "trust_icon", "settings": { "label": "Medical Grade" } },
+        { "type": "trust_icon", "settings": { "label": "30 Day Trial" } },
+        { "type": "trust_icon", "settings": { "label": "Reduces Snoring" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

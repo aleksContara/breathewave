@@ -1,0 +1,110 @@
+{%- comment -%} CTR PDP Sticky Add to Cart bar {%- endcomment -%}
+{%- liquid
+  assign pdp_product = product
+  if pdp_product == blank and closest.product != blank
+    assign pdp_product = closest.product
+  endif
+  assign custom_css = section.settings.custom_css
+  assign section_id_attr = section.settings.section_id
+-%}
+
+{% capture selector %}[data-style-id="{{ section.id }}"]{% endcapture %}
+
+{% capture css %}
+  & {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: #ffffff;
+    border-top: 1px solid #e4e5f0;
+    padding: 10px 24px;
+    box-shadow: 0 -4px 24px rgba(0,0,0,0.08);
+    transition: transform 0.25s ease, opacity 0.25s ease;
+  }
+  & .pdp-sticky__inner { max-width: 1280px; margin: 0 auto; display: flex; align-items: center; gap: 16px; }
+  & .pdp-sticky__nav { display: none; gap: 20px; margin-right: auto; }
+  @media (min-width: 990px) { & .pdp-sticky__nav { display: flex; } }
+  & .pdp-sticky__nav a { font-size: 13px; color: #0a0b0c; text-decoration: none; font-weight: 500; white-space: nowrap; }
+  & .pdp-sticky__nav a:hover { text-decoration: underline; }
+  & .pdp-sticky__thumb { width: 45px; height: 45px; border-radius: 8px; overflow: hidden; flex-shrink: 0; display: none; }
+  @media (min-width: 768px) { & .pdp-sticky__thumb { display: block; } }
+  & .pdp-sticky__thumb img { width: 100%; height: 100%; object-fit: cover; }
+  & .pdp-sticky__info { display: none; flex-direction: column; gap: 2px; margin-right: 32px; }
+  @media (min-width: 768px) { & .pdp-sticky__info { display: flex; } }
+  & .pdp-sticky__title { font-size: 16px; font-weight: 600; color: #0a0b0c; margin: 0; }
+  & .pdp-sticky__vendor { font-size: 14px; color: #666; margin: 0; }
+  & .pdp-sticky__atc { margin-left: auto; min-width: 160px; width: auto; padding: 12px 24px; font-size: 15px; }
+  @media (max-width: 767px) { & .pdp-sticky__atc { width: 100%; margin-left: 0; } & .pdp-sticky__inner { gap: 0; } }
+  & .pdp-sticky__atc:disabled { opacity: 0.5; cursor: not-allowed; }
+  [x-cloak] { display: none !important; }
+  body:has(&) { padding-bottom: 72px; }
+{% endcapture %}
+
+<style>{{ css | append: custom_css | replace: '&', selector | strip_newlines }}</style>
+
+<div
+  data-style-id="{{ section.id }}"
+  {% if section_id_attr != blank %}id="{{ section_id_attr }}"{% endif %}
+  class="pdp-sticky"
+  x-data="ctrPdpSticky"
+  x-show="!$store.ctrPdp.buyBoxVisible"
+  x-transition:enter="transition ease-out duration-200"
+  x-transition:enter-start="opacity-0 translate-y-full"
+  x-transition:enter-end="opacity-100 translate-y-0"
+  x-transition:leave="transition ease-in duration-150"
+  x-transition:leave-start="opacity-100 translate-y-0"
+  x-transition:leave-end="opacity-0 translate-y-full"
+  x-cloak
+  role="region"
+  aria-label="Sticky add to cart"
+>
+  <div class="pdp-sticky__inner">
+    <nav class="pdp-sticky__nav" aria-label="Page sections">
+      <a class="nav-link-pdp" href="#features">Features</a>
+      <a class="nav-link-pdp" href="#video">Video</a>
+      <a class="nav-link-pdp" href="#howtouse">How to use</a>
+      <a class="nav-link-pdp" href="#reviews">Reviews</a>
+      <a class="nav-link-pdp" href="#faq">FAQ</a>
+    </nav>
+
+    <div class="pdp-sticky__thumb" x-show="$store.ctrPdp.variantImage">
+      <img :src="$store.ctrPdp.variantImage" alt="" width="45" height="45">
+    </div>
+
+    <div class="pdp-sticky__info">
+      <p class="pdp-sticky__title" x-text="$store.ctrPdp.productTitle"></p>
+      <p class="pdp-sticky__vendor">{{ pdp_product.vendor }}</p>
+    </div>
+
+    <button
+      type="button"
+      class="pdp-sticky__atc button-primary"
+      @click="addToCart()"
+      :disabled="!$store.ctrPdp.available || $store.ctrPdp.adding"
+    >
+      <span x-show="!$store.ctrPdp.adding && $store.ctrPdp.available">
+        {{ section.settings.atc_label }} · <span x-text="$store.ctrPdp.formattedPrice"></span>
+      </span>
+      <span x-show="$store.ctrPdp.adding" x-cloak>{{ section.settings.atc_adding_label }}</span>
+      <span x-show="!$store.ctrPdp.available && !$store.ctrPdp.adding" x-cloak>{{ section.settings.sold_out_label }}</span>
+    </button>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "CTR PDP Sticky ATC",
+  "tag": "section",
+  "class": "ctr-pdp-sticky-section",
+  "settings": [
+    { "type": "text", "id": "atc_label", "label": "ATC label", "default": "Add To Cart" },
+    { "type": "text", "id": "atc_adding_label", "label": "Adding label", "default": "Adding…" },
+    { "type": "text", "id": "sold_out_label", "label": "Sold out label", "default": "Notify me" },
+    { "type": "text", "id": "section_id", "label": "Section ID" },
+    { "type": "textarea", "id": "custom_css", "label": "Custom CSS" }
+  ],
+  "presets": [{ "name": "CTR PDP Sticky ATC" }]
+}
+{% endschema %}

@@ -1,0 +1,61 @@
+{%- comment -%} CTR PDP Okendo Reviews wrapper {%- endcomment -%}
+{%- liquid
+  assign custom_css = section.settings.custom_css
+  assign section_id_attr = section.settings.section_id
+  assign app_blocks = section.blocks | where: 'type', '@app'
+-%}
+
+{% capture selector %}[data-style-id="{{ section.id }}"]{% endcapture %}
+
+{% capture css %}
+  & {
+    padding: {{ section.settings.padding_top }}px {{ section.settings.padding_horizontal }}px {{ section.settings.padding_bottom }}px;
+    box-sizing: border-box;
+    {% if section.settings.bg_color != blank and section.settings.bg_color.alpha != 0 %}background-color: {{ section.settings.bg_color }};{% endif %}
+  }
+  & .pdp-reviews__inner { max-width: {{ section.settings.max_width }}px; margin: 0 auto; }
+  & .pdp-reviews__placeholder {
+    padding: 48px 24px;
+    text-align: center;
+    border: 2px dashed #c7cfdc;
+    border-radius: 16px;
+    color: #5f6078;
+    font-size: 15px;
+  }
+{% endcapture %}
+
+<style>{{ css | append: custom_css | replace: '&', selector | strip_newlines }}</style>
+
+<div data-style-id="{{ section.id }}" {% if section_id_attr != blank %}id="{{ section_id_attr }}"{% endif %} class="pdp-reviews">
+  <div class="pdp-reviews__inner">
+    {%- if app_blocks.size > 0 -%}
+      {%- for block in app_blocks -%}
+        {% render block %}
+      {%- endfor -%}
+    {%- else -%}
+      <div class="pdp-reviews__placeholder">
+        <p><strong>Okendo Reviews</strong></p>
+        <p>Add the Okendo app block in the theme editor to display product reviews here.</p>
+      </div>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "CTR PDP Reviews",
+  "tag": "section",
+  "class": "ctr-pdp-reviews-section",
+  "settings": [
+    { "type": "range", "id": "max_width", "label": "Max width", "min": 960, "max": 1400, "step": 20, "unit": "px", "default": 1280 },
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 48 },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 48 },
+    { "type": "range", "id": "padding_horizontal", "label": "Padding horizontal", "min": 0, "max": 80, "step": 4, "unit": "px", "default": 24 },
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#f4f8fd" },
+    { "type": "text", "id": "section_id", "label": "Section ID", "default": "reviews" },
+    { "type": "textarea", "id": "custom_css", "label": "Custom CSS" }
+  ],
+  "blocks": [{ "type": "@app" }],
+  "presets": [{ "name": "CTR PDP Reviews" }]
+}
+{% endschema %}

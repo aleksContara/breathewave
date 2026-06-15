@@ -1,0 +1,194 @@
+{%- comment -%} CTR PDP FAQ — tabbed accordions from product metafields {%- endcomment -%}
+{%- liquid
+  assign pdp_product = product
+  if pdp_product == blank and closest.product != blank
+    assign pdp_product = closest.product
+  endif
+  assign custom_css = section.settings.custom_css
+  assign section_id_attr = section.settings.section_id
+-%}
+
+{% capture selector %}[data-style-id="{{ section.id }}"]{% endcapture %}
+
+{% capture css %}
+  & {
+    padding: {{ section.settings.padding_top }}px {{ section.settings.padding_horizontal }}px {{ section.settings.padding_bottom }}px;
+    box-sizing: border-box;
+  }
+  & .pdp-faq__inner {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    align-items: start;
+  }
+  @media (max-width: 767px) {
+    & .pdp-faq__inner { grid-template-columns: 1fr; gap: 32px; }
+  }
+  & .pdp-faq__image { width: 100%; border-radius: 48px; overflow: hidden; object-fit: cover; }
+  @media (max-width: 767px) { & .pdp-faq__image { padding-right: 24px; border-radius: 32px; } }
+  & .pdp-faq__content { display: flex; flex-direction: column; max-width: 650px; width: 100%; }
+  & .pdp-faq__heading { margin: 0 0 32px; }
+  & .pdp-faq__tabs { display: flex; gap: 16px; margin-bottom: 32px; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding-bottom: 4px; }
+  & .pdp-faq__tabs::-webkit-scrollbar { display: none; }
+  & .pdp-faq__panel { display: flex; flex-direction: column; gap: 16px; }
+  & .pdp-faq__accordion { border-bottom: 1px solid #e4e5f0; }
+  & .pdp-faq__accordion-btn { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border: 0; background: transparent; cursor: pointer; font-size: 15px; font-weight: 500; text-align: left; gap: 16px; }
+  & .pdp-faq__accordion-body { padding-bottom: 16px; font-size: 14px; color: #5f6078; line-height: 1.5; }
+{% endcapture %}
+
+<style>{{ css | append: custom_css | replace: '&', selector | strip_newlines }}</style>
+
+<div
+  data-style-id="{{ section.id }}"
+  {% if section_id_attr != blank %}id="{{ section_id_attr }}"{% endif %}
+  class="pdp-faq"
+  x-data="ctrPdpFaq"
+>
+  <div class="pdp-faq__inner">
+    {%- if pdp_product.metafields.smart.faq_image != blank -%}
+      <img
+        class="pdp-faq__image"
+        src="{{ pdp_product.metafields.smart.faq_image.value | image_url: width: 1200 }}"
+        alt=""
+        width="600"
+        height="800"
+        loading="lazy"
+      >
+    {%- endif -%}
+
+    <div class="pdp-faq__content">
+      {%- if section.settings.heading != blank -%}
+        <div class="pdp-faq__heading pdp-title-nohemi richtext-md h2">{{ section.settings.heading }}</div>
+      {%- endif -%}
+
+      {%- assign faq_tab_idx = 0 -%}
+      <div class="pdp-faq__tabs" role="tablist">
+        {%- if pdp_product.metafields.smart.faq_product.value != blank -%}
+          <button type="button" class="button-tab pdp-faq__tab" :class="{ 'pdp-faq__tab--active': activeTab === {{ faq_tab_idx }} }" @click="setTab({{ faq_tab_idx }})" role="tab">Product</button>
+          {%- assign faq_tab_idx = faq_tab_idx | plus: 1 -%}
+        {%- endif -%}
+        {%- if pdp_product.metafields.smart.faq_lifestyle.value != blank -%}
+          <button type="button" class="button-tab pdp-faq__tab" :class="{ 'pdp-faq__tab--active': activeTab === {{ faq_tab_idx }} }" @click="setTab({{ faq_tab_idx }})" role="tab">Lifestyle</button>
+          {%- assign faq_tab_idx = faq_tab_idx | plus: 1 -%}
+        {%- endif -%}
+        {%- if pdp_product.metafields.smart.faq_science.value != blank -%}
+          <button type="button" class="button-tab pdp-faq__tab" :class="{ 'pdp-faq__tab--active': activeTab === {{ faq_tab_idx }} }" @click="setTab({{ faq_tab_idx }})" role="tab">Science</button>
+          {%- assign faq_tab_idx = faq_tab_idx | plus: 1 -%}
+        {%- endif -%}
+        {%- if pdp_product.metafields.smart.faq_basics.value != blank -%}
+          <button type="button" class="button-tab pdp-faq__tab" :class="{ 'pdp-faq__tab--active': activeTab === {{ faq_tab_idx }} }" @click="setTab({{ faq_tab_idx }})" role="tab">Basics</button>
+          {%- assign faq_tab_idx = faq_tab_idx | plus: 1 -%}
+        {%- endif -%}
+        {%- if pdp_product.metafields.smart.faq_sleep.value != blank -%}
+          <button type="button" class="button-tab pdp-faq__tab" :class="{ 'pdp-faq__tab--active': activeTab === {{ faq_tab_idx }} }" @click="setTab({{ faq_tab_idx }})" role="tab">Sleep</button>
+          {%- assign faq_tab_idx = faq_tab_idx | plus: 1 -%}
+        {%- endif -%}
+      </div>
+
+      {%- assign faq_tab_idx = 0 -%}
+      {%- if pdp_product.metafields.smart.faq_product.value != blank -%}
+        <div class="pdp-faq__panel" x-show="activeTab === {{ faq_tab_idx }}" x-cloak role="tabpanel">
+          {%- for item in pdp_product.metafields.smart.faq_product.value -%}
+            <div class="pdp-faq__accordion" x-data="{ open: false }">
+              <button type="button" class="pdp-faq__accordion-btn accordion-btn" @click="open = !open" :aria-expanded="open">
+                {{ item.question }}
+                <span x-text="open ? '−' : '+'"></span>
+              </button>
+              <div x-show="open" x-collapse>
+                <div class="pdp-faq__accordion-body richtext-md">{{ item.answer | metafield_tag }}</div>
+              </div>
+            </div>
+          {%- endfor -%}
+        </div>
+        {%- assign faq_tab_idx = faq_tab_idx | plus: 1 -%}
+      {%- endif -%}
+
+      {%- if pdp_product.metafields.smart.faq_lifestyle.value != blank -%}
+        <div class="pdp-faq__panel" x-show="activeTab === {{ faq_tab_idx }}" x-cloak role="tabpanel">
+          {%- for item in pdp_product.metafields.smart.faq_lifestyle.value -%}
+            <div class="pdp-faq__accordion" x-data="{ open: false }">
+              <button type="button" class="pdp-faq__accordion-btn accordion-btn" @click="open = !open" :aria-expanded="open">
+                {{ item.question }}
+                <span x-text="open ? '−' : '+'"></span>
+              </button>
+              <div x-show="open" x-collapse>
+                <div class="pdp-faq__accordion-body richtext-md">{{ item.answer | metafield_tag }}</div>
+              </div>
+            </div>
+          {%- endfor -%}
+        </div>
+        {%- assign faq_tab_idx = faq_tab_idx | plus: 1 -%}
+      {%- endif -%}
+
+      {%- if pdp_product.metafields.smart.faq_science.value != blank -%}
+        <div class="pdp-faq__panel" x-show="activeTab === {{ faq_tab_idx }}" x-cloak role="tabpanel">
+          {%- for item in pdp_product.metafields.smart.faq_science.value -%}
+            <div class="pdp-faq__accordion" x-data="{ open: false }">
+              <button type="button" class="pdp-faq__accordion-btn accordion-btn" @click="open = !open" :aria-expanded="open">
+                {{ item.question }}
+                <span x-text="open ? '−' : '+'"></span>
+              </button>
+              <div x-show="open" x-collapse>
+                <div class="pdp-faq__accordion-body richtext-md">{{ item.answer | metafield_tag }}</div>
+              </div>
+            </div>
+          {%- endfor -%}
+        </div>
+        {%- assign faq_tab_idx = faq_tab_idx | plus: 1 -%}
+      {%- endif -%}
+
+      {%- if pdp_product.metafields.smart.faq_basics.value != blank -%}
+        <div class="pdp-faq__panel" x-show="activeTab === {{ faq_tab_idx }}" x-cloak role="tabpanel">
+          {%- for item in pdp_product.metafields.smart.faq_basics.value -%}
+            <div class="pdp-faq__accordion" x-data="{ open: false }">
+              <button type="button" class="pdp-faq__accordion-btn accordion-btn" @click="open = !open" :aria-expanded="open">
+                {{ item.question }}
+                <span x-text="open ? '−' : '+'"></span>
+              </button>
+              <div x-show="open" x-collapse>
+                <div class="pdp-faq__accordion-body richtext-md">{{ item.answer | metafield_tag }}</div>
+              </div>
+            </div>
+          {%- endfor -%}
+        </div>
+        {%- assign faq_tab_idx = faq_tab_idx | plus: 1 -%}
+      {%- endif -%}
+
+      {%- if pdp_product.metafields.smart.faq_sleep.value != blank -%}
+        <div class="pdp-faq__panel" x-show="activeTab === {{ faq_tab_idx }}" x-cloak role="tabpanel">
+          {%- for item in pdp_product.metafields.smart.faq_sleep.value -%}
+            <div class="pdp-faq__accordion" x-data="{ open: false }">
+              <button type="button" class="pdp-faq__accordion-btn accordion-btn" @click="open = !open" :aria-expanded="open">
+                {{ item.question }}
+                <span x-text="open ? '−' : '+'"></span>
+              </button>
+              <div x-show="open" x-collapse>
+                <div class="pdp-faq__accordion-body richtext-md">{{ item.answer | metafield_tag }}</div>
+              </div>
+            </div>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "CTR PDP FAQ",
+  "tag": "section",
+  "class": "ctr-pdp-faq-section",
+  "settings": [
+    { "type": "richtext", "id": "heading", "label": "Heading", "default": "<p><strong>questions? we've got you.</strong></p>" },
+    { "type": "range", "id": "max_width", "label": "Max width", "min": 960, "max": 1400, "step": 20, "unit": "px", "default": 1280 },
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 96 },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 96 },
+    { "type": "range", "id": "padding_horizontal", "label": "Padding horizontal", "min": 0, "max": 80, "step": 4, "unit": "px", "default": 24 },
+    { "type": "text", "id": "section_id", "label": "Section ID", "default": "faq" },
+    { "type": "textarea", "id": "custom_css", "label": "Custom CSS" }
+  ],
+  "presets": [{ "name": "CTR PDP FAQ" }]
+}
+{% endschema %}

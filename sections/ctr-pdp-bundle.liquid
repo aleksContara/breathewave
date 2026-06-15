@@ -1,0 +1,93 @@
+{%- comment -%} CTR PDP Bundle section {%- endcomment -%}
+{%- liquid
+  assign custom_css = section.settings.custom_css
+  assign section_id_attr = section.settings.section_id
+-%}
+
+{% capture selector %}[data-style-id="{{ section.id }}"]{% endcapture %}
+
+{% capture css %}
+  & {
+    padding: {{ section.settings.padding_top }}px {{ section.settings.padding_horizontal }}px {{ section.settings.padding_bottom }}px;
+    box-sizing: border-box;
+  }
+  & .pdp-bundle__inner { max-width: {{ section.settings.max_width }}px; margin: 0 auto; }
+  & .pdp-bundle__heading { text-align: center; margin: 0 0 48px; text-transform: lowercase; }
+  & .pdp-bundle__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 96px; justify-content: center; }
+  @media (max-width: 1024px) { & .pdp-bundle__grid { gap: 24px; } }
+  @media (max-width: 767px) { & .pdp-bundle__grid { grid-template-columns: 1fr; gap: 24px; } }
+  & .pdp-bundle__grid > *:nth-child(odd) { display: flex; justify-content: flex-end; }
+  & .pdp-bundle__grid > *:nth-child(even) { display: flex; justify-content: flex-start; }
+  @media (max-width: 767px) {
+    & .pdp-bundle__grid > *:nth-child(odd),
+    & .pdp-bundle__grid > *:nth-child(even) { justify-content: stretch; }
+  }
+  & .pdp-card--big { flex-direction: column; align-items: center; text-align: center; max-width: 320px; width: 100%; }
+  & .pdp-card--big .pdp-card__media { width: 100%; height: auto; aspect-ratio: 1; border-radius: 16px; }
+  & .pdp-card--big .pdp-card__media img { width: 100%; height: 100%; object-fit: cover; }
+  & .pdp-card--big .pdp-card__title { font-size: 18px; }
+{% endcapture %}
+
+<style>{{ css | append: custom_css | replace: '&', selector | strip_newlines }}</style>
+
+<div data-style-id="{{ section.id }}" {% if section_id_attr != blank %}id="{{ section_id_attr }}"{% endif %} class="pdp-bundle">
+  <div class="pdp-bundle__inner">
+    {%- if section.settings.heading != blank -%}
+      <h2 class="pdp-bundle__heading pdp-title-nohemi richtext-md h2">{{ section.settings.heading }}</h2>
+    {%- endif -%}
+    <div class="pdp-bundle__grid" x-data="ctrPdpUpsell">
+      {%- assign bundle_count = 0 -%}
+      {%- if section.settings.bundle_products != blank and section.settings.bundle_products.size > 0 -%}
+        {%- for bundle_product in section.settings.bundle_products -%}
+          {%- if bundle_count >= section.settings.display_limit -%}{% break %}{%- endif -%}
+          {%- if bundle_product != blank -%}
+            {%- unless section.settings.hide_oos and bundle_product.available == false -%}
+              {% render 'ctr-pdp-product-card', card_product: bundle_product, card_style: 'big', show_description: true %}
+              {%- assign bundle_count = bundle_count | plus: 1 -%}
+            {%- endunless -%}
+          {%- endif -%}
+        {%- endfor -%}
+      {%- else -%}
+        {%- assign bundle_handle_list = section.settings.bundle_fallback_handles | replace: ' ', '' | split: ',' -%}
+        {%- for handle in bundle_handle_list -%}
+          {%- if bundle_count >= section.settings.display_limit -%}{% break %}{%- endif -%}
+          {%- assign bundle_product = all_products[handle] -%}
+          {%- if bundle_product != blank -%}
+            {%- unless section.settings.hide_oos and bundle_product.available == false -%}
+              {% render 'ctr-pdp-product-card', card_product: bundle_product, card_style: 'big', show_description: true %}
+              {%- assign bundle_count = bundle_count | plus: 1 -%}
+            {%- endunless -%}
+          {%- endif -%}
+        {%- endfor -%}
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "CTR PDP Bundle",
+  "tag": "section",
+  "class": "ctr-pdp-bundle-section",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "bundle up for better breathing" },
+    { "type": "product_list", "id": "bundle_products", "label": "Bundle products" },
+    {
+      "type": "textarea",
+      "id": "bundle_fallback_handles",
+      "label": "Bundle fallback handles",
+      "default": "sensory-mask,mouth-tape",
+      "info": "Comma-separated product handles. Used when no products are picked above."
+    },
+    { "type": "range", "id": "display_limit", "label": "Display limit", "min": 1, "max": 4, "step": 1, "default": 2 },
+    { "type": "checkbox", "id": "hide_oos", "label": "Hide out of stock", "default": true },
+    { "type": "range", "id": "max_width", "label": "Max width", "min": 960, "max": 1400, "step": 20, "unit": "px", "default": 1280 },
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 96 },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 96 },
+    { "type": "range", "id": "padding_horizontal", "label": "Padding horizontal", "min": 0, "max": 80, "step": 4, "unit": "px", "default": 24 },
+    { "type": "text", "id": "section_id", "label": "Section ID" },
+    { "type": "textarea", "id": "custom_css", "label": "Custom CSS" }
+  ],
+  "presets": [{ "name": "CTR PDP Bundle" }]
+}
+{% endschema %}

@@ -1,0 +1,62 @@
+{%- comment -%} CTR PDP footer image banner (bg.png) {%- endcomment -%}
+{%- liquid
+  assign custom_css = section.settings.custom_css
+  assign section_id_attr = section.settings.section_id
+-%}
+
+{% capture selector %}[data-style-id="{{ section.id }}"]{% endcapture %}
+
+{% capture css %}
+  & {
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+    padding: 0;
+    background-color: {{ section.settings.bg_color }};
+    box-sizing: border-box;
+  }
+  & .pdp-footer-banner__img {
+    object-fit: contain;
+    width: 100%;
+    position: relative;
+    top: 5px;
+    display: block;
+    height: auto;
+  }
+{% endcapture %}
+
+<style>{{ css | append: custom_css | replace: '&', selector | strip_newlines }}</style>
+
+<div data-style-id="{{ section.id }}" {% if section_id_attr != blank %}id="{{ section_id_attr }}"{% endif %} class="pdp-footer-banner">
+  {%- if section.settings.image != blank -%}
+    <picture>
+      {%- if section.settings.mobile_image != blank -%}
+        <source media="(max-width: 768px)" srcset="{{ section.settings.mobile_image | image_url: width: 1200 }}">
+      {%- endif -%}
+      <img
+        class="pdp-footer-banner__img"
+        src="{{ section.settings.image | image_url: width: 1920 }}"
+        alt=""
+        width="1920"
+        height="400"
+        loading="lazy"
+      >
+    </picture>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "CTR PDP Footer Banner",
+  "tag": "section",
+  "class": "ctr-pdp-footer-banner-section",
+  "settings": [
+    { "type": "image_picker", "id": "image", "label": "Desktop image" },
+    { "type": "image_picker", "id": "mobile_image", "label": "Mobile image" },
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#ffffff" },
+    { "type": "text", "id": "section_id", "label": "Section ID" },
+    { "type": "textarea", "id": "custom_css", "label": "Custom CSS" }
+  ],
+  "presets": [{ "name": "CTR PDP Footer Banner" }]
+}
+{% endschema %}

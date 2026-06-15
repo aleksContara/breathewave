@@ -273,6 +273,10 @@
   </script>
 {% endif %}
 
+{% if template.suffix == 'ctr-pdp-otp' or template.suffix == 'starter' %}
+  {% render 'ctr-alpine' %}
+{% endif %}
+
 <script
   src="{{ 'auto-close-details.js' | asset_url }}"
   defer="defer"

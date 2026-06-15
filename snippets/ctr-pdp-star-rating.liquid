@@ -1,0 +1,46 @@
+{%- comment -%}
+  Star rating for PDP buy box — Okendo / Shopify reviews metafields with fallbacks.
+  @param product {Product}
+  @param link_to_reviews {boolean}
+{%- endcomment -%}
+{%- liquid
+  assign rating_value = product.metafields.reviews.rating.value.rating
+  assign rating_count = product.metafields.reviews.rating_count.value
+
+  if rating_value == blank
+    assign rating_value = product.metafields.okendo.summaryData.value.reviewAverage
+  endif
+  if rating_count == blank
+    assign rating_count = product.metafields.okendo.summaryData.value.reviewCount
+  endif
+  if rating_value == blank
+    assign rating_value = product.metafields.judgeme.avg_rating
+    assign rating_count = product.metafields.judgeme.review_count
+  endif
+
+  assign rating_num = rating_value | plus: 0
+  assign count_num = rating_count | plus: 0
+  assign show_rating = false
+  if rating_num > 0 and count_num > 0
+    assign show_rating = true
+  endif
+-%}
+
+{%- if show_rating -%}
+  <div class="pdp-bb__rating">
+    {%- if link_to_reviews -%}
+      <a href="#reviews" class="pdp-bb__rating-link">
+    {%- endif -%}
+    <span class="pdp-bb__stars" aria-hidden="true">
+      {%- for i in (1..5) -%}
+        <svg class="pdp-bb__star{% if i <= rating_num %} pdp-bb__star--filled{% endif %}" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+        </svg>
+      {%- endfor -%}
+    </span>
+    <span class="pdp-bb__rating-count">{{ count_num }} Reviews</span>
+    {%- if link_to_reviews -%}
+      </a>
+    {%- endif -%}
+  </div>
+{%- endif -%}

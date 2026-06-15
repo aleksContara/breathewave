@@ -1,0 +1,51 @@
+{%- comment -%}
+  Product card for upsell / bundle sections.
+  @param card_product {Product}
+  @param card_style {string} flat | big
+  @param show_description {boolean}
+{%- endcomment -%}
+{%- liquid
+  assign card_product = card_product | default: product
+  assign card_variant = card_product.selected_or_first_available_variant
+  assign card_style = card_style | default: 'flat'
+-%}
+{%- if card_product != blank and card_product.available -%}
+  <div class="pdp-card pdp-card--{{ card_style }}">
+    <a href="{{ card_product.url }}" class="pdp-card__media">
+      {%- if card_product.featured_image -%}
+        <img
+          src="{{ card_product.featured_image | image_url: width: 600 }}"
+          alt="{{ card_product.featured_image.alt | escape }}"
+          loading="lazy"
+          width="300"
+          height="300"
+        >
+      {%- endif -%}
+    </a>
+    <div class="pdp-card__body">
+      <a href="{{ card_product.url }}" class="pdp-card__title">{{ card_product.title }}</a>
+      <p class="pdp-card__price">
+        {%- if card_variant.compare_at_price > card_variant.price -%}
+          <s class="pdp-card__compare">{{ card_variant.compare_at_price | money }}</s>
+        {%- endif -%}
+        <span>{{ card_variant.price | money }}</span>
+      </p>
+      {%- if show_description and card_product.metafields.smart.short_description != blank -%}
+        <div class="pdp-card__desc">{{ card_product.metafields.smart.short_description | metafield_tag }}</div>
+      {%- elsif show_description and card_product.description != blank -%}
+        <p class="pdp-card__desc">{{ card_product.description | strip_html | truncate: 120 }}</p>
+      {%- endif -%}
+      {%- if card_variant.available -%}
+        <button
+          type="button"
+          class="pdp-card__atc button button-primary"
+          @click="addProduct({{ card_variant.id }})"
+          :disabled="addingId === {{ card_variant.id }}"
+        >
+          <span x-show="addingId !== {{ card_variant.id }}">Add to cart</span>
+          <span x-show="addingId === {{ card_variant.id }}" x-cloak>Adding…</span>
+        </button>
+      {%- endif -%}
+    </div>
+  </div>
+{%- endif -%}

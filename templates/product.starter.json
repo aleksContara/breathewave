@@ -1,0 +1,431 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "ctr_pdp_buy_box": {
+      "type": "ctr-pdp-buy-box",
+      "blocks": {
+        "ugc_1": {
+          "type": "ugc_video",
+          "settings": {
+            "video": "shopify://files/videos/Collective-Breathewave.mp4",
+            "preview_image": "shopify://shop_images/collective.jpg"
+          }
+        },
+        "ugc_2": {
+          "type": "ugc_video",
+          "settings": {
+            "video": "shopify://files/videos/Jane-Short-9x16.mp4",
+            "preview_image": "shopify://shop_images/jane.jpg"
+          }
+        },
+        "ugc_3": {
+          "type": "ugc_video",
+          "settings": {
+            "video": "shopify://files/videos/Patrick-Short-9x16.mp4",
+            "preview_image": "shopify://shop_images/patrick.jpg"
+          }
+        },
+        "ugc_4": {
+          "type": "ugc_video",
+          "settings": {
+            "video": "shopify://files/videos/Molly-Short-9x16.mp4",
+            "preview_image": "shopify://shop_images/Molly-Short-9x16.jpg"
+          }
+        },
+        "ugc_5": {
+          "type": "ugc_video",
+          "settings": {
+            "video": "shopify://files/videos/Joel-Short-9x16.mp4",
+            "preview_image": "shopify://shop_images/joel.jpg"
+          }
+        },
+        "ugc_6": {
+          "type": "ugc_video",
+          "settings": {
+            "video": "shopify://files/videos/Sage-Short-9x16.mp4",
+            "preview_image": "shopify://shop_images/Sage.jpg"
+          }
+        },
+        "ugc_7": {
+          "type": "ugc_video",
+          "settings": {
+            "video": "shopify://files/videos/Taylor-Short-9x16.mp4",
+            "preview_image": "shopify://shop_images/Taylor-Short-9x16.jpg"
+          }
+        },
+        "trust_medical": {
+          "type": "trust_icon",
+          "settings": {
+            "icon_type": "shield",
+            "label": "Medical Grade"
+          }
+        },
+        "trust_trial": {
+          "type": "trust_icon",
+          "settings": {
+            "icon_type": "thumbs-up",
+            "label": "30 Day Trial"
+          }
+        },
+        "trust_snoring": {
+          "type": "trust_icon",
+          "settings": {
+            "icon_type": "volume-min",
+            "label": "Reduces Snoring"
+          }
+        }
+      },
+      "block_order": [
+        "ugc_1",
+        "ugc_2",
+        "ugc_3",
+        "ugc_4",
+        "ugc_5",
+        "ugc_6",
+        "ugc_7",
+        "trust_medical",
+        "trust_trial",
+        "trust_snoring"
+      ],
+      "settings": {
+        "product": "{{ closest.product }}",
+        "max_width": 1280,
+        "padding_top": 24,
+        "padding_bottom": 48,
+        "padding_horizontal": 24,
+        "show_breadcrumb": true,
+        "breadcrumb_collection": "all-products",
+        "detailed_option_name": "supply",
+        "show_otp_card": true,
+        "otp_card_title": "One-time Purchase",
+        "otp_bullets": "Exclusive discount limited to first-time customers|First-time customers only|30 day risk free trial",
+        "first_timer_title": "First Time Purchase",
+        "first_timer_note": "Discount automatically applied at cart. first-time customers only. limit 1 per email.",
+        "atc_label": "Add to Cart",
+        "atc_adding_label": "Adding…",
+        "atc_added_label": "Added!",
+        "sold_out_label": "Notify me",
+        "show_ugc": true,
+        "ugc_heading": "See it in action",
+        "upsell_heading": "Pair wells with",
+        "upsell_products": [],
+        "upsell_fallback_handles": "sensory-mask,mouth-tape",
+        "upsell_limit": 2,
+        "hide_upsell_oos": true,
+        "accordion_details_label": "Details",
+        "accordion_how_to_use_label": "How to Use",
+        "accordion_after_care_label": "After Care",
+        "accordion_material_label": "Material",
+        "custom_css": ""
+      }
+    },
+    "ctr_pdp_sticky": {
+      "type": "ctr-pdp-sticky-atc",
+      "settings": {
+        "atc_label": "Add To Cart",
+        "atc_adding_label": "Adding…",
+        "sold_out_label": "Notify me",
+        "custom_css": ""
+      }
+    },
+    "ctr_pdp_features": {
+      "type": "ctr-pdp-features",
+      "settings": {
+        "content_source": "metafield",
+        "max_width": 1280,
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "padding_horizontal": 24,
+        "bg_color": "#f4f8fd",
+        "section_id": "features",
+        "custom_css": ""
+      }
+    },
+    "ctr_pdp_marquee": {
+      "type": "ctr-marquee",
+      "blocks": {
+        "text_1": { "type": "text", "settings": { "text": "30 day risk free trial" } },
+        "text_2": { "type": "text", "settings": { "text": "30 day risk free trial" } },
+        "text_3": { "type": "text", "settings": { "text": "30 day risk free trial" } },
+        "text_4": { "type": "text", "settings": { "text": "30 day risk free trial" } },
+        "text_5": { "type": "text", "settings": { "text": "30 day risk free trial" } }
+      },
+      "block_order": ["text_1", "text_2", "text_3", "text_4", "text_5"],
+      "settings": {
+        "speed": 20,
+        "direction": "left",
+        "separator": "•",
+        "sep_gap": 20,
+        "sep_size": 18,
+        "bg_color": "#21232f",
+        "text_color": "#f4f8fd",
+        "sep_color": "#6cfff5",
+        "font_size": 14,
+        "font_weight": "400",
+        "padding_v": 14,
+        "item_gap": 16,
+        "hide_on_mobile": false,
+        "aria_label": "30 day risk free trial",
+        "custom_css": "",
+        "section_id": ""
+      }
+    },
+    "ctr_pdp_video": {
+      "type": "ctr-pdp-video",
+      "settings": {
+        "section_id": "video",
+        "video_product": "{{ closest.product }}",
+        "aspect_ratio_mobile": 0.8,
+        "aspect_ratio": 1.9,
+        "border_radius": 28,
+        "max_width": 1280,
+        "padding_x_mobile": 26,
+        "padding_x_desktop": 78,
+        "padding_top_mobile": 24,
+        "padding_bottom_mobile": 24,
+        "padding_top_desktop": 48,
+        "padding_bottom_desktop": 48,
+        "h_align_mobile": "center",
+        "v_align_mobile": "center",
+        "h_align_desktop": "center",
+        "v_align_desktop": "center",
+        "show_play_button": true,
+        "play_button_size": 80,
+        "play_button_idle_timeout": 1.5,
+        "play_button_bg": "#ffffff",
+        "play_button_color": "#0a0e1a",
+        "show_heading": true,
+        "heading": "",
+        "heading_force_break_desktop": true,
+        "cta_label": "Watch Video",
+        "cta_action": "none",
+        "cta_link": "",
+        "cta_label_active": "Mute",
+        "metafield_namespace": "custom",
+        "metafield_key": "hero_video",
+        "video_aria_label": "Product video",
+        "autoplay": false,
+        "muted": true,
+        "loop": true,
+        "controls": false,
+        "playsinline": true,
+        "pause_offscreen": true,
+        "bg_color": "#0a0e1a",
+        "heading_color": "#ffffff",
+        "cta_bg": "#7affd9",
+        "cta_color": "#0a0e1a",
+        "overlay_opacity": 0,
+        "heading_font_family": "Nohemi, sans-serif",
+        "heading_size_mobile": 40,
+        "heading_size_desktop": 72,
+        "heading_line_height": 1.1,
+        "heading_weight": 400,
+        "cta_radius": 50
+      }
+    },
+    "ctr_pdp_how_to_use": {
+      "type": "ctr-how-to-use",
+      "blocks": {
+        "step_1": {
+          "type": "step",
+          "settings": {
+            "image": "shopify://shop_images/how-to-use-1a.png",
+            "step_label": "step 1",
+            "description": "<p>Align left (L) and right (R) indicators. Insert gently.</p>"
+          }
+        },
+        "step_2": {
+          "type": "step",
+          "settings": {
+            "image": "shopify://shop_images/how-to-use-2a.png",
+            "step_label": "step 2",
+            "description": "<p>Push in gently until only the bridge is visible.</p>"
+          }
+        },
+        "step_3": {
+          "type": "step",
+          "settings": {
+            "image": "shopify://shop_images/how-to-use-3a.png",
+            "step_label": "step 3",
+            "description": "<p>Adjust until it feels right. Comfort is key.</p>"
+          }
+        },
+        "note_1": {
+          "type": "note",
+          "settings": {
+            "text": "<p>*care matters. after use, soak 2 to 3 minutes in warm water, wipe, rinse, and store dry.</p>"
+          }
+        }
+      },
+      "block_order": ["step_1", "step_2", "step_3", "note_1"],
+      "settings": {
+        "eyebrow": "3 EASY STEPS FOR BETTER BREATHING",
+        "heading": "<p>how to use</p>",
+        "heading_size_desktop": 38,
+        "heading_size_mobile": 30,
+        "header_gap": 40,
+        "desktop_cols": "3",
+        "steps_gap": 24,
+        "note_gap": 32,
+        "max_width": 1200,
+        "section_bg": "#000000",
+        "section_padding_v": 40,
+        "section_padding_h": 24,
+        "card_bg": "#1e2235",
+        "card_radius": 0,
+        "card_padding_v": 52,
+        "card_padding_h": 40,
+        "eyebrow_color": "#6bfff5",
+        "heading_color": "#ffffff",
+        "label_color": "#ffffff",
+        "label_size": 22,
+        "desc_color": "#ffffff",
+        "desc_size": 15,
+        "note_color": "#ffffff",
+        "note_size": 14,
+        "eyebrow_size": 12,
+        "custom_css": "",
+        "section_id": "howtouse"
+      }
+    },
+    "ctr_pdp_bundle": {
+      "type": "ctr-pdp-bundle",
+      "settings": {
+        "heading": "bundle up for better breathing",
+        "bundle_products": [],
+        "bundle_fallback_handles": "sensory-mask,mouth-tape",
+        "display_limit": 2,
+        "hide_oos": true,
+        "max_width": 1280,
+        "padding_top": 96,
+        "padding_bottom": 96,
+        "padding_horizontal": 24,
+        "custom_css": ""
+      }
+    },
+    "ctr_pdp_reviews": {
+      "type": "ctr-pdp-reviews",
+      "settings": {
+        "max_width": 1280,
+        "padding_top": 48,
+        "padding_bottom": 48,
+        "padding_horizontal": 24,
+        "bg_color": "#f4f8fd",
+        "section_id": "reviews",
+        "custom_css": ""
+      }
+    },
+    "ctr_pdp_faq": {
+      "type": "ctr-pdp-faq",
+      "settings": {
+        "heading": "<p><strong>questions? we've got you.</strong></p>",
+        "max_width": 1280,
+        "padding_top": 96,
+        "padding_bottom": 96,
+        "padding_horizontal": 24,
+        "section_id": "faq",
+        "custom_css": ""
+      }
+    },
+    "ctr_pdp_instagram": {
+      "type": "ctr-instagram-grid",
+      "blocks": {
+        "image_1": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/social-site-1.jpg",
+            "link": ""
+          }
+        },
+        "image_2": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/social-site-2.jpg",
+            "link": ""
+          }
+        },
+        "image_3": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/social-site-3.jpg",
+            "link": ""
+          }
+        },
+        "image_4": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/social-site-4.jpg",
+            "link": ""
+          }
+        },
+        "image_5": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/social-site-5.jpg",
+            "link": ""
+          }
+        }
+      },
+      "block_order": ["image_1", "image_2", "image_3", "image_4", "image_5"],
+      "settings": {
+        "section_id": "",
+        "heading": "follow us",
+        "handle_text": "@Breathewave",
+        "handle_link": "https://www.instagram.com/breathewave/",
+        "placeholder_count": 5,
+        "max_width": 1680,
+        "columns_desktop": 5,
+        "columns_mobile": "2",
+        "gap": 20,
+        "gap_mobile": 14,
+        "image_aspect": "1 / 1",
+        "image_radius": 22,
+        "heading_size_desktop": 48,
+        "heading_size_mobile": 38,
+        "heading_gap": 64,
+        "heading_gap_mobile": 34,
+        "bg_color": "",
+        "heading_color": "#000000",
+        "handle_color": "#c8cedd",
+        "padding_top": 52,
+        "padding_bottom": 72,
+        "padding_horizontal": 40,
+        "padding_top_mobile": 40,
+        "padding_bottom_mobile": 52,
+        "padding_horizontal_mobile": 18,
+        "custom_css": ""
+      }
+    },
+    "ctr_pdp_footer_banner": {
+      "type": "ctr-pdp-footer-banner",
+      "settings": {
+        "image": "shopify://shop_images/bg.png",
+        "mobile_image": "shopify://shop_images/bgm.png",
+        "bg_color": "#ffffff",
+        "section_id": "",
+        "custom_css": ""
+      }
+    }
+  },
+  "order": [
+    "ctr_pdp_buy_box",
+    "ctr_pdp_sticky",
+    "ctr_pdp_features",
+    "ctr_pdp_marquee",
+    "ctr_pdp_video",
+    "ctr_pdp_how_to_use",
+    "ctr_pdp_bundle",
+    "ctr_pdp_reviews",
+    "ctr_pdp_faq",
+    "ctr_pdp_instagram",
+    "ctr_pdp_footer_banner"
+  ]
+}

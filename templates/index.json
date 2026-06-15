@@ -7,7 +7,7 @@
  * made to this file may be overwritten.
  * ------------------------------------------------------------
  */
- {
+{
   "sections": {
     "hero_jVaWmY": {
       "type": "hero",
@@ -254,7 +254,7 @@
           "settings": {
             "cta_label": "Buy now",
             "cta_url": "",
-            "cta_bg": "#3de8c8",
+            "cta_bg": "#6bfff5",
             "cta_color": "#000000"
           }
         },
@@ -546,7 +546,7 @@
         "card_padding_v": 52,
         "card_padding_h": 40,
         "step_card_bg": "",
-        "eyebrow_color": "#3de8c8",
+        "eyebrow_color": "#6bfff5",
         "heading_color": "#ffffff",
         "label_color": "#ffffff",
         "label_size": 22,
@@ -567,7 +567,7 @@
           "settings": {
             "cta_label": "Buy now",
             "cta_url": "",
-            "cta_bg": "#3de8c8",
+            "cta_bg": "#6bfff5",
             "cta_color": "#000000"
           }
         },
@@ -606,7 +606,7 @@
       "settings": {
         "star_count": 5,
         "star_size": 28,
-        "star_color": "#3de8c8",
+        "star_color": "#6bfff5",
         "heading": "<p>real reviews</p>",
         "heading_size_desktop": 48,
         "heading_size_mobile": 36,
@@ -810,7 +810,7 @@
             "text_align_mobile": "left",
             "show_rating_star": false,
             "rating_text": "BREATHING 2.0",
-            "rating_color": "#6cfff5",
+            "rating_color": "#6bfff5",
             "rating_size": 14,
             "headline": "<h1>find your flow.<br/>ride your breath.</h1>",
             "show_headline_badge": false,
@@ -1032,7 +1032,7 @@
         "body": "<p>Every Breathewave product is designed to support better breathing and whole-body wellness. Explore the full lineup and find what fits your flow.</p>",
         "body_size": 15,
         "see_all_label": "See All →",
-        "see_all_url": "",
+        "see_all_url": "#",
         "see_all_size": 16,
         "btn_label": "View details",
         "show_badge": true,
@@ -1060,7 +1060,7 @@
         "body_color": "#555566",
         "title_color": "#111111",
         "title_size": 14,
-        "star_color": "#3de8c8",
+        "star_color": "#000000",
         "star_size": 14,
         "review_count_color": "#888899",
         "review_count_size": 12,
@@ -1068,7 +1068,7 @@
         "price_size": 15,
         "compare_price_color": "#999999",
         "compare_price_size": 13,
-        "btn_bg": "#3de8c8",
+        "btn_bg": "#6bfff5",
         "btn_color": "#000000",
         "btn_size": 14,
         "btn_padding_v": 12,

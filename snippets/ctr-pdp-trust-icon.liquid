@@ -1,0 +1,27 @@
+{%- comment -%}
+  Trust icon with optional image or built-in SVG fallback.
+  @param icon_type {string} shield | thumbs-up | volume-min
+  @param label {string}
+  @param icon_image {image}
+{%- endcomment -%}
+{%- liquid
+  assign icon_type = icon_type | default: 'shield'
+  assign label = label | default: ''
+-%}
+<div class="pdp-bb__trust-item">
+  {%- if icon_image != blank -%}
+    <img class="pdp-bb__trust-icon" src="{{ icon_image | image_url: width: 48 }}" alt="" width="24" height="24" loading="lazy">
+  {%- else -%}
+    <span class="pdp-bb__trust-icon pdp-bb__trust-icon--svg" aria-hidden="true">
+      {%- case icon_type -%}
+        {%- when 'thumbs-up' -%}
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M7 10v10H4V10h3zm2.5-1.5L14 4v6h5.5l-2 9H9.5V8.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+        {%- when 'volume-min' -%}
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 9v6h4l5 4V5L8 9H4zm11.5 3a3.5 3.5 0 000-5M16 6a7 7 0 010 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        {%- else -%}
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 3l7 4v6c0 4-3 7-7 8-4-1-7-4-7-8V7l7-4z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+      {%- endcase -%}
+    </span>
+  {%- endif -%}
+  <span class="richtext-md h5">{{ label }}</span>
+</div>

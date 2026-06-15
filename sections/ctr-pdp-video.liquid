@@ -1,0 +1,1298 @@
+{%- liquid
+  assign sid = section.id
+
+  assign section_id_attr = section.settings.section_id
+  assign target_product = product
+  if target_product == blank and closest.product != blank
+    assign target_product = closest.product
+  endif
+  if target_product == blank and section.settings.video_product != blank
+    assign target_product = section.settings.video_product
+  endif
+
+  # Resolve metafield video from the picked product
+  assign mf_namespace = section.settings.metafield_namespace | default: 'custom'
+  assign mf_key = section.settings.metafield_key | default: 'hero_video'
+  assign mf_video = nil
+  if target_product != blank
+    assign mf_video = target_product.metafields[mf_namespace][mf_key].value
+  endif
+  assign fallback_video = section.settings.fallback_video
+
+  # Resolve thumbnails from picked product's metafields
+  assign thumb_desktop = nil
+  assign thumb_mobile = nil
+  if target_product != blank
+    assign thumb_desktop = target_product.metafields.smart.video_cover_image.value
+    assign thumb_mobile = target_product.metafields.smart.video_cover_image_mobile.value
+  endif
+
+  # Cross-fallback if one viewport's thumb is missing
+  assign thumb_desktop = thumb_desktop | default: thumb_mobile
+  assign thumb_mobile = thumb_mobile | default: thumb_desktop
+
+  assign has_thumbnail = false
+  if thumb_mobile != blank or thumb_desktop != blank
+    assign has_thumbnail = true
+  endif
+
+  # Force muted when autoplay is on (browser policy)
+  assign is_muted = section.settings.muted
+  if section.settings.autoplay
+    assign is_muted = true
+  endif
+
+  # Force playsinline when autoplay is on (iOS requirement)
+  assign is_playsinline = section.settings.playsinline
+  if section.settings.autoplay
+    assign is_playsinline = true
+  endif
+
+  assign cta_action = section.settings.cta_action
+  assign show_play_btn = section.settings.show_play_button
+
+  assign has_cta = false
+  if cta_action != 'none' and section.settings.cta_label != blank
+    assign has_cta = true
+  endif
+
+  # Alignment maps for flex
+  case section.settings.h_align_mobile
+    when 'left'
+      assign h_align_mobile_flex = 'flex-start'
+      assign h_align_mobile_text = 'left'
+    when 'right'
+      assign h_align_mobile_flex = 'flex-end'
+      assign h_align_mobile_text = 'right'
+    else
+      assign h_align_mobile_flex = 'center'
+      assign h_align_mobile_text = 'center'
+  endcase
+
+  case section.settings.h_align_desktop
+    when 'left'
+      assign h_align_desktop_flex = 'flex-start'
+      assign h_align_desktop_text = 'left'
+    when 'right'
+      assign h_align_desktop_flex = 'flex-end'
+      assign h_align_desktop_text = 'right'
+    else
+      assign h_align_desktop_flex = 'center'
+      assign h_align_desktop_text = 'center'
+  endcase
+
+  case section.settings.v_align_mobile
+    when 'top'
+      assign v_align_mobile = 'flex-start'
+    when 'bottom'
+      assign v_align_mobile = 'flex-end'
+    else
+      assign v_align_mobile = 'center'
+  endcase
+
+  case section.settings.v_align_desktop
+    when 'top'
+      assign v_align_desktop = 'flex-start'
+    when 'bottom'
+      assign v_align_desktop = 'flex-end'
+    else
+      assign v_align_desktop = 'center'
+  endcase
+-%}
+
+<div {% if section_id_attr != blank %}id="{{ section_id_attr }}"{% endif %} data-style-id="{{ sid }}">
+<ctr-video-hero-static
+  data-section-id="{{ sid }}"
+  data-autoplay="{{ section.settings.autoplay }}"
+  data-pause-offscreen="{{ section.settings.pause_offscreen }}"
+  data-cta-action="{{ cta_action }}"
+  data-idle-timeout="{{ section.settings.play_button_idle_timeout | default: 1.5 }}"
+  data-has-play-btn="{{ show_play_btn }}"
+  data-has-cta="{{ has_cta }}"
+  data-has-thumbnail="{{ has_thumbnail }}"
+  data-h-align-mobile="{{ section.settings.h_align_mobile }}"
+  data-h-align-desktop="{{ section.settings.h_align_desktop }}"
+  data-playing="false"
+  data-idle="false"
+  data-has-played="false"
+  class="ctr-video-hero-static"
+>
+  <div class="ctr-video-hero-static__inner">
+    <div class="ctr-video-hero-static__media">
+      {%- if mf_video.sources or fallback_video.sources -%}
+        {%- liquid
+          assign video_to_use = mf_video
+          unless mf_video.sources
+            assign video_to_use = fallback_video
+          endunless
+        -%}
+        <video
+          class="ctr-video-hero-static__video"
+          data-ctr-video
+          {% if section.settings.autoplay %}autoplay{% endif %}
+          {% if is_muted %}muted{% endif %}
+          {% if section.settings.loop %}loop{% endif %}
+          {% if section.settings.controls %}controls{% endif %}
+          {% if is_playsinline %}playsinline webkit-playsinline{% endif %}
+          preload="metadata"
+          {% if thumb_desktop != blank %}poster="{{ thumb_desktop | image_url: width: 1600 }}"{% elsif video_to_use.preview_image %}poster="{{ video_to_use.preview_image | image_url: width: 1600 }}"{% endif %}
+          aria-label="{{ section.settings.video_aria_label | default: 'Product video' | escape }}"
+        >
+          {%- for source in video_to_use.sources -%}
+            <source src="{{ source.url }}" type="{{ source.mime_type }}">
+          {%- endfor -%}
+        </video>
+      {%- else -%}
+        <div class="ctr-video-hero-static__placeholder" role="img" aria-label="Video placeholder">
+          {%- if target_product == blank -%}
+            <span>Select a product in the section settings to load its video and thumbnail.</span>
+          {%- else -%}
+            <span>This product has no video at <code>{{ mf_namespace }}.{{ mf_key }}</code>. Upload a fallback below or set the metafield.</span>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+
+      {%- if has_thumbnail -%}
+        <picture class="ctr-video-hero-static__thumbnail" data-ctr-thumbnail aria-hidden="true">
+          {%- if thumb_mobile != blank -%}
+            <source media="(max-width: 749px)"
+                    srcset="{{ thumb_mobile | image_url: width: 800 }} 800w,
+                            {{ thumb_mobile | image_url: width: 1200 }} 1200w,
+                            {{ thumb_mobile | image_url: width: 1600 }} 1600w"
+                    sizes="100vw">
+          {%- endif -%}
+          {%- if thumb_desktop != blank -%}
+            <source media="(min-width: 750px)"
+                    srcset="{{ thumb_desktop | image_url: width: 1200 }} 1200w,
+                            {{ thumb_desktop | image_url: width: 1800 }} 1800w,
+                            {{ thumb_desktop | image_url: width: 2400 }} 2400w"
+                    sizes="(min-width: 750px) 100vw">
+          {%- endif -%}
+          {%- assign fallback_thumb = thumb_desktop | default: thumb_mobile -%}
+          <img src="{{ fallback_thumb | image_url: width: 1600 }}"
+               alt=""
+               loading="eager"
+               decoding="async">
+        </picture>
+      {%- endif -%}
+
+      {%- if section.settings.overlay_opacity > 0 -%}
+        <div class="ctr-video-hero-static__overlay-tint" aria-hidden="true"></div>
+      {%- endif -%}
+
+      {%- if show_play_btn -%}
+        <div class="ctr-video-hero-static__play-btn-slot">
+          <button
+            class="ctr-video-hero-static__play-btn"
+            type="button"
+            data-ctr-play-btn
+            aria-label="Play video with sound"
+          >
+            <span class="ctr-video-hero-static__play-icon-wrap" data-state="play">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M8 5v14l11-7z" fill="currentColor"/>
+              </svg>
+            </span>
+            <span class="ctr-video-hero-static__play-icon-wrap" data-state="pause">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M6 5h4v14H6zM14 5h4v14h-4z" fill="currentColor"/>
+              </svg>
+            </span>
+          </button>
+        </div>
+      {%- endif -%}
+
+      <div class="ctr-video-hero-static__overlay">
+        {%- if section.settings.show_heading and section.settings.heading != blank -%}
+          <div class="ctr-video-hero-static__heading"
+               data-force-break="{{ section.settings.heading_force_break_desktop }}">
+            {{ section.settings.heading }}
+          </div>
+        {%- endif -%}
+
+        {%- if has_cta -%}
+          {%- if cta_action == 'url' -%}
+            <a class="ctr-video-hero-static__cta"
+               href="{{ section.settings.cta_link | default: '#' }}"
+               {% if section.settings.cta_link == blank %}aria-disabled="true"{% endif %}
+            >
+              {{ section.settings.cta_label }}
+            </a>
+          {%- else -%}
+            <button class="ctr-video-hero-static__cta"
+                    type="button"
+                    data-ctr-cta
+                    aria-pressed="false"
+            >
+              <span data-ctr-cta-label-default>{{ section.settings.cta_label }}</span>
+              {%- if cta_action == 'unmute' -%}
+                <span data-ctr-cta-label-active hidden>{{ section.settings.cta_label_active | default: 'Mute' }}</span>
+              {%- endif -%}
+            </button>
+          {%- endif -%}
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</ctr-video-hero-static>
+</div>
+
+{%- style -%}
+  [data-section-id="{{ sid }}"].ctr-video-hero-static {
+    --ctr-bg: {{ section.settings.bg_color }};
+    --ctr-heading-color: {{ section.settings.heading_color }};
+    --ctr-heading-font: {{ section.settings.heading_font_family | default: 'Nohemi, sans-serif' }};
+    --ctr-cta-bg: {{ section.settings.cta_bg }};
+    --ctr-cta-color: {{ section.settings.cta_color }};
+    --ctr-radius: {{ section.settings.border_radius }}px;
+    --ctr-cta-radius: {{ section.settings.cta_radius }}px;
+    --ctr-max-width: {{ section.settings.max_width }}px;
+    --ctr-aspect: {{ section.settings.aspect_ratio_mobile | default: 0.8 }};
+    --ctr-pad-top: {{ section.settings.padding_top_mobile }}px;
+    --ctr-pad-bottom: {{ section.settings.padding_bottom_mobile }}px;
+    --ctr-pad-x: {{ section.settings.padding_x_mobile | default: 16 }}px;
+    --ctr-h-size: {{ section.settings.heading_size_mobile }}px;
+    --ctr-h-line: {{ section.settings.heading_line_height }};
+    --ctr-h-weight: {{ section.settings.heading_weight }};
+    --ctr-overlay-opacity: {{ section.settings.overlay_opacity | divided_by: 100.0 }};
+    --ctr-play-size: {{ section.settings.play_button_size | default: 80 }}px;
+    --ctr-play-bg: {{ section.settings.play_button_bg | default: '#FFFFFF' }};
+    --ctr-play-color: {{ section.settings.play_button_color | default: '#0A0E1A' }};
+    --ctr-h-align-flex: {{ h_align_mobile_flex }};
+    --ctr-h-align-text: {{ h_align_mobile_text }};
+    --ctr-v-align: {{ v_align_mobile }};
+
+    display: block;
+    background: var(--ctr-bg);
+    padding-top: var(--ctr-pad-top);
+    padding-bottom: var(--ctr-pad-bottom);
+  }
+
+  @media (min-width: 750px) {
+    [data-section-id="{{ sid }}"].ctr-video-hero-static {
+      --ctr-pad-top: {{ section.settings.padding_top_desktop }}px;
+      --ctr-pad-bottom: {{ section.settings.padding_bottom_desktop }}px;
+      --ctr-pad-x: {{ section.settings.padding_x_desktop | default: 48 }}px;
+      --ctr-h-size: {{ section.settings.heading_size_desktop }}px;
+      --ctr-aspect: {{ section.settings.aspect_ratio | default: 1.6 }};
+      --ctr-h-align-flex: {{ h_align_desktop_flex }};
+      --ctr-h-align-text: {{ h_align_desktop_text }};
+      --ctr-v-align: {{ v_align_desktop }};
+    }
+  }
+
+  [data-section-id="{{ sid }}"] .ctr-video-hero-static__inner {
+    max-width: var(--ctr-max-width);
+    margin: 0 auto;
+    padding-left: var(--ctr-pad-x);
+    padding-right: var(--ctr-pad-x);
+    box-sizing: border-box;
+  }
+
+  [data-section-id="{{ sid }}"] .ctr-video-hero-static__media {
+    position: relative;
+    width: 100%;
+    aspect-ratio: var(--ctr-aspect);
+    border-radius: var(--ctr-radius);
+    overflow: hidden;
+    background: #1a1a1a;
+    isolation: isolate;
+  }
+
+  [data-section-id="{{ sid }}"] .ctr-video-hero-static__video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    cursor: pointer;
+  }
+
+  [data-section-id="{{ sid }}"] .ctr-video-hero-static__thumbnail {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: block;
+    pointer-events: none;
+    opacity: 1;
+    transition: opacity 400ms ease;
+  }
+
+  [data-section-id="{{ sid }}"] .ctr-video-hero-static__thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  [data-section-id="{{ sid }}"][data-has-played="true"] .ctr-video-hero-static__thumbnail {
+    opacity: 0;
+  }
+
+  [data-section-id="{{ sid }}"] .ctr-video-hero-static__placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.5);
+    text-align: center;
+    padding: 2rem;
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  [data-section-id="{{ sid }}"] .ctr-video-hero-static__placeholder code {
+    background: rgba(255, 255, 255, 0.08);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.95em;
+  }
+
+  [data-section-id="{{ sid }}"] .ctr-video-hero-static__overlay-tint {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, var(--ctr-overlay-opacity));
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  [data-section-id="{{ sid }}"] .ctr-video-hero-static__play-btn-slot {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    transition: opacity 350ms ease;
+  }
+
+  [data-section-id="{{ sid }}"] .ctr-video-hero-static__play-btn {
+    position: relative;
+    pointer-events: auto;
+    width: var(--ctr-play-size);
+    height: var(--ctr-play-size);
+    border-radius: 50%;
+    background: var(--ctr-play-bg);
+    color: var(--ctr-play-color);
+    border: 0;
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+    opacity: 1;
+    transition: transform 200ms ease, box-shadow 200ms ease;
+    will-change: transform;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  [data-section-id="{{ sid }}"] .ctr-video-hero-static__play-btn:hover {
+    transform: scale(1.06);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+  }
+
+  [data-section-id="{{ sid }}"] .ctr-video-hero-static__play-btn:focus-visible {
+    outline: 2px solid var(--ctr-play-bg);
+    outline-offset: 4px;
+  }
+
+  [data-section-id="{{ sid }}"] .ctr-video-hero-static__play-icon-wrap {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 150ms ease;
+    pointer-events: none;
+  }
+
+  [data-section-id="{{ sid }}"] .ctr-video-hero-static__play-icon-wrap svg {
+    width: 38%;
+    height: 38%;
+    display: block;
+  }
+
+  [data-section-id="{{ sid }}"][data-playing="false"] .ctr-video-hero-static__play-icon-wrap[data-state="play"] {
+    opacity: 1;
+  }
+
+  [data-section-id="{{ sid }}"][data-playing="true"] .ctr-video-hero-static__play-icon-wrap[data-state="pause"] {
+    opacity: 1;
+  }
+
+  [data-section-id="{{ sid }}"][data-playing="true"][data-idle="true"] .ctr-video-hero-static__play-btn-slot {
+    opacity: 0;
+  }
+
+  [data-section-id="{{ sid }}"][data-playing="true"][data-idle="true"] .ctr-video-hero-static__play-btn {
+    pointer-events: none;
+  }
+
+  [data-section-id="{{ sid }}"] .ctr-video-hero-static__overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: var(--ctr-h-align-flex);
+    justify-content: var(--ctr-v-align);
+    gap: clamp(20px, 4vw, 40px);
+    padding: clamp(24px, 5vw, 48px);
+    pointer-events: none;
+    text-align: var(--ctr-h-align-text);
+  }
+
+  [data-section-id="{{ sid }}"][data-has-play-btn="true"][data-has-cta="true"] .ctr-video-hero-static__overlay {
+    justify-content: space-between;
+    gap: 0;
+    padding-top: clamp(28px, 6vw, 60px);
+    padding-bottom: clamp(28px, 6vw, 60px);
+  }
+
+  [data-section-id="{{ sid }}"] .ctr-video-hero-static__heading {
+    color: var(--ctr-heading-color);
+    font-family: var(--ctr-heading-font);
+    font-size: var(--ctr-h-size);
+    line-height: var(--ctr-h-line);
+    font-weight: var(--ctr-h-weight);
+    letter-spacing: -0.02em;
+    margin: 0;
+    max-width: 80%;
+  }
+
+  [data-section-id="{{ sid }}"][data-h-align-mobile="center"] .ctr-video-hero-static__heading {
+    text-wrap: balance;
+    max-width: 18ch;
+  }
+
+  @media (min-width: 750px) {
+    [data-section-id="{{ sid }}"][data-h-align-desktop="center"] .ctr-video-hero-static__heading {
+      text-wrap: balance;
+      max-width: 18ch;
+    }
+    [data-section-id="{{ sid }}"]:not([data-h-align-desktop="center"]) .ctr-video-hero-static__heading {
+      text-wrap: wrap;
+      max-width: 80%;
+    }
+  }
+
+  [data-section-id="{{ sid }}"] .ctr-video-hero-static__heading > *,
+  [data-section-id="{{ sid }}"] .ctr-video-hero-static__heading p {
+    margin: 0;
+    font-family: inherit;
+    font-weight: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    color: inherit;
+    letter-spacing: inherit;
+  }
+
+  @media (min-width: 750px) {
+    [data-section-id="{{ sid }}"] .ctr-video-hero-static__heading[data-force-break="true"] [data-ctr-heading-break]::before {
+      content: "\A";
+      white-space: pre;
+    }
+  }
+
+  [data-section-id="{{ sid }}"] .ctr-video-hero-static__cta {
+    pointer-events: auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: var(--ctr-cta-bg);
+    color: var(--ctr-cta-color);
+    border: 0;
+    cursor: pointer;
+    border-radius: var(--ctr-cta-radius);
+    padding: 16px 36px;
+    font-size: clamp(15px, 1.1vw, 17px);
+    font-weight: 500;
+    text-decoration: none;
+    line-height: 1;
+    font-family: inherit;
+    transition: transform 200ms ease, opacity 200ms ease;
+    will-change: transform;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  [data-section-id="{{ sid }}"] .ctr-video-hero-static__cta:hover {
+    transform: translateY(-1px);
+    opacity: 0.95;
+  }
+
+  [data-section-id="{{ sid }}"] .ctr-video-hero-static__cta:focus-visible {
+    outline: 2px solid var(--ctr-cta-bg);
+    outline-offset: 3px;
+  }
+
+  [data-section-id="{{ sid }}"] .ctr-video-hero-static__cta[aria-disabled="true"] {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-section-id="{{ sid }}"] .ctr-video-hero-static__cta,
+    [data-section-id="{{ sid }}"] .ctr-video-hero-static__play-btn,
+    [data-section-id="{{ sid }}"] .ctr-video-hero-static__play-btn-slot,
+    [data-section-id="{{ sid }}"] .ctr-video-hero-static__play-icon-wrap,
+    [data-section-id="{{ sid }}"] .ctr-video-hero-static__thumbnail {
+      transition: none;
+    }
+  }
+{%- endstyle -%}
+
+<script>
+  (function () {
+    if (window.customElements && customElements.get('ctr-video-hero-static')) return;
+
+    class CTRVideoHeroStatic extends HTMLElement {
+      constructor() {
+        super();
+        this._observer = null;
+        this._video = null;
+        this._cta = null;
+        this._playBtn = null;
+        this._wasPlaying = false;
+        this._idleTimer = null;
+        this._idleTimeout = 1500;
+        this._lastIdleWake = 0;
+
+        this._ctaHandler = null;
+        this._playBtnHandler = null;
+        this._videoClickHandler = null;
+        this._stateChangeHandler = null;
+        this._playingHandler = null;
+        this._activityHandler = null;
+      }
+
+      connectedCallback() {
+        this._video = this.querySelector('[data-ctr-video]');
+        this._cta = this.querySelector('[data-ctr-cta]');
+        this._playBtn = this.querySelector('[data-ctr-play-btn]');
+
+        var idle = parseFloat(this.dataset.idleTimeout);
+        if (!isNaN(idle) && idle > 0) {
+          this._idleTimeout = idle * 1000;
+        }
+
+        if (!this._video) return;
+
+        this._setupCTA();
+        this._setupPlayButton();
+        this._setupOffscreenPause();
+        this._setupIdleTracking();
+        this._setupHeadingBreak();
+        this._setupThumbnailDismiss();
+        this._handleAutoplay();
+        this._updateState();
+      }
+
+      disconnectedCallback() {
+        if (this._observer) {
+          this._observer.disconnect();
+          this._observer = null;
+        }
+        if (this._cta && this._ctaHandler) {
+          this._cta.removeEventListener('click', this._ctaHandler);
+        }
+        if (this._playBtn && this._playBtnHandler) {
+          this._playBtn.removeEventListener('click', this._playBtnHandler);
+        }
+        if (this._video) {
+          if (this._videoClickHandler) {
+            this._video.removeEventListener('click', this._videoClickHandler);
+          }
+          if (this._stateChangeHandler) {
+            this._video.removeEventListener('play', this._stateChangeHandler);
+            this._video.removeEventListener('pause', this._stateChangeHandler);
+            this._video.removeEventListener('volumechange', this._stateChangeHandler);
+          }
+          if (this._playingHandler) {
+            this._video.removeEventListener('playing', this._playingHandler);
+          }
+        }
+        if (this._activityHandler) {
+          this.removeEventListener('mousemove', this._activityHandler);
+          this.removeEventListener('touchstart', this._activityHandler);
+          this.removeEventListener('focusin', this._activityHandler);
+        }
+        this._clearIdleTimer();
+      }
+
+      _setupHeadingBreak() {
+        var heading = this.querySelector('.ctr-video-hero-static__heading[data-force-break="true"]');
+        if (!heading) return;
+        if (heading.querySelector('[data-ctr-heading-break]')) return;
+
+        var target = heading.querySelector('p') || heading;
+        var text = (target.textContent || '').trim();
+        if (!text) return;
+
+        var words = text.split(/\s+/);
+        if (words.length < 2) return;
+
+        var mid = Math.ceil(words.length / 2);
+        var first = words.slice(0, mid).join(' ');
+        var second = words.slice(mid).join(' ');
+
+        target.innerHTML = first + ' <span data-ctr-heading-break></span>' + second;
+      }
+
+      _setupThumbnailDismiss() {
+        var self = this;
+        this._playingHandler = function () {
+          self.setAttribute('data-has-played', 'true');
+        };
+        this._video.addEventListener('playing', this._playingHandler);
+      }
+
+      _handleAutoplay() {
+        if (this.dataset.autoplay !== 'true') return;
+        var video = this._video;
+        var tryPlay = function () {
+          var p = video.play();
+          if (p && typeof p.catch === 'function') {
+            p.catch(function () { /* autoplay blocked - silent */ });
+          }
+        };
+        if (video.readyState >= 2) {
+          tryPlay();
+        } else {
+          video.addEventListener('loadeddata', tryPlay, { once: true });
+        }
+      }
+
+      _setupCTA() {
+        if (!this._cta) return;
+        var action = this.dataset.ctaAction;
+        if (action !== 'unmute' && action !== 'fullscreen') return;
+
+        var self = this;
+        this._ctaHandler = function (e) {
+          e.preventDefault();
+          if (action === 'unmute') {
+            self._toggleMute();
+          } else if (action === 'fullscreen') {
+            self._enterFullscreen();
+          }
+        };
+        this._cta.addEventListener('click', this._ctaHandler);
+      }
+
+      _setupPlayButton() {
+        var self = this;
+
+        if (this._playBtn) {
+          this._playBtnHandler = function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (Date.now() - self._lastIdleWake < 300) return;
+            self._togglePlayWithSound();
+          };
+          this._playBtn.addEventListener('click', this._playBtnHandler);
+        }
+
+        this._videoClickHandler = function () {
+          if (Date.now() - self._lastIdleWake < 300) return;
+          self._togglePlayWithSound();
+        };
+        this._video.addEventListener('click', this._videoClickHandler);
+
+        this._stateChangeHandler = function () {
+          self._updateState();
+        };
+        this._video.addEventListener('play', this._stateChangeHandler);
+        this._video.addEventListener('pause', this._stateChangeHandler);
+        this._video.addEventListener('volumechange', this._stateChangeHandler);
+      }
+
+      _togglePlayWithSound() {
+        var video = this._video;
+        if (!video) return;
+
+        if (video.muted || video.paused) {
+          video.muted = false;
+          var p = video.play();
+          if (p && typeof p.catch === 'function') p.catch(function () {});
+        } else {
+          video.pause();
+        }
+      }
+
+      _toggleMute() {
+        var video = this._video;
+        if (!video) return;
+        video.muted = !video.muted;
+
+        var defaultLabel = this._cta && this._cta.querySelector('[data-ctr-cta-label-default]');
+        var activeLabel = this._cta && this._cta.querySelector('[data-ctr-cta-label-active]');
+        if (defaultLabel && activeLabel) {
+          defaultLabel.hidden = !video.muted;
+          activeLabel.hidden = video.muted;
+        }
+
+        if (video.paused) {
+          var p = video.play();
+          if (p && typeof p.catch === 'function') p.catch(function () {});
+        }
+        if (this._cta) this._cta.setAttribute('aria-pressed', String(!video.muted));
+      }
+
+      _enterFullscreen() {
+        var video = this._video;
+        if (!video) return;
+        video.muted = false;
+
+        var req =
+          video.requestFullscreen ||
+          video.webkitEnterFullscreen ||
+          video.webkitRequestFullscreen ||
+          video.msRequestFullscreen;
+
+        if (req) {
+          try {
+            var p = req.call(video);
+            if (p && typeof p.catch === 'function') p.catch(function () {});
+          } catch (err) { /* noop */ }
+        }
+        var play = video.play();
+        if (play && typeof play.catch === 'function') play.catch(function () {});
+      }
+
+      _updateState() {
+        var video = this._video;
+        if (!video) return;
+
+        var playingWithSound = !video.paused && !video.muted;
+        this.setAttribute('data-playing', String(playingWithSound));
+
+        if (this._playBtn) {
+          this._playBtn.setAttribute(
+            'aria-label',
+            playingWithSound ? 'Pause video' : 'Play video with sound'
+          );
+        }
+
+        this._resetIdleTimer();
+      }
+
+      _setupIdleTracking() {
+        if (!this._playBtn) return;
+        var self = this;
+        this._activityHandler = function () {
+          if (self.getAttribute('data-idle') === 'true') {
+            self._lastIdleWake = Date.now();
+          }
+          self._showAndResetIdle();
+        };
+        this.addEventListener('mousemove', this._activityHandler);
+        this.addEventListener('touchstart', this._activityHandler, { passive: true });
+        this.addEventListener('focusin', this._activityHandler);
+      }
+
+      _showAndResetIdle() {
+        this.setAttribute('data-idle', 'false');
+        this._resetIdleTimer();
+      }
+
+      _resetIdleTimer() {
+        this._clearIdleTimer();
+
+        var video = this._video;
+        if (!video) return;
+
+        var playingWithSound = !video.paused && !video.muted;
+        if (!playingWithSound) {
+          this.setAttribute('data-idle', 'false');
+          return;
+        }
+
+        var self = this;
+        this._idleTimer = setTimeout(function () {
+          self.setAttribute('data-idle', 'true');
+        }, this._idleTimeout);
+      }
+
+      _clearIdleTimer() {
+        if (this._idleTimer) {
+          clearTimeout(this._idleTimer);
+          this._idleTimer = null;
+        }
+      }
+
+      _setupOffscreenPause() {
+        if (this.dataset.pauseOffscreen !== 'true') return;
+        if (!('IntersectionObserver' in window)) return;
+
+        var self = this;
+        this._observer = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (entry) {
+              if (!self._video) return;
+              if (entry.isIntersecting) {
+                if (self._wasPlaying || self.dataset.autoplay === 'true') {
+                  var p = self._video.play();
+                  if (p && typeof p.catch === 'function') p.catch(function () {});
+                }
+              } else {
+                self._wasPlaying = !self._video.paused;
+                self._video.pause();
+              }
+            });
+          },
+          { threshold: 0.25 }
+        );
+        this._observer.observe(this);
+      }
+    }
+
+    customElements.define('ctr-video-hero-static', CTRVideoHeroStatic);
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "CTR PDP Video",
+  "tag": "section",
+  "class": "ctr-pdp-video-section",
+  "class": "ctr-video-hero-static-wrap",
+  "settings": [
+    { "type": "header", "content": "Source Product" },
+    {
+      "type": "paragraph",
+      "content": "Pick a product whose metafields will provide the video and thumbnails. Required."
+    },
+    {
+      "type": "product",
+      "id": "video_product",
+      "label": "Source product"
+    },
+
+    { "type": "header", "content": "Layout" },
+    {
+      "type": "range",
+      "id": "aspect_ratio_mobile",
+      "label": "Aspect ratio (mobile)",
+      "min": 0.5,
+      "max": 2.5,
+      "step": 0.1,
+      "default": 0.8,
+      "info": "0.8 = 4:5 portrait. 0.7 = taller. 1.0 = square."
+    },
+    {
+      "type": "range",
+      "id": "aspect_ratio",
+      "label": "Aspect ratio (desktop)",
+      "min": 0.5,
+      "max": 2.5,
+      "step": 0.1,
+      "default": 1.6,
+      "info": "1.6 = 16:10. 1.8 = 16:9. 1.0 = square."
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "Video border radius",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "label": "Max width",
+      "min": 800,
+      "max": 1600,
+      "step": 20,
+      "unit": "px",
+      "default": 1280
+    },
+
+    { "type": "header", "content": "Spacing" },
+    {
+      "type": "paragraph",
+      "content": "Match adjacent sections by setting these to the same gutter values used elsewhere on the page."
+    },
+    {
+      "type": "range",
+      "id": "padding_x_mobile",
+      "label": "Horizontal padding (mobile)",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "padding_x_desktop",
+      "label": "Horizontal padding (desktop)",
+      "min": 0,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "label": "Padding top (mobile)",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "label": "Padding bottom (mobile)",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "padding_top_desktop",
+      "label": "Padding top (desktop)",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_desktop",
+      "label": "Padding bottom (desktop)",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    },
+
+    { "type": "header", "content": "Content Alignment" },
+    {
+      "type": "select",
+      "id": "h_align_mobile",
+      "label": "Horizontal align (mobile)",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "v_align_mobile",
+      "label": "Vertical align (mobile)",
+      "options": [
+        { "value": "top", "label": "Top" },
+        { "value": "center", "label": "Center" },
+        { "value": "bottom", "label": "Bottom" }
+      ],
+      "default": "center",
+      "info": "Vertical align is overridden only when both the play button AND a CTA are visible (heading docks top, CTA docks bottom)."
+    },
+    {
+      "type": "select",
+      "id": "h_align_desktop",
+      "label": "Horizontal align (desktop)",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "v_align_desktop",
+      "label": "Vertical align (desktop)",
+      "options": [
+        { "value": "top", "label": "Top" },
+        { "value": "center", "label": "Center" },
+        { "value": "bottom", "label": "Bottom" }
+      ],
+      "default": "center",
+      "info": "Vertical align is overridden only when both the play button AND a CTA are visible (heading docks top, CTA docks bottom)."
+    },
+
+    { "type": "header", "content": "Play Button" },
+    {
+      "type": "checkbox",
+      "id": "show_play_button",
+      "label": "Show centered play/pause button",
+      "default": true,
+      "info": "Plays with sound on click. Fades while playing if there is no mouse/touch activity. Always visible when paused or muted."
+    },
+    {
+      "type": "range",
+      "id": "play_button_size",
+      "label": "Button size",
+      "min": 48,
+      "max": 140,
+      "step": 4,
+      "unit": "px",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "play_button_idle_timeout",
+      "label": "Hide after (seconds)",
+      "min": 0.5,
+      "max": 10,
+      "step": 0.5,
+      "default": 1.5
+    },
+    {
+      "type": "color",
+      "id": "play_button_bg",
+      "label": "Button background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "play_button_color",
+      "label": "Button icon color",
+      "default": "#0A0E1A"
+    },
+
+    { "type": "header", "content": "Content" },
+    {
+      "type": "checkbox",
+      "id": "show_heading",
+      "label": "Show heading overlay",
+      "default": true
+    },
+    {
+      "type": "richtext",
+      "id": "heading",
+      "label": "Heading",
+      "default": "<p>worlds most comfortable nasal dilator</p>"
+    },
+    {
+      "type": "checkbox",
+      "id": "heading_force_break_desktop",
+      "label": "Force two lines on desktop",
+      "default": true,
+      "info": "Splits the heading into two balanced lines on desktop. Mobile wraps naturally."
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "CTA label",
+      "default": "Watch Video"
+    },
+    {
+      "type": "select",
+      "id": "cta_action",
+      "label": "CTA action",
+      "options": [
+        { "value": "url", "label": "Navigate to URL" },
+        { "value": "unmute", "label": "Unmute and play sound" },
+        { "value": "fullscreen", "label": "Open fullscreen" },
+        { "value": "none", "label": "Hide CTA" }
+      ],
+      "default": "none",
+      "info": "If using the centered play button, set this to 'Hide CTA' or 'Navigate to URL' to avoid duplicating controls."
+    },
+    {
+      "type": "url",
+      "id": "cta_link",
+      "label": "CTA link",
+      "info": "Used only when CTA action is 'Navigate to URL'."
+    },
+    {
+      "type": "text",
+      "id": "cta_label_active",
+      "label": "CTA label when active",
+      "default": "Mute",
+      "info": "Used only when CTA action is 'Unmute and play sound'."
+    },
+
+    { "type": "text", "id": "section_id", "label": "Section ID", "default": "video" },
+    { "type": "header", "content": "Video Source" },
+    {
+      "type": "paragraph",
+      "content": "Uses the current product's metafield (default: custom.hero_video). Thumbnails from smart.video_cover_image and smart.video_cover_image_mobile. Optional product override below for non-product templates."
+    },
+    {
+      "type": "text",
+      "id": "metafield_namespace",
+      "label": "Video metafield namespace",
+      "default": "custom"
+    },
+    {
+      "type": "text",
+      "id": "metafield_key",
+      "label": "Video metafield key",
+      "default": "hero_video"
+    },
+    {
+      "type": "video",
+      "id": "fallback_video",
+      "label": "Fallback video",
+      "info": "Used if the source product has no video metafield set."
+    },
+    {
+      "type": "text",
+      "id": "video_aria_label",
+      "label": "Video accessible label",
+      "default": "Product video",
+      "info": "Used by screen readers."
+    },
+
+    { "type": "header", "content": "Playback" },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Autoplay",
+      "default": true,
+      "info": "Browsers require muted videos to autoplay - muted will be forced when this is on."
+    },
+    {
+      "type": "checkbox",
+      "id": "muted",
+      "label": "Muted",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "loop",
+      "label": "Loop",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "controls",
+      "label": "Show native video controls",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "playsinline",
+      "label": "Play inline on mobile",
+      "default": true,
+      "info": "Prevents iOS from auto-launching fullscreen. Forced on when autoplay is on."
+    },
+    {
+      "type": "checkbox",
+      "id": "pause_offscreen",
+      "label": "Pause when scrolled offscreen",
+      "default": true,
+      "info": "Saves battery and bandwidth."
+    },
+
+    { "type": "header", "content": "Colors" },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section background",
+      "default": "#0A0E1A"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "cta_bg",
+      "label": "CTA background",
+      "default": "#7AFFD9"
+    },
+    {
+      "type": "color",
+      "id": "cta_color",
+      "label": "CTA text color",
+      "default": "#0A0E1A"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Video overlay tint",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "default": 0,
+      "info": "Darkens the video for heading legibility. Set to 0 for no tint."
+    },
+
+    { "type": "header", "content": "Typography" },
+    {
+      "type": "text",
+      "id": "heading_font_family",
+      "label": "Heading font family",
+      "default": "Nohemi, sans-serif",
+      "info": "Use the exact font name as registered in the theme. Include a generic fallback (e.g. 'Nohemi, sans-serif')."
+    },
+    {
+      "type": "range",
+      "id": "heading_size_mobile",
+      "label": "Heading size (mobile)",
+      "min": 24,
+      "max": 64,
+      "step": 1,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "heading_size_desktop",
+      "label": "Heading size (desktop)",
+      "min": 32,
+      "max": 120,
+      "step": 1,
+      "unit": "px",
+      "default": 72
+    },
+    {
+      "type": "range",
+      "id": "heading_line_height",
+      "label": "Heading line height",
+      "min": 0.9,
+      "max": 1.6,
+      "step": 0.1,
+      "default": 1.1
+    },
+    {
+      "type": "range",
+      "id": "heading_weight",
+      "label": "Heading font weight",
+      "min": 100,
+      "max": 900,
+      "step": 100,
+      "default": 400
+    },
+    {
+      "type": "range",
+      "id": "cta_radius",
+      "label": "CTA border radius",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "default": 50
+    }
+  ],
+  "presets": [
+    {
+      "name": "CTR PDP Video",
+      "category": "Custom"
+    }
+  ]
+}
+{% endschema %}

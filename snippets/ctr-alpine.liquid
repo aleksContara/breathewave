@@ -1,0 +1,45 @@
+{%- comment -%} Alpine.js — loaded only on ctr-pdp-otp / starter product templates {%- endcomment -%}
+{{ 'ctr-pdp-design-system.css' | asset_url | stylesheet_tag }}
+<script>
+  window.Shopify = window.Shopify || {};
+  Shopify.money_format = {{ shop.money_format | json }};
+  if (typeof Shopify.formatMoney !== 'function') {
+    Shopify.formatMoney = function (cents, format) {
+      if (typeof cents === 'string') cents = cents.replace('.', '');
+      format = format || Shopify.money_format;
+      if (!format) format = '${{ "{{" }}amount{{ "}}" }}';
+      var value = '';
+      var placeholder = /\{\{\s*(\w+)\s*\}\}/;
+      function formatWithDelimiters(number, precision, thousands, decimal) {
+        thousands = thousands || ',';
+        decimal = decimal || '.';
+        if (isNaN(number) || number == null) return '0';
+        number = (number / 100.0).toFixed(precision);
+        var parts = number.split('.');
+        var dollars = parts[0].replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1' + thousands);
+        var centsPart = parts[1] ? decimal + parts[1] : '';
+        return dollars + centsPart;
+      }
+      var match = format.match(placeholder);
+      if (!match) return String(cents / 100);
+      switch (match[1]) {
+        case 'amount':
+          value = formatWithDelimiters(cents, 2);
+          break;
+        case 'amount_no_decimals':
+          value = formatWithDelimiters(cents, 0);
+          break;
+        case 'amount_with_comma_separator':
+          value = formatWithDelimiters(cents, 2, '.', ',');
+          break;
+        default:
+          value = formatWithDelimiters(cents, 2);
+      }
+      return format.replace(placeholder, value);
+    };
+  }
+</script>
+<script src="{{ '_alpinejs.collapse.min.js' | asset_url }}" defer></script>
+<script src="{{ '_alpinejs.intersect.min.js' | asset_url }}" defer></script>
+<script src="{{ 'ctr-pdp.js' | asset_url }}" defer></script>
+<script src="{{ '_alpinejs.min.js' | asset_url }}" defer></script>
